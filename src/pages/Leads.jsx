@@ -2,7 +2,7 @@ import React from 'react'
 
 const Leads = () => {
   return (
-    <div>Welcome, this is Leads</div>
+    <div><h1>Welcome, this is Leads</h1></div>
   )
 }
 

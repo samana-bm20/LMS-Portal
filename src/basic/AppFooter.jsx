@@ -1,12 +1,23 @@
 // src/components/AppFooter.js
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+const drawerWidth = 240;
 
-const AppFooter = () => (
-  <Box sx={{ p: 2, mt: 'auto', backgroundColor: '#f5f5f5', textAlign: 'center' }}>
-    <Typography variant="body2" color="textSecondary">
-      © {new Date().getFullYear()} My App. All rights reserved.
-    </Typography>
+const AppFooter = ({ open }) => (
+  <Box
+    className='p-4 bg-gray-100 text-center shadow-md text-sm text-gray-600 flex justify-between item-center'
+    sx={{
+      w: open ? `calc(auto - ${drawerWidth}px)` : 'auto',
+      ml: open ? `${drawerWidth}px` : 0,
+      transition: 'width 0.3s ease, margin-left 0.3s ease'
+    }}
+  >
+    <div>
+        © {new Date().getFullYear()} LMS
+      </div>
+      <div>
+        All rights reserved by ML Infomap.
+      </div>
   </Box>
 );
 

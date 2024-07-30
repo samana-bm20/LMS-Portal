@@ -1,12 +1,10 @@
 import React from 'react';
-import { createBrowserRouter, RouterProvider, Routes } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoutes';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard'
 import Leads from '../pages/Leads'
 import { useAuth } from '../providers/AuthProvider';
 import MainLayout from '../layout/MainLayout';
-
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -37,38 +35,8 @@ const AppRoutes = () => {
       }
     ]);
 
-  //   const router = createBrowserRouter([
-  //   {
-  //     path: '/',
-  //     element: <Login />,
-  //   },
-  //   {
-  //     path: '/dashboard',
-  //     element: <ProtectedRoute element={<MainLayout />} />,
-  //     children: [
-  //       {
-  //         path: '/dashboard',
-  //         element: <ProtectedRoute element={<Dashboard />} />,
-  //       },
-  //       {
-  //         path: '/menu',
-  //         element: <ProtectedRoute element={<Menu />} />,
-  //       },
-  //       {
-  //         path: '/about',
-  //         element: <ProtectedRoute element={<About />} />,
-  //       },
-  //       {
-  //         path: '/contact',
-  //         element: <ProtectedRoute element={<Contact />} />,
-  //       },
-  //     ],
-  //   },
-  // ]);
-
   return (
     <RouterProvider router={router} />
-
   )
 };
 

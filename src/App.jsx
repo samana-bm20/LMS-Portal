@@ -2,12 +2,16 @@
 import React from 'react';
 import { AuthProvider } from './providers/AuthProvider';
 import AppRoutes from './router/Routes';
+import { ThemeProvider } from '@mui/material';
+import theme from './theme';
 
 const App = () => (
   <>
-    <AuthProvider>
+    <ThemeProvider theme={theme}>
+      <AuthProvider>
         <AppRoutes />
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </>
 );
 

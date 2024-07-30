@@ -1,34 +1,44 @@
 // src/layouts/MainLayout.js
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Box, Toolbar } from '@mui/material';
-import AppBar from '../basic/AppBar';
+import AppHeader from '../basic/AppHeader';
 import AppDrawer from '../basic/AppDrawer'
 import AppFooter from '../basic/AppFooter'
 import { Outlet } from 'react-router-dom';
+const drawerWidth = 240;
 
 const MainLayout = () => {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const drawerShow = useSelector((state) => state.drawerShow)
+  const dispatch = useDispatch();
 
   const handleDrawerToggle = () => {
-    setDrawerOpen(!drawerOpen);
-  };
+    dispatch({ type: 'set', drawerShow: !drawerShow })
+  }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar onMenuClick={handleDrawerToggle} />
-      <AppDrawer open={drawerOpen} onClose={handleDrawerToggle} />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh'
+      }}
+    >
+      <AppHeader onMenuClick={handleDrawerToggle} open={drawerShow}/>
+      <AppDrawer open={drawerShow} onClose={handleDrawerToggle} />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-          ml: { sm: `${240}px` }, // Adjust margin based on drawer width
+          ml: drawerShow ? `${drawerWidth}px` : 0,
+          transition: 'width 0.3s ease, margin-left 0.3s ease'
         }}
       >
         <Toolbar />
         <Outlet />
       </Box>
-      <AppFooter />
+      <AppFooter open={drawerShow}/>
     </Box>
   );
 };
