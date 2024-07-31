@@ -4,7 +4,7 @@ import {
 } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import RoutesConfig from './RoutesConfig';
-import Logo from '../assets/newLogo.svg'
+import Logo from '../assets/Logo/newLogo.svg'
 
 const drawerWidth = 240;
 
@@ -47,7 +47,8 @@ const AppDrawer = ({ open, onClose }) => {
       <List>
         {RoutesConfig.map((route, index) => (
           <ListItemButton component={Link} to={route.to} key={route.to}
-            selected={selectedIndex == index}
+            // selected={selectedIndex === index}
+            autoFocus={selectedIndex === index}
             sx={{
               '&:hover': {
                 backgroundColor: 'primary.dark',
@@ -58,7 +59,7 @@ const AppDrawer = ({ open, onClose }) => {
                 color: 'primary.contrastText',
                 borderRadius: '10px',
                 ml: '5px', mr: '5px', mt: '1px', mb: '1px'
-              }
+              },
             }}
           >
             <ListItemIcon primary={route.name} sx={{ color: '#fff' }}>{route.icon}</ListItemIcon>
