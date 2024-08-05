@@ -1,18 +1,25 @@
 // src/App.js
 import React from 'react';
 import { AuthProvider } from './providers/AuthProvider';
+import { ModeProvider } from './providers/ModeProvider';
 import AppRoutes from './router/Routes';
-import { ThemeProvider } from '@mui/material';
-import theme from './theme';
+import { Theme } from './Theme'
+import { CssBaseline } from '@mui/material';
 
-const App = () => (
-  <>
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </ThemeProvider>
-  </>
-);
+const App = () => {
+
+  return (
+    <>
+      <ModeProvider>
+        <Theme>
+          <CssBaseline />
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </Theme>
+      </ModeProvider>
+    </>
+  );
+}
 
 export default App;

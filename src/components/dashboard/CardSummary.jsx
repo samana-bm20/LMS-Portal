@@ -89,13 +89,13 @@ const Card1 = ({ color, title, count, icon }) => (
 
 const Card2 = ({ color, title, total, active, dead, icon, alt }) => (
     <div className={`${color} text-white shadow-md rounded-lg p-4 m-2`}>
-        <div className='text-2xl font-semibold mb-2'>{title}</div>
+        <div className='text-xl font-semibold mb-2'>{title}</div>
         <div className="flex">
             <div className="flex-grow">
                 <div className="text-lg font-semibold">
                     <p>Total Leads</p>
                 </div>
-                <div className="text-xl font-semibold mb-2">
+                <div className="text-lg font-semibold mb-2">
                     <p>{total}</p>
                 </div>
             </div>

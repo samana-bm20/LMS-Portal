@@ -5,12 +5,15 @@ import {
 import { Link, useLocation } from 'react-router-dom';
 import RoutesConfig from './RoutesConfig';
 import Logo from '../assets/Logo/newLogo.svg'
+import blackLogo from '../assets/Logo/blackLogo.svg'
+import { useMode } from '../providers/ModeProvider';
 
 const drawerWidth = 240;
 
 const AppDrawer = ({ open, onClose }) => {
   const location = useLocation();
   const [selectedIndex, setSelectedIndex] = useState();
+  const { mode } = useMode();
 
   useEffect(() => {
     const currentPath = location.pathname;
@@ -29,8 +32,8 @@ const AppDrawer = ({ open, onClose }) => {
         '& .MuiDrawer-paper': {
           width: drawerWidth,
           boxSizing: 'border-box',
-          backgroundColor: '#0245A3',
-          color: '#fff',
+          backgroundColor: 'primary.main',
+          color: 'primary.contrastText',
         },
       }}
     >
@@ -39,11 +42,11 @@ const AppDrawer = ({ open, onClose }) => {
           <img
             className="h-20 w-40 object-fill m-2"
             alt="ML INFOMAP"
-            src={Logo}
+            src={mode == 'light' ? Logo : blackLogo}
           />
         </div>
       </div>
-      <Divider />
+      <Divider sx={{backgroundColor: 'divider'}}/>
       <List>
         {RoutesConfig.map((route, index) => (
           <ListItemButton component={Link} to={route.to} key={route.to}
@@ -62,7 +65,7 @@ const AppDrawer = ({ open, onClose }) => {
               },
             }}
           >
-            <ListItemIcon primary={route.name} sx={{ color: '#fff' }}>{route.icon}</ListItemIcon>
+            <ListItemIcon primary={route.name} sx={{ color: 'primary.contrastText' }}>{route.icon}</ListItemIcon>
             <ListItemText primary={route.name} />
           </ListItemButton>
         ))}

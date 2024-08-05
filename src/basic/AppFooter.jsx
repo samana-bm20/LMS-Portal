@@ -5,8 +5,10 @@ const drawerWidth = 240;
 
 const AppFooter = ({ open }) => (
   <Box
-    className='p-4 bg-gray-100 text-center shadow-md text-sm text-gray-600 flex justify-between item-center'
+    className='p-4 text-center shadow-md text-sm text-gray-600 flex justify-between item-center'
     sx={{
+      backgroundColor: 'background.footer',
+      color: 'text.secondary',
       w: open ? `calc(auto - ${drawerWidth}px)` : 'auto',
       ml: open ? `${drawerWidth}px` : 0,
       transition: 'width 0.3s ease, margin-left 0.3s ease'
