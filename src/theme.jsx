@@ -41,26 +41,3 @@ export const Theme = ({children}) => {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
 
-// export default getTheme;
-
-// const theme = createTheme({
-//   palette: {
-//     primary: {
-//       main: '#0245A3', //'#1976d2'
-//       light: '#c9e5ff',
-//       dark: '#013073',
-//       contrastText: '#fff',
-//     },
-//     secondary: {
-//       main: '#dc004e',
-//     },
-//     text: {
-//       main: '#fff',
-//     }
-//   },
-//   typography: {
-//     fontFamily: '"Helvetica", "Roboto", "Arial", "sans-serif"',
-//   },
-// });
-
-// export default theme;
