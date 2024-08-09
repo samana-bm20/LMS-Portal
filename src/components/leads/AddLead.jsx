@@ -1,43 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types';
-import { Box, Tabs, Tab, TextField, alpha, useTheme } from '@mui/material'
-
-function CustomTabPanel(props) {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
-            {...other}
-        >
-            {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-        </div>
-    );
-}
-
-CustomTabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
+import { Box, TextField, InputLabel, Select, MenuItem, FormControl, alpha, useTheme } from '@mui/material'
+import Config from '../../Config';
+import axios from 'axios';
 
 const AddLead = ({ handleLeadDataChange }) => {
     const theme = useTheme();
     const primaryColorWithOpacity = alpha(theme.palette.primary.main, 0.1); // Adjust opacity as needed
-    const [value, setValue] = useState(0);
     const [leadID, setLeadID] = useState('');
+    const [product, setProduct] = useState('');
+    const [status, setStatus] = useState('');
     const [newLeadData, setNewLeadData] = useState({
-        LID: '',
+        LID: 0,
         name: '',
         designationDept: '',
         organizationName: '',
@@ -46,25 +19,55 @@ const AddLead = ({ handleLeadDataChange }) => {
             emailID: ''
         },
         address: '',
-        product: '',
+        PID: '',
+        pName: '',
         status: '',
         source: '',
         assignedTo: ''
     });
+    const productOptions = {
+        'P1': 'Business Analyst',
+        'P2': 'EIGAP',
+        'P3': 'MapData',
+        'P4': 'LRS',
+      };
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
-
+    //#region Max LID
     useEffect(() => {
-        handleLeadDataChange(newLeadData);
-    }, [newLeadData, handleLeadDataChange]);
+        const getMaxLID = async () => {
+            try {
+                const response = await axios.get(`${Config.apiUrl}/getMaxLID`);
+                setLeadID(response.data[0].LID);
+                setNewLeadData((prev) => ({
+                    ...prev,
+                    LID: parseInt(response.data[0].LID + 1, 10),
+                }));
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        getMaxLID();
+    }, []);
 
+    //#region Field Change
     const handleNewLeadChange = (e) => {
         const { name, value } = e.target;
+        if (name == 'status') {
+            setStatus(value);
+        }
         setNewLeadData((prev) => ({
             ...prev,
             [name]: value,
+        }));
+    };
+
+    const handleProductChange = (e) => {
+        const { name, value } = e.target;
+        setProduct(value);
+        setNewLeadData((prev) => ({
+            ...prev,
+            PID: value,
+            [name]: productOptions[value],
         }));
     };
 
@@ -79,135 +82,144 @@ const AddLead = ({ handleLeadDataChange }) => {
         }));
     };
 
+    //#region Form Data
+    useEffect(() => {
+        handleLeadDataChange(newLeadData);
+    }, [newLeadData, handleLeadDataChange]);
+
     return (
-        <Box sx={{ width: '100%' }}>
-
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="New Lead" {...a11yProps(0)} />
-                    <Tab label="Existing Lead" {...a11yProps(1)} />
-                </Tabs>
-            </Box>
-
-            <CustomTabPanel value={value} index={0}>
-                <Box className="p-4 rounded-lg shadow-md" component="form"
-                    sx={{backgroundColor: primaryColorWithOpacity} }>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div className="mb-2">
-                            <TextField
-                                required
-                                name='LID'
-                                id="outlined-required"
-                                label="LID"
-                                size='small'
-                                onChange={handleNewLeadChange}
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <TextField
-                                required
-                                name='name'
-                                id="outlined-required"
-                                label="Lead Name"
-                                size='small'
-                                onChange={handleNewLeadChange}
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <TextField
-                                name='mobileNo'
-                                id="outlined"
-                                label="Contact"
-                                size='small'
-                                onChange={handleNestedChange}
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <TextField
-                                name='emailID'
-                                id="outlined"
-                                label="Email ID"
-                                size='small'
-                                onChange={handleNestedChange}
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <TextField
-                                name='designationDept'
-                                id="outlined"
-                                label="Designation/Dept."
-                                size='small'
-                                onChange={handleNewLeadChange}
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <TextField
-                                required
-                                name='organizationName'
-                                id="outlined-required"
-                                label="Organization"
-                                size='small'
-                                onChange={handleNewLeadChange}
-                            />
-                        </div>
-                    </div>
-                    <div className='mt-2 mb-4'>
-                        <TextField
-                            name='address'
-                            id="outlined"
-                            label="Address"
-                            fullWidth
-                            onChange={handleNewLeadChange}
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div className="mb-2">
-                            <TextField
-                                required
-                                name='product'
-                                id="outlined-required"
-                                label="Product"
-                                size='small'
-                                onChange={handleNewLeadChange}
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <TextField
-                                required
-                                name='status'
-                                id="outlined-required"
-                                label="Status"
-                                size='small'
-                                onChange={handleNewLeadChange}
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <TextField
-                                required
-                                name='source'
-                                id="outlined-required"
-                                label="Source"
-                                size='small'
-                                onChange={handleNewLeadChange}
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <TextField
-                                required
-                                name='assignedTo'
-                                id="outlined-required"
-                                label="Assigned To"
-                                size='small'
-                                onChange={handleNewLeadChange}
-                            />
-                        </div>
-                    </div>
-                </Box>
-            </CustomTabPanel>
-
-            <CustomTabPanel value={value} index={1}>
-                Existing Lead
-            </CustomTabPanel>
+        <Box className="p-4 rounded-lg shadow-md" component="form"
+            sx={{ backgroundColor: primaryColorWithOpacity }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="mb-2">
+                    <TextField
+                        required
+                        name='LID'
+                        id="outlined-required"
+                        label="LID"
+                        size='small'
+                        value={leadID + 1}
+                        disabled
+                    // onChange={handleNewLeadChange}
+                    />
+                </div>
+                <div className="mb-2">
+                    <TextField
+                        required
+                        name='name'
+                        id="outlined-required"
+                        label="Lead Name"
+                        size='small'
+                        onChange={handleNewLeadChange}
+                    />
+                </div>
+                <div className="mb-2">
+                    <TextField
+                        name='mobileNo'
+                        id="outlined"
+                        label="Contact"
+                        size='small'
+                        onChange={handleNestedChange}
+                    />
+                </div>
+                <div className="mb-2">
+                    <TextField
+                        name='emailID'
+                        id="outlined"
+                        label="Email ID"
+                        size='small'
+                        onChange={handleNestedChange}
+                    />
+                </div>
+                <div className="mb-2">
+                    <TextField
+                        name='designationDept'
+                        id="outlined"
+                        label="Designation/Dept."
+                        size='small'
+                        onChange={handleNewLeadChange}
+                    />
+                </div>
+                <div className="mb-2">
+                    <TextField
+                        required
+                        name='organizationName'
+                        id="outlined-required"
+                        label="Organization"
+                        size='small'
+                        onChange={handleNewLeadChange}
+                    />
+                </div>
+            </div>
+            <div className='mt-2 mb-4'>
+                <TextField
+                    name='address'
+                    id="outlined"
+                    label="Address"
+                    fullWidth
+                    onChange={handleNewLeadChange}
+                />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="mb-2">
+                <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Product Name</InputLabel>
+                    <Select
+                        name='pName'
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Product Name"
+                        value={product}
+                        onChange={handleProductChange}
+                        size='small'
+                    >
+                        <MenuItem value='P1'>Business Analyst</MenuItem>
+                        <MenuItem value='P2'>EIGAP</MenuItem>
+                        <MenuItem value='P3'>MapData</MenuItem>
+                        <MenuItem value='P4'>LRS</MenuItem>
+                    </Select>
+                    </FormControl>
+                </div>
+                <div className="mb-2">
+                <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                    <Select
+                        name='status'
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Status"
+                        value={status}
+                        onChange={handleNewLeadChange}
+                        size='small'
+                    >
+                        <MenuItem value='spoke'>spoke</MenuItem>
+                        <MenuItem value='proposal sent'>proposal sent</MenuItem>
+                        <MenuItem value='active'>active</MenuItem>
+                        <MenuItem value='inactive'>inactive</MenuItem>
+                    </Select>
+                    </FormControl>
+                </div>
+                <div className="mb-2">
+                    <TextField
+                        required
+                        name='source'
+                        id="outlined-required"
+                        label="Source"
+                        size='small'
+                        onChange={handleNewLeadChange}
+                    />
+                </div>
+                <div className="mb-2">
+                    <TextField
+                        required
+                        name='assignedTo'
+                        id="outlined-required"
+                        label="Assigned To"
+                        size='small'
+                        onChange={handleNewLeadChange}
+                    />
+                </div>
+            </div>
         </Box>
     );
 }

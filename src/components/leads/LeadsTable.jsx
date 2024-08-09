@@ -9,19 +9,28 @@ import {
 } from 'material-react-table';
 
 import {
-    Box, Button, ListItemIcon, MenuItem, lighten, FormControl, InputLabel, Select
+    Box, Button, ListItemIcon, MenuItem, lighten, FormControl, InputLabel, Select, Dialog,
+    DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
 
 //Icons Imports
-import { AccountCircleRounded, AddCommentRounded, ChangeCircleRounded } from '@mui/icons-material';
+import { AccountCircleRounded, AddCommentRounded, AddShoppingCartRounded } from '@mui/icons-material';
+
+import AddProduct from './AddProduct';
 
 const LeadsTable = () => {
     const [data, setData] = useState([]);
     const [product, setProduct] = useState('All');
+    const [openAddProduct, setOpenAddProduct] = useState(false);
 
+    //#region Fetch Data
     const handleProductChange = (event) => {
         setProduct(event.target.value);
     };
+
+    const closeAddProduct = () => {
+        setOpenAddProduct(false);
+    }
 
     useEffect(() => {
         const fetchLeadsData = async () => {
@@ -35,6 +44,7 @@ const LeadsTable = () => {
         fetchLeadsData();
     }, [product]);
 
+    //#region Table Column
     const columns = useMemo(
         () => [
             {
@@ -115,6 +125,7 @@ const LeadsTable = () => {
         [],
     );
 
+    //#region Top Toolbar
     // const handleDeactivate = () => {
     //     table.getSelectedRowModel().flatRows.map((row) => {
     //         alert('deactivating ' + row.getValue('name'));
@@ -150,7 +161,7 @@ const LeadsTable = () => {
             <Box>
                 <Box sx={{ display: 'flex', gap: '0.5rem', minWidth: 200 }}>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Product Name</InputLabel>
+                        <InputLabel id="demo-simple-select-label" className='pb-2'>Product Name</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
@@ -195,6 +206,7 @@ const LeadsTable = () => {
         </Box>
     );
 
+    //#region Table
     const table = useMaterialReactTable({
         columns,
         data,
@@ -259,21 +271,41 @@ const LeadsTable = () => {
             <MenuItem
                 key={2}
                 onClick={() => {
-                    // Send email logic...
+                    setOpenAddProduct(true);
                     closeMenu();
                 }}
                 sx={{ m: 0 }}
             >
                 <ListItemIcon>
-                    <ChangeCircleRounded color='primary' />
+                    <AddShoppingCartRounded color='primary' />
                 </ListItemIcon>
-                Change Status
+                Add Product
             </MenuItem>,
         ],
         renderTopToolbar,
     });
 
-    return <MaterialReactTable table={table} />;
+
+    return (
+        <>
+            <MaterialReactTable table={table} />
+            <Dialog
+                open={openAddProduct}
+                onClose={closeAddProduct}
+            >
+                <DialogTitle>Add Lead</DialogTitle>
+                <DialogContent>
+                    <AddProduct />
+                </DialogContent>
+                <DialogActions>
+                    <div className='m-4'>
+                        <Button onClick={closeAddProduct}>Cancel</Button>
+                        <Button variant='contained' >Submit</Button>
+                    </div>
+                </DialogActions>
+            </Dialog>
+        </>
+    );
 };
 
 export default LeadsTable;

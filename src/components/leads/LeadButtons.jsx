@@ -9,6 +9,8 @@ const LeadButtons = () => {
     const [openAddLeadDialog, setOpenAddLeadDialog] = useState(false);
     const [addLeadData, setAddLeadData] = useState([]);
     const [addLeadError, setAddLeadError] = useState(false);
+    const [addErrorMessage, setAddErrorMessage] = useState('');
+    const [addLeadSuccess, setAddLeadSuccess] = useState(false);
 
     const openAddLead = () => {
         setOpenAddLeadDialog(true);
@@ -23,27 +25,43 @@ const LeadButtons = () => {
     }, []);
 
     const handleAddLead = async () => {
-        if (!addLeadData.name || !addLeadData.organizationName || !addLeadData.product ||
+        if (!addLeadData.name || !addLeadData.organizationName || !addLeadData.pName ||
             !addLeadData.status || !addLeadData.source || !addLeadData.assignedTo) {
+            setAddErrorMessage('Required fields cannot be empty.')
+            setAddLeadError(true);
+            return;
+        }
+        try {
+            debugger
+            const response = await axios.post(`${Config.apiUrl}/addLead`, addLeadData);
+            console.log(response.data);
+            setOpenAddLeadDialog(false);
+            setAddLeadSuccess(true);
+            setAddErrorMessage('');
+        } catch (error) {
+            if (error.response && error.response.data) {
                 setAddLeadError(true);
-                return;
-            } 
-            try {
-                const response = await axios.post(`${Config.apiUrl}/addLead`, addLeadData);
-                console.log(response.status);
-                setOpenAddLeadDialog(false);
-            } catch (error) {
-                
+                setAddErrorMessage(error.response.data);
+            } else {
+                setAddErrorMessage('An unexpected error occurred.');
             }
+        }
     };
 
     const addLeadErrorClose = (event, reason) => {
         if (reason === 'clickaway') {
-          return;
+            return;
         }
         setAddLeadError(false);
-      };
-    
+    };
+
+    const addLeadSuccessClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setAddLeadSuccess(false);
+    };
+
 
     return (
         <div className="flex flex-col md:flex-row justify-end space-x-reverse p-2 m-1 ">
@@ -77,9 +95,19 @@ const LeadButtons = () => {
                 autoHideDuration={2000}
                 onClose={addLeadErrorClose}>
                 <Alert onClose={addLeadErrorClose} severity="error" variant='filled'>
-                    Required fields cannot be empty
+                    {addErrorMessage}
                 </Alert>
             </Snackbar>
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={addLeadSuccess}
+                autoHideDuration={2000}
+                onClose={addLeadSuccessClose}>
+                <Alert onClose={addLeadSuccessClose} severity="success" variant='filled'>
+                    New lead added successfully!
+                </Alert>
+            </Snackbar>
+
             {/* Import Lead */}
             <Button
                 sx={{ m: '5px' }}
