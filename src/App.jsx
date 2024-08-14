@@ -1,11 +1,13 @@
-// src/App.js
 import React from 'react';
-import { AuthProvider } from './providers/AuthProvider';
-import { ModeProvider } from './providers/ModeProvider';
-import { DetailsProvider } from './providers/DetailsProvider';
 import AppRoutes from './router/Routes';
 import { Theme } from './Theme'
 import { CssBaseline } from '@mui/material';
+
+//providers
+import { AuthProvider } from './providers/AuthProvider';
+import { ModeProvider } from './providers/ModeProvider';
+import { DetailsProvider } from './providers/DetailsProvider';
+import { FetchLeadsProvider } from './providers/FetchLeadsProvider';
 
 const App = () => {
 
@@ -16,7 +18,9 @@ const App = () => {
           <CssBaseline />
           <AuthProvider>
             <DetailsProvider>
-              <AppRoutes />
+              <FetchLeadsProvider>
+                <AppRoutes />
+              </FetchLeadsProvider>
             </DetailsProvider>
           </AuthProvider>
         </Theme>

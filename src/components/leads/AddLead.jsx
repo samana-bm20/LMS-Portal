@@ -5,15 +5,14 @@ import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 
 const AddLead = ({ handleLeadDataChange }) => {
-    const { statusValues, productValues, userValues } = useDetails();
     const theme = useTheme();
-    const primaryColorWithOpacity = alpha(theme.palette.primary.main, 0.1); // Adjust opacity as needed
+    const { statusValues, productValues, userValues } = useDetails();
+    const primaryColorWithOpacity = alpha(theme.palette.background.footer, 0.5);
     const [leadID, setLeadID] = useState('');
     const [product, setProduct] = useState('');
     const [status, setStatus] = useState('');
     const [assignedTo, setAssignedTo] = useState('');
     const [newLeadData, setNewLeadData] = useState({
-        LID: 0,
         name: '',
         designationDept: '',
         organizationName: '',
@@ -34,10 +33,6 @@ const AddLead = ({ handleLeadDataChange }) => {
             try {
                 const response = await axios.get(`${Config.apiUrl}/getMaxLID`);
                 setLeadID(response.data[0].LID);
-                setNewLeadData((prev) => ({
-                    ...prev,
-                    LID: parseInt(response.data[0].LID + 1, 10),
-                }));
             } catch (error) {
                 console.error(error);
             }

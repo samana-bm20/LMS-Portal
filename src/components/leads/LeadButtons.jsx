@@ -4,14 +4,17 @@ import { AddCircleRounded, FileUploadRounded } from '@mui/icons-material'
 import AddLead from './AddLead'
 import Config from '../../Config';
 import axios from 'axios';
+import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 
 const LeadButtons = () => {
+    const { fetchLeadsData } = useFetchLeads();
     const [openAddLeadDialog, setOpenAddLeadDialog] = useState(false);
     const [addLeadData, setAddLeadData] = useState([]);
-    const [addLeadError, setAddLeadError] = useState(false);
-    const [addErrorMessage, setAddErrorMessage] = useState('');
-    const [addLeadSuccess, setAddLeadSuccess] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
 
+    //#region Add Lead Dialog
     const openAddLead = () => {
         setOpenAddLeadDialog(true);
     }
@@ -24,40 +27,42 @@ const LeadButtons = () => {
         setAddLeadData(data);
     }, []);
 
+    //#region Add Lead
     const handleAddLead = async () => {
         if (!addLeadData.name || !addLeadData.organizationName || !addLeadData.PID ||
             !addLeadData.SID || !addLeadData.source || !addLeadData.UID) {
-            setAddErrorMessage('Required fields cannot be empty.')
-            setAddLeadError(true);
+            setErrorMessage('Required fields cannot be empty.')
+            setError(true);
             return;
         }
         try {
             const _ = await axios.post(`${Config.apiUrl}/addLead`, addLeadData);
+            fetchLeadsData();
             setOpenAddLeadDialog(false);
-            setAddLeadSuccess(true);
-            setAddErrorMessage('');
+            setSuccess(true);
+            setErrorMessage('');
         } catch (error) {
             if (error.response && error.response.data) {
-                setAddLeadError(true);
-                setAddErrorMessage(error.response.data);
+                setError(true);
+                setErrorMessage(error.response.data);
             } else {
-                setAddErrorMessage('An unexpected error occurred.');
+                setErrorMessage('An unexpected error occurred.');
             }
         }
     };
 
-    const addLeadErrorClose = (event, reason) => {
+    const errorClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setAddLeadError(false);
+        setError(false);
     };
 
-    const addLeadSuccessClose = (event, reason) => {
+    const successClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setAddLeadSuccess(false);
+        setSuccess(false);
     };
 
 
@@ -89,19 +94,19 @@ const LeadButtons = () => {
             </Dialog>
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={addLeadError}
+                open={error}
                 autoHideDuration={2000}
-                onClose={addLeadErrorClose}>
-                <Alert onClose={addLeadErrorClose} severity="error" variant='filled'>
-                    {addErrorMessage}
+                onClose={errorClose}>
+                <Alert onClose={errorClose} severity="error" variant='filled'>
+                    {errorMessage}
                 </Alert>
             </Snackbar>
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={addLeadSuccess}
+                open={success}
                 autoHideDuration={2000}
-                onClose={addLeadSuccessClose}>
-                <Alert onClose={addLeadSuccessClose} severity="success" variant='filled'>
+                onClose={successClose}>
+                <Alert onClose={successClose} severity="success" variant='filled'>
                     New lead added successfully!
                 </Alert>
             </Snackbar>

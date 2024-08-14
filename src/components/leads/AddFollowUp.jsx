@@ -6,14 +6,16 @@ import {
 import Config from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
+import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 
 const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => {
     const theme = useTheme();
+    const { fetchLeadsData } = useFetchLeads();
     const { statusValues } = useDetails();
-    const primaryColorWithOpacity = alpha(theme.palette.primary.main, 0.1);
-    const [addErrorMessage, setAddErrorMessage] = useState('');
-    const [addFollowUpError, setAddFollowUpError] = useState(false);
-    const [addFollowUpSuccess, setAddFollowUpSuccess] = useState(false);
+    const primaryColorWithOpacity = alpha(theme.palette.background.footer, 0.5);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
     const [status, setStatus] = useState('');
     const [type, setType] = useState('');
     const [nextType, setNextType] = useState('');
@@ -69,41 +71,42 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
     }
     //#region Add Follow-up
     const handleAddFollowUp = async () => {
-        debugger
         if (!followUpData.date || !followUpData.type || !followUpData.remarks || !followUpData.SID) {
-            setAddErrorMessage('Required fields cannot be empty.')
-            setAddFollowUpError(true);
+            setErrorMessage('Required fields cannot be empty.')
+            setError(true);
             return;
         }
         try {
             const _ = await axios.post(`${Config.apiUrl}/addFollowUp`, followUpData);
+            fetchLeadsData();
             setOpenAddFollowUp(false);
-            setType(''); setNextType('');
-            setAddFollowUpSuccess(true);
-            setAddErrorMessage('');
+            setType('');
+            setNextType('');
+            setSuccess(true);
+            setErrorMessage('');
         } catch (error) {
             if (error.response && error.response.data) {
-                setAddFollowUpError(true);
-                setAddErrorMessage(error.response.data);
+                setError(true);
+                setErrorMessage(error.response.data);
             } else {
-                setAddErrorMessage('An unexpected error occurred.');
+                setErrorMessage('An unexpected error occurred.');
             }
         }
     };
 
     //#region Snackbar
-    const addFollowUpErrorClose = (event, reason) => {
+    const errorClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setAddFollowUpError(false);
+        setError(false);
     };
 
-    const addFollowUpSuccessClose = (event, reason) => {
+    const successClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setAddFollowUpSuccess(false);
+        setSuccess(false);
     };
 
     return (
@@ -182,19 +185,19 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <div className="mb-2">
-                                <TextField
-                                    name='nextDate'
-                                    id="outlined-required"
-                                    label="Next Follow-Up"
-                                    size='small'
-                                    type="datetime-local"
-                                    InputLabelProps={{ shrink: true }}
-                                    onChange={handleFollowUpChange}
-                                    fullWidth
-                                />
-                            </div>
-                            <div className="mb-3">
+                                <div className="mb-2">
+                                    <TextField
+                                        name='nextDate'
+                                        id="outlined-required"
+                                        label="Next Follow-Up"
+                                        size='small'
+                                        type="datetime-local"
+                                        InputLabelProps={{ shrink: true }}
+                                        onChange={handleFollowUpChange}
+                                        fullWidth
+                                    />
+                                </div>
+                                <div className="mb-3">
                                     <FormControl fullWidth>
                                         <InputLabel id="type-select-label">Type</InputLabel>
                                         <Select
@@ -227,19 +230,19 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
 
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={addFollowUpError}
+                open={error}
                 autoHideDuration={2000}
-                onClose={addFollowUpErrorClose}>
-                <Alert onClose={addFollowUpErrorClose} severity="error" variant='filled'>
-                    {addErrorMessage}
+                onClose={errorClose}>
+                <Alert onClose={errorClose} severity="error" variant='filled'>
+                    {errorMessage}
                 </Alert>
             </Snackbar>
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={addFollowUpSuccess}
+                open={success}
                 autoHideDuration={2000}
-                onClose={addFollowUpSuccessClose}>
-                <Alert onClose={addFollowUpSuccessClose} severity="success" variant='filled'>
+                onClose={successClose}>
+                <Alert onClose={successClose} severity="success" variant='filled'>
                     Follow-up added successfully!
                 </Alert>
             </Snackbar>

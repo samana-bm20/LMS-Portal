@@ -6,14 +6,16 @@ import {
 import Config from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
+import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 
 const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
     const theme = useTheme();
+    const { fetchLeadsData } = useFetchLeads();
     const { statusValues, productValues, userValues } = useDetails();
-    const primaryColorWithOpacity = alpha(theme.palette.primary.main, 0.1); // Adjust opacity as needed
-    const [addErrorMessage, setAddErrorMessage] = useState('');
-    const [addProductError, setAddProductError] = useState(false);
-    const [addProductSuccess, setAddProductSuccess] = useState(false);
+    const primaryColorWithOpacity = alpha(theme.palette.background.footer, 0.5);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
     const [product, setProduct] = useState('');
     const [status, setStatus] = useState('');
     const [assignedTo, setAssignedTo] = useState('');
@@ -61,39 +63,39 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
     //#region Add Product
     const handleAddProduct = async () => {
         if (!productData.PID || !productData.SID || !productData.source || !productData.UID) {
-            setAddErrorMessage('Required fields cannot be empty.')
-            setAddProductError(true);
+            setErrorMessage('Required fields cannot be empty.')
+            setError(true);
             return;
         }
         try {
-            const response = await axios.post(`${Config.apiUrl}/addProduct`, productData);
-            console.log(response.data);
+            const _ = await axios.post(`${Config.apiUrl}/addProduct`, productData);
+            fetchLeadsData();
             setOpenAddProduct(false);
-            setAddProductSuccess(true);
-            setAddErrorMessage('');
+            setSuccess(true);
+            setErrorMessage('');
         } catch (error) {
             if (error.response && error.response.data) {
-                setAddProductError(true);
-                setAddErrorMessage(error.response.data);
+                setError(true);
+                setErrorMessage(error.response.data);
             } else {
-                setAddErrorMessage('An unexpected error occurred.');
+                setErrorMessage('An unexpected error occurred.');
             }
         }
     };
 
     //#region Snackbar
-    const addProductErrorClose = (event, reason) => {
+    const errorClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setAddProductError(false);
+        setError(false);
     };
 
-    const addProductSuccessClose = (event, reason) => {
+    const successClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setAddProductSuccess(false);
+        setSuccess(false);
     };
 
     return (
@@ -185,19 +187,19 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
             </Dialog>
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={addProductError}
+                open={error}
                 autoHideDuration={2000}
-                onClose={addProductErrorClose}>
-                <Alert onClose={addProductErrorClose} severity="error" variant='filled'>
-                    {addErrorMessage}
+                onClose={errorClose}>
+                <Alert onClose={errorClose} severity="error" variant='filled'>
+                    {errorMessage}
                 </Alert>
             </Snackbar>
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={addProductSuccess}
+                open={success}
                 autoHideDuration={2000}
-                onClose={addProductSuccessClose}>
-                <Alert onClose={addProductSuccessClose} severity="success" variant='filled'>
+                onClose={successClose}>
+                <Alert onClose={successClose} severity="success" variant='filled'>
                     New product added successfully!
                 </Alert>
             </Snackbar>

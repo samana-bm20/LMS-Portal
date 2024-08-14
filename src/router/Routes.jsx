@@ -1,10 +1,13 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { useAuth } from '../providers/AuthProvider';
+import MainLayout from '../layout/MainLayout';
+
+//pages
 import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard'
 import Leads from '../pages/Leads'
-import { useAuth } from '../providers/AuthProvider';
-import MainLayout from '../layout/MainLayout';
+import Tasks from '../pages/Tasks';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -20,6 +23,10 @@ const AppRoutes = () => {
         {
           path: '/leads',
           element: <Leads />
+        },
+        {
+          path: '/tasks',
+          element: <Tasks />
         },
       ],
     },

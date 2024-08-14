@@ -15,13 +15,13 @@ import {
 //Icons Imports
 import { AccountCircleRounded, AddCommentRounded, AddShoppingCartRounded } from '@mui/icons-material';
 
+import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import ViewProfile from './ViewProfile';
 import AddFollowUp from './AddFollowUp';
 import AddProduct from './AddProduct';
 
 const LeadsTable = () => {
-    const [data, setData] = useState([]);
-    const [product, setProduct] = useState('All');
+    const { fetchLeadsData, data, product, setProduct} = useFetchLeads();
     const [openViewProfile, setOpenViewProfile] = useState(false);
     const [openAddFollowUp, setOpenAddFollowUp] = useState(false);
     const [openAddProduct, setOpenAddProduct] = useState(false);
@@ -34,16 +34,7 @@ const LeadsTable = () => {
         setProduct(event.target.value);
     };
 
-
     useEffect(() => {
-        const fetchLeadsData = async () => {
-            try {
-                const response = await axios.get(`${Config.apiUrl}/leadData/${product}`);
-                setData(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
         fetchLeadsData();
     }, [product]);
 
