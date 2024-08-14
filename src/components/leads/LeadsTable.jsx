@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import Config from '../../Config';
-import axios from 'axios';
 import {
     MaterialReactTable,
     useMaterialReactTable,
@@ -9,18 +7,12 @@ import {
 } from 'material-react-table';
 
 import {
-<<<<<<< HEAD
     Box, Button, ListItemIcon, MenuItem, lighten, FormControl, InputLabel, Select, useTheme
-=======
-    Box, Button, ListItemIcon, MenuItem, lighten, FormControl, InputLabel, Select, Dialog,
-    DialogTitle, DialogContent, DialogActions
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
 } from '@mui/material';
 
 //Icons Imports
 import { AccountCircleRounded, AddCommentRounded, AddShoppingCartRounded } from '@mui/icons-material';
 
-<<<<<<< HEAD
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import ViewProfile from './ViewProfile';
 import AddFollowUp from './AddFollowUp';
@@ -34,37 +26,13 @@ const LeadsTable = () => {
     const [leadID, setLeadID] = useState(0);
     const [productID, setProductID] = useState('');
     const [statusID, setStatusID] = useState('');
-=======
-import AddProduct from './AddProduct';
-
-const LeadsTable = () => {
-    const [data, setData] = useState([]);
-    const [product, setProduct] = useState('All');
-    const [openAddProduct, setOpenAddProduct] = useState(false);
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
 
     //#region Fetch Data
     const handleProductChange = (event) => {
         setProduct(event.target.value);
     };
 
-<<<<<<< HEAD
     useEffect(() => {
-=======
-    const closeAddProduct = () => {
-        setOpenAddProduct(false);
-    }
-
-    useEffect(() => {
-        const fetchLeadsData = async () => {
-            try {
-                const response = await axios.get(`${Config.apiUrl}/leadData/${product}`);
-                setData(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
         fetchLeadsData();
     }, [product]);
 
@@ -91,11 +59,7 @@ const LeadsTable = () => {
                 filterVariant: 'autocomplete',
                 header: 'Contact',
                 size: 100,
-<<<<<<< HEAD
                 Cell: ({ row }) => row.original.contact?.mobileNo ?? '--',
-=======
-                Cell: ({ row }) => row.original.contact?.mobileNo || '--',
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
             },
             {
                 accessorKey: 'contact.emailID',
@@ -103,7 +67,6 @@ const LeadsTable = () => {
                 filterVariant: 'autocomplete',
                 header: 'Email',
                 size: 100,
-<<<<<<< HEAD
                 Cell: ({ row }) => row.original.contact?.emailID ?? '--',
             },
             {
@@ -141,36 +104,6 @@ const LeadsTable = () => {
                         </Box>
                     );
                 },
-=======
-                Cell: ({ row }) => row.original.contact?.emailID || '--',
-            },
-            {
-                accessorKey: 'productDetails.status',
-                filterFn: 'between',
-                header: 'Status',
-                size: 100,
-                Cell: ({ cell }) => (
-                    <Box
-                        component="span"
-                        sx={(theme) => ({
-                            backgroundColor:
-                                cell.getValue() === 'spoke'
-                                    ? theme.palette.secondary.main
-                                    : (cell.getValue() === 'proposal sent'
-                                        ? theme.palette.warning.main
-                                        : (cell.getValue() === 'inactive'
-                                            ? theme.palette.error.main
-                                            : theme.palette.success.main)),
-                            borderRadius: '1rem',
-                            color: 'primary.contrastText',
-                            maxWidth: '9ch',
-                            p: '0.4rem',
-                        })}
-                    >
-                        {cell.getValue()}
-                    </Box>
-                ),
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
             },
             {
                 accessorKey: 'productDetails.pName',
@@ -309,7 +242,6 @@ const LeadsTable = () => {
             shape: 'rounded',
             variant: 'outlined',
         },
-<<<<<<< HEAD
         renderRowActionMenuItems: ({ row, closeMenu }) => {
             const lidValue = parseInt(row.original.LID);
             const pidValue = row.original.productDetails.PID;
@@ -362,49 +294,6 @@ const LeadsTable = () => {
                 </MenuItem>,
             ]
         },
-=======
-        renderRowActionMenuItems: ({ closeMenu }) => [
-            <MenuItem
-                key={0}
-                onClick={() => {
-                    // View profile logic...
-                    closeMenu();
-                }}
-                sx={{ m: 0 }}
-            >
-                <ListItemIcon>
-                    <AccountCircleRounded color='primary' />
-                </ListItemIcon>
-                View Profile
-            </MenuItem>,
-            <MenuItem
-                key={1}
-                onClick={() => {
-                    // Send email logic...
-                    closeMenu();
-                }}
-                sx={{ m: 0 }}
-            >
-                <ListItemIcon>
-                    <AddCommentRounded color='primary' />
-                </ListItemIcon>
-                Add Follow-up
-            </MenuItem>,
-            <MenuItem
-                key={2}
-                onClick={() => {
-                    setOpenAddProduct(true);
-                    closeMenu();
-                }}
-                sx={{ m: 0 }}
-            >
-                <ListItemIcon>
-                    <AddShoppingCartRounded color='primary' />
-                </ListItemIcon>
-                Add Product
-            </MenuItem>,
-        ],
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
         renderTopToolbar,
     });
 
@@ -412,7 +301,6 @@ const LeadsTable = () => {
     return (
         <>
             <MaterialReactTable table={table} />
-<<<<<<< HEAD
             <ViewProfile
                 openViewProfile={openViewProfile}
                 setOpenViewProfile={setOpenViewProfile}
@@ -430,23 +318,6 @@ const LeadsTable = () => {
                 setOpenAddProduct={setOpenAddProduct}
                 lid={leadID}
             />
-=======
-            <Dialog
-                open={openAddProduct}
-                onClose={closeAddProduct}
-            >
-                <DialogTitle>Add Lead</DialogTitle>
-                <DialogContent>
-                    <AddProduct />
-                </DialogContent>
-                <DialogActions>
-                    <div className='m-4'>
-                        <Button onClick={closeAddProduct}>Cancel</Button>
-                        <Button variant='contained' >Submit</Button>
-                    </div>
-                </DialogActions>
-            </Dialog>
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
         </>
     );
 };

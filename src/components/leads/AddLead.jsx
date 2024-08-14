@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Box, TextField, InputLabel, Select, MenuItem, FormControl, alpha, useTheme } from '@mui/material'
 import Config from '../../Config';
 import axios from 'axios';
-<<<<<<< HEAD
 import { useDetails } from '../../providers/DetailsProvider';
 
 const AddLead = ({ handleLeadDataChange }) => {
@@ -14,17 +13,6 @@ const AddLead = ({ handleLeadDataChange }) => {
     const [status, setStatus] = useState('');
     const [assignedTo, setAssignedTo] = useState('');
     const [newLeadData, setNewLeadData] = useState({
-=======
-
-const AddLead = ({ handleLeadDataChange }) => {
-    const theme = useTheme();
-    const primaryColorWithOpacity = alpha(theme.palette.primary.main, 0.1); // Adjust opacity as needed
-    const [leadID, setLeadID] = useState('');
-    const [product, setProduct] = useState('');
-    const [status, setStatus] = useState('');
-    const [newLeadData, setNewLeadData] = useState({
-        LID: 0,
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
         name: '',
         designationDept: '',
         organizationName: '',
@@ -34,24 +22,10 @@ const AddLead = ({ handleLeadDataChange }) => {
         },
         address: '',
         PID: '',
-<<<<<<< HEAD
         SID: '',
         UID: '',
         source: '',
     });
-=======
-        pName: '',
-        status: '',
-        source: '',
-        assignedTo: ''
-    });
-    const productOptions = {
-        'P1': 'Business Analyst',
-        'P2': 'EIGAP',
-        'P3': 'MapData',
-        'P4': 'LRS',
-      };
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
 
     //#region Max LID
     useEffect(() => {
@@ -59,13 +33,6 @@ const AddLead = ({ handleLeadDataChange }) => {
             try {
                 const response = await axios.get(`${Config.apiUrl}/getMaxLID`);
                 setLeadID(response.data[0].LID);
-<<<<<<< HEAD
-=======
-                setNewLeadData((prev) => ({
-                    ...prev,
-                    LID: parseInt(response.data[0].LID + 1, 10),
-                }));
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
             } catch (error) {
                 console.error(error);
             }
@@ -76,7 +43,6 @@ const AddLead = ({ handleLeadDataChange }) => {
     //#region Field Change
     const handleNewLeadChange = (e) => {
         const { name, value } = e.target;
-<<<<<<< HEAD
         if (name == 'PID') {
             setProduct(value);
         }
@@ -86,30 +52,12 @@ const AddLead = ({ handleLeadDataChange }) => {
         if (name == 'UID') {
             setAssignedTo(value);
         }
-=======
-        if (name == 'status') {
-            setStatus(value);
-        }
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
         setNewLeadData((prev) => ({
             ...prev,
             [name]: value,
         }));
     };
 
-<<<<<<< HEAD
-=======
-    const handleProductChange = (e) => {
-        const { name, value } = e.target;
-        setProduct(value);
-        setNewLeadData((prev) => ({
-            ...prev,
-            PID: value,
-            [name]: productOptions[value],
-        }));
-    };
-
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
     const handleNestedChange = (e) => {
         const { name, value } = e.target;
         setNewLeadData(prev => ({
@@ -201,7 +149,6 @@ const AddLead = ({ handleLeadDataChange }) => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="mb-2">
-<<<<<<< HEAD
                     <FormControl required fullWidth>
                         <InputLabel id="demo-simple-select-label">Product Name</InputLabel>
                         <Select
@@ -236,43 +183,6 @@ const AddLead = ({ handleLeadDataChange }) => {
                             ))}
                         </Select>
 
-=======
-                <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Product Name</InputLabel>
-                    <Select
-                        name='pName'
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Product Name"
-                        value={product}
-                        onChange={handleProductChange}
-                        size='small'
-                    >
-                        <MenuItem value='P1'>Business Analyst</MenuItem>
-                        <MenuItem value='P2'>EIGAP</MenuItem>
-                        <MenuItem value='P3'>MapData</MenuItem>
-                        <MenuItem value='P4'>LRS</MenuItem>
-                    </Select>
-                    </FormControl>
-                </div>
-                <div className="mb-2">
-                <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                    <Select
-                        name='status'
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Status"
-                        value={status}
-                        onChange={handleNewLeadChange}
-                        size='small'
-                    >
-                        <MenuItem value='spoke'>spoke</MenuItem>
-                        <MenuItem value='proposal sent'>proposal sent</MenuItem>
-                        <MenuItem value='active'>active</MenuItem>
-                        <MenuItem value='inactive'>inactive</MenuItem>
-                    </Select>
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
                     </FormControl>
                 </div>
                 <div className="mb-2">
@@ -286,7 +196,6 @@ const AddLead = ({ handleLeadDataChange }) => {
                     />
                 </div>
                 <div className="mb-2">
-<<<<<<< HEAD
                     <FormControl required fullWidth>
                         <InputLabel id="demo-simple-select-label">Assigned To</InputLabel>
                         <Select
@@ -304,16 +213,6 @@ const AddLead = ({ handleLeadDataChange }) => {
                         </Select>
 
                     </FormControl>
-=======
-                    <TextField
-                        required
-                        name='assignedTo'
-                        id="outlined-required"
-                        label="Assigned To"
-                        size='small'
-                        onChange={handleNewLeadChange}
-                    />
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
                 </div>
             </div>
         </Box>

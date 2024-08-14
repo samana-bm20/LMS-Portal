@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react'
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from '@mui/material'
-<<<<<<< HEAD
 import { AddCircleRounded, FileUploadRounded } from '@mui/icons-material'
 import AddLead from './AddLead'
 import Config from '../../Config';
@@ -16,20 +15,6 @@ const LeadButtons = () => {
     const [success, setSuccess] = useState(false);
 
     //#region Add Lead Dialog
-=======
-import { AddCircleRounded, FileUploadRounded, FileDownloadRounded } from '@mui/icons-material'
-import AddLead from './AddLead'
-import Config from '../../Config';
-import axios from 'axios';
-
-const LeadButtons = () => {
-    const [openAddLeadDialog, setOpenAddLeadDialog] = useState(false);
-    const [addLeadData, setAddLeadData] = useState([]);
-    const [addLeadError, setAddLeadError] = useState(false);
-    const [addErrorMessage, setAddErrorMessage] = useState('');
-    const [addLeadSuccess, setAddLeadSuccess] = useState(false);
-
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
     const openAddLead = () => {
         setOpenAddLeadDialog(true);
     }
@@ -42,7 +27,6 @@ const LeadButtons = () => {
         setAddLeadData(data);
     }, []);
 
-<<<<<<< HEAD
     //#region Add Lead
     const handleAddLead = async () => {
         if (!addLeadData.name || !addLeadData.organizationName || !addLeadData.PID ||
@@ -63,33 +47,10 @@ const LeadButtons = () => {
                 setErrorMessage(error.response.data);
             } else {
                 setErrorMessage('An unexpected error occurred.');
-=======
-    const handleAddLead = async () => {
-        if (!addLeadData.name || !addLeadData.organizationName || !addLeadData.pName ||
-            !addLeadData.status || !addLeadData.source || !addLeadData.assignedTo) {
-            setAddErrorMessage('Required fields cannot be empty.')
-            setAddLeadError(true);
-            return;
-        }
-        try {
-            debugger
-            const response = await axios.post(`${Config.apiUrl}/addLead`, addLeadData);
-            console.log(response.data);
-            setOpenAddLeadDialog(false);
-            setAddLeadSuccess(true);
-            setAddErrorMessage('');
-        } catch (error) {
-            if (error.response && error.response.data) {
-                setAddLeadError(true);
-                setAddErrorMessage(error.response.data);
-            } else {
-                setAddErrorMessage('An unexpected error occurred.');
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
             }
         }
     };
 
-<<<<<<< HEAD
     const errorClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -102,20 +63,6 @@ const LeadButtons = () => {
             return;
         }
         setSuccess(false);
-=======
-    const addLeadErrorClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setAddLeadError(false);
-    };
-
-    const addLeadSuccessClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setAddLeadSuccess(false);
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
     };
 
 
@@ -134,11 +81,7 @@ const LeadButtons = () => {
                 open={openAddLeadDialog}
                 onClose={closeAddLead}
             >
-<<<<<<< HEAD
                 <DialogTitle>Add New Lead</DialogTitle>
-=======
-                <DialogTitle>Add Lead</DialogTitle>
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
                 <DialogContent>
                     <AddLead handleLeadDataChange={handleLeadDataChange} />
                 </DialogContent>
@@ -151,34 +94,19 @@ const LeadButtons = () => {
             </Dialog>
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-<<<<<<< HEAD
                 open={error}
                 autoHideDuration={2000}
                 onClose={errorClose}>
                 <Alert onClose={errorClose} severity="error" variant='filled'>
                     {errorMessage}
-=======
-                open={addLeadError}
-                autoHideDuration={2000}
-                onClose={addLeadErrorClose}>
-                <Alert onClose={addLeadErrorClose} severity="error" variant='filled'>
-                    {addErrorMessage}
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
                 </Alert>
             </Snackbar>
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-<<<<<<< HEAD
                 open={success}
                 autoHideDuration={2000}
                 onClose={successClose}>
                 <Alert onClose={successClose} severity="success" variant='filled'>
-=======
-                open={addLeadSuccess}
-                autoHideDuration={2000}
-                onClose={addLeadSuccessClose}>
-                <Alert onClose={addLeadSuccessClose} severity="success" variant='filled'>
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
                     New lead added successfully!
                 </Alert>
             </Snackbar>
@@ -191,18 +119,6 @@ const LeadButtons = () => {
             >
                 Import Lead
             </Button>
-<<<<<<< HEAD
-=======
-
-            {/* Export Lead */}
-            <Button
-                sx={{ m: '5px' }}
-                variant="contained"
-                startIcon={<FileDownloadRounded />}
-            >
-                Export Lead
-            </Button>
->>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
         </div>
     )
 }
