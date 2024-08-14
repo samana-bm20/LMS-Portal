@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+<<<<<<< HEAD
 import { useAuth } from '../providers/AuthProvider';
 import MainLayout from '../layout/MainLayout';
 
@@ -8,6 +9,13 @@ import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard'
 import Leads from '../pages/Leads'
 import Tasks from '../pages/Tasks';
+=======
+import Login from '../pages/Login';
+import Dashboard from '../pages/Dashboard'
+import Leads from '../pages/Leads'
+import { useAuth } from '../providers/AuthProvider';
+import MainLayout from '../layout/MainLayout';
+>>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -24,10 +32,13 @@ const AppRoutes = () => {
           path: '/leads',
           element: <Leads />
         },
+<<<<<<< HEAD
         {
           path: '/tasks',
           element: <Tasks />
         },
+=======
+>>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
       ],
     },
     {

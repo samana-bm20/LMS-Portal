@@ -19,11 +19,19 @@ const RoutesConfig = [
     to: '/leads',
     icon: <DynamicFormRounded />,
   },
+<<<<<<< HEAD
   {
     name: 'Tasks',
     to: '/tasks',
     icon: <AssignmentRounded />,
   },
+=======
+  // {
+  //   name: 'Tasks',
+  //   to: '/tasks',
+  //   icon: <AssignmentRounded />,
+  // },
+>>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
   // {
   //   name: 'Reminder',
   //   to: '/reminder',

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react'
 import {
     Box, Button, MenuItem, FormControl, TextField, InputLabel, Select, Dialog,
@@ -206,6 +207,14 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
 
         </>
     )
+=======
+import React from 'react'
+
+const AddProduct = () => {
+  return (
+    <div>AddProduct</div>
+  )
+>>>>>>> 5145d8b87a2573e55d07671c07279ccd5d427e5c
 }
 
 export default AddProduct
