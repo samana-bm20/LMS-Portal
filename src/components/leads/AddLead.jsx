@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Box, TextField, InputLabel, Select, MenuItem, FormControl, alpha, useTheme } from '@mui/material'
+import { Paper, TextField, InputLabel, Select, MenuItem, FormControl } from '@mui/material'
 import Config from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 
 const AddLead = ({ handleLeadDataChange }) => {
-    const theme = useTheme();
     const { statusValues, productValues, userValues } = useDetails();
-    const primaryColorWithOpacity = alpha(theme.palette.background.footer, 0.5);
     const [leadID, setLeadID] = useState('');
     const [product, setProduct] = useState('');
     const [status, setStatus] = useState('');
@@ -75,8 +73,7 @@ const AddLead = ({ handleLeadDataChange }) => {
     }, [newLeadData, handleLeadDataChange]);
 
     return (
-        <Box className="p-4 rounded-lg shadow-md" component="form"
-            sx={{ backgroundColor: primaryColorWithOpacity }}>
+        <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="mb-2">
                     <TextField
@@ -215,7 +212,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                     </FormControl>
                 </div>
             </div>
-        </Box>
+        </Paper>
     );
 }
 

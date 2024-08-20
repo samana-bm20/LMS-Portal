@@ -3,6 +3,7 @@ import { Button } from '@mui/material'
 import { AddTaskRounded } from '@mui/icons-material'
 
 import AddTask from '../components/tasks/AddTask'
+import TaskCards from '../components/tasks/TaskCards'
 
 const Tasks = () => {
     const [openAddTask, setOpenAddTask] = useState(false)
@@ -24,8 +25,12 @@ const Tasks = () => {
                 openAddTask={openAddTask}
                 setOpenAddTask={setOpenAddTask}
             />
-        </>
-    )
+            <div className="container mx-auto p-2 m-2">
+                <TaskCards />
+            </div>
+
+            </>
+            )
 }
 
-export default Tasks
+            export default Tasks

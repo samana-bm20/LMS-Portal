@@ -15,7 +15,8 @@ const AppDrawer = ({ open, onClose }) => {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const { mode } = useMode();
   const listItemRefs = useRef([]);
-
+  let fetchedSelectedIndex;
+  
   useEffect(() => {
     const currentPath = location.pathname;
     const selectedItemIndex = RoutesConfig.findIndex(item => item.to === currentPath);
@@ -28,10 +29,14 @@ const AppDrawer = ({ open, onClose }) => {
   }, [location.pathname]);
 
   useEffect(() => {
-    if (selectedIndex !== null && listItemRefs.current[selectedIndex]) {
-      listItemRefs.current[selectedIndex].focus();
+    sessionStorage.setItem('selectedIndex', selectedIndex);
+
+    fetchedSelectedIndex = sessionStorage.getItem('selectedIndex')
+
+    if (fetchedSelectedIndex !== null && listItemRefs.current[fetchedSelectedIndex]) {
+      listItemRefs.current[fetchedSelectedIndex].focus();
     }
-  }, [selectedIndex]);
+  }, [fetchedSelectedIndex]);
 
   return (
     <MuiDrawer

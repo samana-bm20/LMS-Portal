@@ -1,6 +1,6 @@
 import React from 'react';
 import AppRoutes from './router/Routes';
-import { Theme } from './Theme'
+import { Theme } from './theme'
 import { CssBaseline } from '@mui/material';
 
 //providers

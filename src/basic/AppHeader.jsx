@@ -1,5 +1,4 @@
-// src/components/AppBar.js
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   AppBar as MuiAppBar, Box, Toolbar, IconButton, Typography, Badge, Button, ButtonGroup, Fab, Menu,
   MenuItem, Divider
@@ -11,7 +10,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { useAuth } from '../providers/AuthProvider';
 import { useMode } from '../providers/ModeProvider';
-
+import { useDetails } from '../providers/DetailsProvider';
 //#region Responsive
 const drawerWidth = 240;
 const AppBar = styled(MuiAppBar, {
@@ -36,8 +35,18 @@ const AppHeader = ({ onMenuClick, open }) => {
   const { logout } = useAuth();
   const { mode, toggleColorMode } = useMode();
   const [anchorElUser, setAnchorElUser] = useState('');
+  const [user, setUser] = useState('');
+  const { loggedUser, userValues } = useDetails();
+  let userName
+  //#region Menu
 
- //#region Menu
+  const fetchUser = () => {
+
+    const username = userValues.filter((user) => user.username === loggedUser)
+    userName = username[0]?.uName
+  }
+  fetchUser();
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -46,9 +55,12 @@ const AppHeader = ({ onMenuClick, open }) => {
     setAnchorElUser(null);
   };
 
+  
+  
+
   const settings = [
     {
-      name: 'John Doe',
+      name: userName,
       icon: <FaceRounded color='primary' />
     },
     {

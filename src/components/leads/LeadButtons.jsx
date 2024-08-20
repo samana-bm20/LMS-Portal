@@ -5,10 +5,12 @@ import AddLead from './AddLead'
 import Config from '../../Config';
 import axios from 'axios';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
+import ImportLead from './ImportLead';
 
 const LeadButtons = () => {
     const { fetchLeadsData } = useFetchLeads();
     const [openAddLeadDialog, setOpenAddLeadDialog] = useState(false);
+    const [openImportLead, setOpenImportLead] = useState(false);
     const [addLeadData, setAddLeadData] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
@@ -116,10 +118,12 @@ const LeadButtons = () => {
                 sx={{ m: '5px' }}
                 variant="contained"
                 startIcon={<FileUploadRounded />}
+                onClick={() => setOpenImportLead(true)}
             >
                 Import Lead
             </Button>
-        </div>
+            <ImportLead openImportLead={openImportLead} setOpenImportLead={setOpenImportLead} />
+        </div >
     )
 }
 

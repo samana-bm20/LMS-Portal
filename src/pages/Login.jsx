@@ -1,7 +1,13 @@
 // src/pages/Login.js
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../providers/AuthProvider';
+import React, { useState } from "react";
+// import { useContext } from "react";
+// import { AuthContext } from "../context";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../providers/AuthProvider";
+import CryptoJS from "crypto-js";
+import axios from "axios";
+import Config from "../Config";
+
 import {
   Container,
   Box,
@@ -13,23 +19,24 @@ import {
   IconButton,
   InputAdornment,
   Snackbar,
-  Alert
-} from '@mui/material';
+  Alert,
+} from "@mui/material";
 import {
   LockRounded,
   LoginRounded,
   VisibilityRounded,
   VisibilityOffRounded,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const { login ,isAuthenticated, errorOpen, setErrorOpen } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
-  const [errorOpen, setErrorOpen] = useState(false);
+  // const { isAuthenticated } = useContext(AuthContext);
+
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -41,48 +48,76 @@ const Login = () => {
   const handleLogin = (event) => {
     event.preventDefault();
     if (!username || !password) {
-      setErrorOpen(true)
+      setErrorOpen(true);
     } else {
       console.log({
         username: username,
         password: password,
       });
-      setSuccessOpen(true);
+
+      const encryptionKey = "my-secure-key-123456";
+
+      const usernameS = username;
+      const passwordS = password;
+
+      const encryptedUsername = CryptoJS.AES.encrypt(
+        usernameS,
+        encryptionKey
+      ).toString();
+      const encryptedPassword = CryptoJS.AES.encrypt(
+        passwordS,
+        encryptionKey
+      ).toString();
+
+      sessionStorage.setItem("username", encryptedUsername);
+      sessionStorage.setItem("password", encryptedPassword);
+
       login();
-      navigate('/dashboard')
+      if (isAuthenticated) {
+        setSuccessOpen(true);
+        // navigate('/dashboard')
+      }
     }
   };
 
+  
+ 
+
   //#region Success/Error
   const handleSuccessClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setSuccessOpen(false);
   };
 
   const handleErrorClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setErrorOpen(false);
   };
 
   return (
-    <Container component="main" maxWidth="xs" sx={{minHeight: '100vh', display: 'flex'}}>
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{ minHeight: "100vh", display: "flex" }}
+    >
       <CssBaseline />
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         <Avatar
           alt="ML Infomap"
           // src={logo}
-          sx={{ m: 1, bgcolor: 'primary.main' }}>
+          sx={{ m: 1, bgcolor: "primary.main" }}
+        >
           <LockRounded />
         </Avatar>
         <Typography component="h1" variant="h5">
@@ -94,9 +129,9 @@ const Login = () => {
           noValidate
           sx={{
             mt: 1,
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center'
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
           }}
         >
           <TextField
@@ -108,7 +143,9 @@ const Login = () => {
             name="username"
             autoComplete="username"
             value={username}
-            onChange={(e) => { setUsername(e.target.value) }}
+            onChange={(e) => {
+              setUsername(e.target.value);
+            }}
             autoFocus
           />
           <TextField
@@ -117,21 +154,29 @@ const Login = () => {
             fullWidth
             name="password"
             label="Password"
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             id="password"
             value={password}
-            onChange={(e) => { setPassword(e.target.value) }}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
             autoComplete="current-password"
             InputProps={{
-              endAdornment: <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                >
-                  {showPassword ? <VisibilityOffRounded /> : <VisibilityRounded />}
-                </IconButton>
-              </InputAdornment>,
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {showPassword ? (
+                      <VisibilityOffRounded />
+                    ) : (
+                      <VisibilityRounded />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
 
@@ -148,25 +193,36 @@ const Login = () => {
       </Box>
 
       <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={successOpen}
         autoHideDuration={3000}
-        onClose={handleSuccessClose}>
-        <Alert onClose={handleSuccessClose} severity="success" variant="filled" sx={{ width: '100%' }}>
+        onClose={handleSuccessClose}
+      >
+        <Alert
+          onClose={handleSuccessClose}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
           Login Successful
         </Alert>
       </Snackbar>
 
       <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={errorOpen}
         autoHideDuration={3000}
-        onClose={handleErrorClose}>
-        <Alert onClose={handleErrorClose} severity="error" variant="filled" sx={{ width: '100%' }}>
+        onClose={handleErrorClose}
+      >
+        <Alert
+          onClose={handleErrorClose}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
           Enter valid credentials
         </Alert>
       </Snackbar>
-
     </Container>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
-    Box, Button, TextField, InputLabel, Select, MenuItem, FormControl, alpha, useTheme,
+    Paper, Button, TextField, InputLabel, Select, MenuItem, FormControl, 
     Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert
 } from '@mui/material'
 import Config from '../../Config';
@@ -9,10 +9,8 @@ import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 
 const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => {
-    const theme = useTheme();
     const { fetchLeadsData } = useFetchLeads();
     const { statusValues } = useDetails();
-    const primaryColorWithOpacity = alpha(theme.palette.background.footer, 0.5);
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -117,7 +115,7 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
             >
                 <DialogTitle>Add Follow-Up</DialogTitle>
                 <DialogContent>
-                    <Box className="p-4 rounded-lg shadow-md" component="form" sx={{ backgroundColor: primaryColorWithOpacity }}>
+                    <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
                         <div className="grid grid-cols-1 gap-2">
                             <div className="mb-2">
                                 <TextField
@@ -217,7 +215,7 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
                                 </div>
                             </div>
                         </div>
-                    </Box>
+                    </Paper>
 
                 </DialogContent>
                 <DialogActions>

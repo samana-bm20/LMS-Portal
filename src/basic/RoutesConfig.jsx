@@ -24,11 +24,11 @@ const RoutesConfig = [
     to: '/tasks',
     icon: <AssignmentRounded />,
   },
-  // {
-  //   name: 'Reminder',
-  //   to: '/reminder',
-  //   icon: <AlarmRounded />,
-  // },
+  {
+    name: 'Reminder',
+    to: '/reminder',
+    icon: <AlarmRounded />,
+  },
   // {
   //   name: 'Calendar',
   //   to: '/calendar',

@@ -1,75 +1,11 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import { AssignmentRounded, AssignmentIndRounded, AssignmentLateRounded, AssistantPhotoRounded } from '@mui/icons-material';
 import BusinessAnalyst from '../../assets/DashboardCards/businessAnalyst.svg'
 import EIGAP from '../../assets/DashboardCards/eigap.svg'
 import LRS from '../../assets/DashboardCards/lrs.svg'
 import MapData from '../../assets/DashboardCards/mapData.svg'
-
-const card1Data = [
-    {
-        color: 'bg-red-500',
-        title: 'Total Leads',
-        count: '195',
-        icon: <AssignmentRounded fontSize="large" />
-    },
-    {
-        color: 'bg-blue-500',
-        title: 'New Leads',
-        count: '120',
-        icon: <AssignmentIndRounded fontSize="large" />
-    },
-    {
-        color: 'bg-green-600',
-        title: 'Active Leads',
-        count: '45',
-        icon: <AssignmentLateRounded fontSize="large" />
-    },
-    {
-        color: 'bg-gray-500',
-        title: 'Dead Leads',
-        count: '30',
-        icon: <AssistantPhotoRounded fontSize="large" />
-    },
-];
-
-const card2Data = [
-    {
-        color: 'bg-purple-500',
-        title: 'Business Analyst',
-        total: '80',
-        active: '75',
-        dead: '5',
-        icon: BusinessAnalyst,
-        alt: 'B.A.'
-    },
-    {
-        color: 'bg-orange-500',
-        title: 'EIGAP',
-        total: '50',
-        active: '38',
-        dead: '12',
-        icon: EIGAP,
-        alt: 'B.A.'
-    },
-    {
-        color: 'bg-pink-500',
-        title: 'LRS',
-        total: '69',
-        active: '49',
-        dead: '20',
-        icon: LRS,
-        alt: 'B.A.'
-    },
-    {
-        color: 'bg-teal-600',
-        title: 'Map Data',
-        total: '73',
-        active: '66',
-        dead: '7',
-        icon: MapData,
-        alt: 'B.A.'
-    },
-];
+import Config from '../../Config';
+import axios from 'axios';
 
 const Card1 = ({ color, title, count, icon }) => (
     <div className={`${color} text-white shadow-md rounded-lg p-4 m-2 flex`}>
@@ -108,6 +44,138 @@ const Card2 = ({ color, title, total, active, dead, icon, alt }) => (
 );
 
 const CardSummary = () => {
+    //Total Lead count active or dead declare variable (state variable and updater variable = initial value)
+    const [totalCount, setTotalCount] = useState(0);
+    const [activeCount, setActiveCount] = useState(0);
+    const [deadCount, setInactiveCount] = useState(0);
+    const [totalLeadsLastTwoMonths, setTotalLeadsLastTwoMonths] = useState(0);
+
+    //Total Product Lead countdeclare variable (state variable and updater variable = initial value)
+    const [card2Data, setCard2Data] = useState([]);
+    const cardOrder = ['Business Analyst', 'EIGAP', 'LRS', 'Map Data'];
+
+
+
+    // funtion of lead count (fetch data of total lead, active lead, new lead, dead lead from api)
+    const fetchTotalCount = async () => {
+       
+        try {
+            const response = await axios.get(`${Config.apiUrl}/leads-status`);
+            if (Array.isArray(response.data) && response.data.length > 0) {
+                const data = response.data[0];
+                const { totalLeads, activeLeads, deadLeads, totalLeadsLastTwoMonths } = data;
+                setTotalCount(totalLeads);
+                setActiveCount(activeLeads);
+                setInactiveCount(deadLeads);
+                setTotalLeadsLastTwoMonths(totalLeadsLastTwoMonths);
+            } else {
+                console.error('Unexpected response format:', response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching total count:', error);
+        }
+    };
+
+    // funtion of productLead count (fetch data of ProductName,ActiveLead,DeadLead,totalProductLead from api)
+    const fetchProductLeadCount = async () => {
+        try {
+            const response = await axios.get(`${Config.apiUrl}/ProductLead-Status`);
+    
+            if (Array.isArray(response.data) && response.data.length > 0) {
+                const transformedData = response.data.map(item => {
+                    let colorClass = '';
+    
+                    switch (item.productName) {
+                        case 'Business Analyst':
+                            colorClass = 'bg-purple-500';
+                            break;
+                        case 'EIGAP':
+                            colorClass = 'bg-orange-500';
+                            break;
+                        case 'LRS':
+                            colorClass = 'bg-pink-500';
+                            break;
+                        case 'Map Data':
+                            colorClass = 'bg-teal-600';
+                            break;
+                        default:
+                            colorClass = 'bg-gray-500'; // Fallback color
+                    }
+    
+                    return {
+                        color: colorClass,
+                        title: item.productName,
+                        total: item.totalLeads,
+                        active: item.activeLeads,
+                        dead: item.deactiveLeads,
+                        icon: getIcon(item.productName), // Implement getIcon function if needed
+                        alt: item.productName
+                    };
+                });
+    
+                // Sort the transformedData according to the fixed cardOrder
+                const sortedData = transformedData.sort((a, b) => {
+                    return cardOrder.indexOf(a.title) - cardOrder.indexOf(b.title);
+                });
+    
+                setCard2Data(sortedData);
+            } else {
+                console.error('Unexpected response format:', response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+    
+    
+    const getIcon = (productName) => {
+        switch (productName) {
+            case 'Business Analyst':
+                return BusinessAnalyst;
+            case 'EIGAP':
+                return EIGAP;
+            case 'LRS':
+                return LRS;
+            case 'Map Data':
+                return MapData;
+            default:
+                return DefaultIcon; 
+        }
+    };
+
+    // Call function
+useEffect(() => {
+    fetchTotalCount();
+    fetchProductLeadCount();
+}, [totalCount]);
+
+    const card1Data = [
+        {
+            color: 'bg-red-500',
+            title: 'Total Leads',
+            count: totalCount !== null ? totalCount : 'Loading...',
+            icon: <AssignmentRounded fontSize="large" />
+        },
+        {
+            color: 'bg-blue-500',
+            title: 'New Leads',
+            count: totalLeadsLastTwoMonths !== null ? totalLeadsLastTwoMonths : 'Loading...',
+            icon: <AssignmentIndRounded fontSize="large" />
+        },
+        {
+            color: 'bg-green-600',
+            title: 'Active Leads',
+            count: activeCount !== null ? activeCount : 'Loading...',
+            icon: <AssignmentLateRounded fontSize="large" />
+        },
+        {
+            color: 'bg-gray-500',
+            title: 'Dead Leads',
+            count: deadCount !== null ? deadCount : 'Loading...',
+            icon: <AssistantPhotoRounded fontSize="large" />
+        },
+    ];
+
     return (
         <div className="grid gap-4 lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1">
             {card1Data.map((card, index) => (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {
-    Box, Button, MenuItem, FormControl, TextField, InputLabel, Select, Dialog,
-    DialogTitle, DialogContent, DialogActions, useTheme, alpha, Snackbar, Alert
+    Paper, Button, MenuItem, FormControl, TextField, InputLabel, Select, Dialog,
+    DialogTitle, DialogContent, DialogActions, Snackbar, Alert
 } from '@mui/material';
 import Config from '../../Config';
 import axios from 'axios';
@@ -9,10 +9,8 @@ import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 
 const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
-    const theme = useTheme();
     const { fetchLeadsData } = useFetchLeads();
     const { statusValues, productValues, userValues } = useDetails();
-    const primaryColorWithOpacity = alpha(theme.palette.background.footer, 0.5);
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -106,8 +104,7 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
             >
                 <DialogTitle>Add New Product</DialogTitle>
                 <DialogContent>
-                    <Box className="p-4 rounded-lg shadow-md" component="form"
-                        sx={{ backgroundColor: primaryColorWithOpacity }}>
+                    <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div className="mb-2">
                                 <FormControl required fullWidth>
@@ -176,7 +173,7 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
                                 </FormControl>
                             </div>
                         </div>
-                    </Box>
+                    </Paper>
                 </DialogContent>
                 <DialogActions>
                     <div className='m-4'>

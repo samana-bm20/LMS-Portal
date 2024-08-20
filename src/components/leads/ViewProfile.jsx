@@ -13,7 +13,10 @@ import ProductDetails from './ProductDetails';
 import FollowUpHistory from './FollowUpHistory';
 
 function CustomTabPanel(props) {
+    
+    // const []= useState()
     const { children, value, index, ...other } = props;
+    
 
     return (
         <div
@@ -41,15 +44,21 @@ function a11yProps(index) {
     };
 }
 
-const ViewProfile = ({ openViewProfile, setOpenViewProfile, lid }) => {
+const ViewProfile = ({ openViewProfile, setOpenViewProfile, lid, statusValues }) => {
+    const [data, setData] = useState([]);
+    const [leads, setLeads] = useState('All');
     const [value, setValue] = useState(0);
-
+    
+    
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
     const closeViewProfile = () => {
         setOpenViewProfile(false);
     }
+   
+
+    
 
     return (
         <>
@@ -68,13 +77,13 @@ const ViewProfile = ({ openViewProfile, setOpenViewProfile, lid }) => {
                             </Tabs>
                         </Box>
                         <CustomTabPanel value={value} index={0}>
-                            <LeadDetails />
+                            <LeadDetails leadId={lid}/>
                         </CustomTabPanel>
                         <CustomTabPanel value={value} index={1}>
-                            <ProductDetails />
+                            <ProductDetails leadId={lid} statusValues = {statusValues}/>
                         </CustomTabPanel>
                         <CustomTabPanel value={value} index={2}>
-                            <FollowUpHistory />
+                            <FollowUpHistory leadId={lid} />
                         </CustomTabPanel>
                     </Box>
                 </DialogContent>

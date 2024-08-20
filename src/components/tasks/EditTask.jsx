@@ -1,34 +1,51 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
-    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete
+    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete, useTheme, alpha
 } from '@mui/material'
-import { useDetails } from '../../providers/DetailsProvider';
-import { useFetchLeads } from '../../providers/FetchLeadsProvider';
-import Config from '../../Config';
-import axios from 'axios';
+import { useDetails } from '../../providers/DetailsProvider'
+import Config from '../../Config'
+import axios from 'axios'
 
-const AddTask = ({ openAddTask, setOpenAddTask }) => {
-    const { userValues, fetchTasks } = useDetails();
-    const { data } = useFetchLeads();
+const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
+    const { userValues, taskData, fetchTasks } = useDetails();
     const [assignedTo, setAssignedTo] = useState('');
     const [taskStatus, setTaskStatus] = useState('');
-    const [addTaskData, setAddTaskData] = useState({
+    const [taskDate, setTaskDate] = useState('');
+    let selectedTask;
+    const [editTaskData, setEditTaskData] = useState({
+        editedBy: 'U1',
         taskDate: '',
-        title: '',
-        description: '',
-        createdBy: 'U1',
         UID: '',
         taskStatus: '',
-        LID: null,
-        PID: null,
     });
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
 
+    //#region Fetch Data
+    const getSelectedTask = () => {
+        if (tid) {
+            selectedTask = taskData.filter(task => task.TID === tid);
+            setAssignedTo(selectedTask[0].UID);
+            setTaskStatus(selectedTask[0].taskStatus);
+            const formattedDate = new Date(selectedTask[0].taskDate).toISOString().slice(0, 16);
+            setTaskDate(formattedDate);
+            setEditTaskData((prev) => ({
+                ...prev,
+                taskDate: formattedDate,
+                UID: selectedTask[0].UID,
+                taskStatus: selectedTask[0].taskStatus,
+            }));
+        }
+    }
+
+    useEffect(() => {
+        getSelectedTask();
+    }, [tid]);
+
     //#region Field Change
-    const handleAddTaskChange = (e) => {
+    const handleEditTaskChange = (e) => {
         const { name, value } = e.target;
         if (name === 'UID') {
             setAssignedTo(value);
@@ -36,47 +53,26 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         if (name === 'taskStatus') {
             setTaskStatus(value);
         }
-        setAddTaskData((prev) => ({
+        if (name === 'taskDate') {
+            setTaskDate(value);
+        }
+        setEditTaskData((prev) => ({
             ...prev,
             [name]: value,
         }));
     };
 
-    const handleLeadChange = (event, value) => {
-        if (value) {
-            setAddTaskData((prev) => ({
-                ...prev,
-                LID: value.LID,
-                PID: value.productDetails.PID
-            }));
-        } else {
-            setAddTaskData((prev) => ({
-                ...prev,
-                LID: null,
-                PID: null
-            }));
-        }
-    }
-
-    //#region Add Task
-    const handleAddTask = async () => {
-        if (!addTaskData.taskDate || !addTaskData.title || !addTaskData.description ||
-            !addTaskData.UID || !addTaskData.taskStatus) {
+    const handleEditTask = async () => {
+        if (!editTaskData.taskDate || !editTaskData.UID || !editTaskData.taskStatus) {
             setErrorMessage('Required fields cannot be empty.')
             setError(true);
             return;
         }
         try {
-            const _ = await axios.post(`${Config.apiUrl}/addTask`, addTaskData);
-            setOpenAddTask(false);
+            const _ = await axios.put(`${Config.apiUrl}/editTask/${tid}`, editTaskData);
+            setOpenEditTask(false);
             fetchTasks();
-            setAssignedTo('');
-            setTaskStatus('');
-            setAddTaskData((prev) => ({
-                ...prev,
-                LID: null,
-                PID: null
-            }));
+            getSelectedTask();
             setSuccess(true);
             setErrorMessage('');
         } catch (error) {
@@ -89,10 +85,9 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         }
     };
 
-    const closeAddTask = () => {
-        setOpenAddTask(false);
-        setAssignedTo('');
-        setTaskStatus('');
+    const closeEditTask = () => {
+        setOpenEditTask(false);
+        getSelectedTask();
     }
 
     // #region Snackbar
@@ -113,13 +108,13 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
     return (
         <>
             <Dialog
-                open={openAddTask}
-                onClose={closeAddTask}
+                open={openEditTask}
+                onClose={closeEditTask}
             >
-                <DialogTitle>Add New Task</DialogTitle>
+                <DialogTitle>Edit Task</DialogTitle>
                 <DialogContent>
                     <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 gap-2">
                             <div className="mb-2">
                                 <TextField
                                     required
@@ -128,35 +123,13 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                     label="Task Date"
                                     size='small'
                                     type="datetime-local"
+                                    value={taskDate}
                                     InputLabelProps={{ shrink: true }}
-                                    onChange={handleAddTaskChange}
+                                    onChange={handleEditTaskChange}
                                     fullWidth
                                 />
                             </div>
-                            <div className="mb-2">
-                                <TextField
-                                    required
-                                    name='title'
-                                    id="outlined-required"
-                                    label="Title"
-                                    size='small'
-                                    onChange={handleAddTaskChange}
-                                />
-                            </div>
-                        </div>
-                        <div className='mt-2 mb-4'>
-                            <TextField
-                                required
-                                name='description'
-                                id="outlined"
-                                label="Description"
-                                fullWidth
-                                multiline
-                                onChange={handleAddTaskChange}
-                            />
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div className="mb-2">
                                 <FormControl required fullWidth>
                                     <InputLabel id="demo-simple-select-label">Assigned To</InputLabel>
@@ -166,7 +139,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                         id="demo-simple-select"
                                         label="Assigned To"
                                         value={assignedTo}
-                                        onChange={handleAddTaskChange}
+                                        onChange={handleEditTaskChange}
                                         size='small'
                                     >
                                         {userValues.map((user) => (
@@ -184,7 +157,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                         id="demo-simple-select"
                                         label="Task Status"
                                         value={taskStatus}
-                                        onChange={handleAddTaskChange}
+                                        onChange={handleEditTaskChange}
                                         size='small'
                                     >
                                         <MenuItem value="To Do">To Do</MenuItem>
@@ -195,29 +168,12 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                 </FormControl>
                             </div>
                         </div>
-
-                        <div className="mb-2 mt-2">
-                            <Autocomplete
-                                fullWidth
-                                size="small"
-                                options={data}
-                                getOptionLabel={(option) => `${option.name}-${option.organizationName} (${option.productDetails.pName})`}
-                                onChange={handleLeadChange}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Lead"
-                                        variant="outlined"
-                                    />
-                                )}
-                            />
-                        </div>
                     </Paper>
                 </DialogContent>
                 <DialogActions>
                     <div className='m-4'>
-                        <Button onClick={closeAddTask}>Cancel</Button>
-                        <Button variant='contained' onClick={handleAddTask}>Add</Button>
+                        <Button onClick={closeEditTask}>Cancel</Button>
+                        <Button variant='contained' onClick={handleEditTask}>Update</Button>
                     </div>
                 </DialogActions>
             </Dialog>
@@ -237,11 +193,11 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                 autoHideDuration={2000}
                 onClose={successClose}>
                 <Alert onClose={successClose} severity="success" variant='filled'>
-                    New task added successfully!
+                    Task updated successfully!
                 </Alert>
             </Snackbar>
         </>
     )
 }
 
-export default AddTask
+export default EditTask
