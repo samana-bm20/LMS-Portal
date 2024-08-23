@@ -252,6 +252,7 @@ const LeadsTable = () => {
                     key={0}
                     onClick={() => {
                         setLeadID(lidValue);
+                        setProductID(pidValue);
                         setOpenViewProfile(true);
                         closeMenu();
                     }}
@@ -305,6 +306,7 @@ const LeadsTable = () => {
                 openViewProfile={openViewProfile}
                 setOpenViewProfile={setOpenViewProfile}
                 lid={leadID}
+                pid={productID}
             />
             <AddFollowUp
                 openAddFollowUp={openAddFollowUp}

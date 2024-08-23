@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
     TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete
@@ -9,7 +9,9 @@ import Config from '../../Config';
 import axios from 'axios';
 
 const AddTask = ({ openAddTask, setOpenAddTask }) => {
-    const { userValues, fetchTasks } = useDetails();
+    const { loggedUser, userValues, fetchTasks } = useDetails();
+    const user = userValues.filter((user) => user.username === loggedUser)
+    let uid = user[0]?.UID
     const { data } = useFetchLeads();
     const [assignedTo, setAssignedTo] = useState('');
     const [taskStatus, setTaskStatus] = useState('');
@@ -17,7 +19,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         taskDate: '',
         title: '',
         description: '',
-        createdBy: 'U1',
+        createdBy: '',
         UID: '',
         taskStatus: '',
         LID: null,
@@ -26,6 +28,13 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
+    
+    useEffect(() => {
+        const getCreatedBy = () => {
+            setAddTaskData((prev) => ({...prev, createdBy: uid}))
+        }
+        getCreatedBy();
+    }, [uid]);
 
     //#region Field Change
     const handleAddTaskChange = (e) => {

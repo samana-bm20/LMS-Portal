@@ -6,7 +6,7 @@ import TodayTasks from '../components/dashboard/TodayTasks';
 
 const Dashboard = () => {
   return (
-    <div>
+    <div className='overflow-y-auto scrollbar-thin'>
       <div className="container mx-auto p-2 mb-2">
         <CardSummary />
       </div>

@@ -20,6 +20,7 @@ export const Theme = ({children}) => {
             paper: '#fff',
             footer: '#eee',
             header: '#e0e0e0',
+            card: '#D1D5DB',
           },
         }
         : {
@@ -33,6 +34,7 @@ export const Theme = ({children}) => {
             paper: '#121212',
             footer: '#272727',
             header: '#383838',
+            card: '#373737'
           },
         }),
     },

@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import {
     Box, Button, MenuItem, FormControl, TextField, InputLabel, Select, Dialog,
-    DialogTitle, DialogContent, Snackbar, Alert, Tabs, Tab
+    DialogTitle, DialogContent, Snackbar, Alert, Tabs, Tab,
+    DialogActions, IconButton
 } from '@mui/material';
 import Config from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 import PropTypes from 'prop-types';
-
+import { CloseRounded } from '@mui/icons-material';
 import LeadDetails from './LeadDetails';
 import ProductDetails from './ProductDetails';
 import FollowUpHistory from './FollowUpHistory';
 
 function CustomTabPanel(props) {
-    
+
     // const []= useState()
     const { children, value, index, ...other } = props;
-    
+
 
     return (
         <div
@@ -44,21 +45,19 @@ function a11yProps(index) {
     };
 }
 
-const ViewProfile = ({ openViewProfile, setOpenViewProfile, lid, statusValues }) => {
+const ViewProfile = ({ openViewProfile, setOpenViewProfile, lid, pid }) => {
     const [data, setData] = useState([]);
     const [leads, setLeads] = useState('All');
     const [value, setValue] = useState(0);
-    
-    
+
+
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
     const closeViewProfile = () => {
         setOpenViewProfile(false);
+        setValue(0);
     }
-   
-
-    
 
     return (
         <>
@@ -66,7 +65,12 @@ const ViewProfile = ({ openViewProfile, setOpenViewProfile, lid, statusValues })
                 open={openViewProfile}
                 onClose={closeViewProfile}
             >
-                <DialogTitle>Lead Profile</DialogTitle>
+                <div className='flex justify-between items-center gap-4 mr-2'>
+                    <DialogTitle>Lead Profile</DialogTitle>
+                    <IconButton aria-label="close" color="primary" onClick={closeViewProfile}>
+                        <CloseRounded fontSize="inherit" />
+                    </IconButton>
+                </div>
                 <DialogContent>
                     <Box sx={{ width: '100%' }}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -76,37 +80,18 @@ const ViewProfile = ({ openViewProfile, setOpenViewProfile, lid, statusValues })
                                 <Tab label="Follow-Up" {...a11yProps(2)} />
                             </Tabs>
                         </Box>
-                        <CustomTabPanel value={value} index={0}>
-                            <LeadDetails leadId={lid}/>
+                        <CustomTabPanel className='w-[450px] h-[300px]' value={value} index={0}>
+                            <LeadDetails leadId={lid} />
                         </CustomTabPanel>
-                        <CustomTabPanel value={value} index={1}>
-                            <ProductDetails leadId={lid} statusValues = {statusValues}/>
+                        <CustomTabPanel className='w-[450px] h-[300px]' value={value} index={1}>
+                            <ProductDetails leadId={lid} productId={pid} />
                         </CustomTabPanel>
-                        <CustomTabPanel value={value} index={2}>
-                            <FollowUpHistory leadId={lid} />
+                        <CustomTabPanel className='w-[450px] h-[300px]' value={value} index={2}>
+                            <FollowUpHistory leadId={lid} productId={pid} />
                         </CustomTabPanel>
                     </Box>
                 </DialogContent>
             </Dialog>
-            {/* <Snackbar
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={addProductError}
-                autoHideDuration={2000}
-                onClose={addProductErrorClose}>
-                <Alert onClose={addProductErrorClose} severity="error" variant='filled'>
-                    {addErrorMessage}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={addProductSuccess}
-                autoHideDuration={2000}
-                onClose={addProductSuccessClose}>
-                <Alert onClose={addProductSuccessClose} severity="success" variant='filled'>
-                    New product added successfully!
-                </Alert>
-            </Snackbar> */}
-
         </>
     )
 }

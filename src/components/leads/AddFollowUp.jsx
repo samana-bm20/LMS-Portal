@@ -10,7 +10,9 @@ import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 
 const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => {
     const { fetchLeadsData } = useFetchLeads();
-    const { statusValues } = useDetails();
+    const { loggedUser, userValues, statusValues, fetchFollowUps } = useDetails();
+    const user = userValues.filter((user) => user.username === loggedUser)
+    const uid = user[0]?.UID;
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -23,9 +25,10 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
         date: '',
         type: '',
         SID: '',
-        UID: 'U1',
+        UID: '',
         remarks: ''
     });
+    console.log(followUpData)
 
     //#region Set IDs
     useEffect(() => {
@@ -35,6 +38,7 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
                 LID: lid,
                 PID: pid,
                 SID: sid,
+                UID: uid,
             }));
 
             const initialStatus = statusValues.find(status => status.SID === sid);
@@ -43,7 +47,7 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
             }
         }
         setIDs();
-    }, [lid, pid, sid]);
+    }, [lid, pid, sid, uid]);
 
     //#region Field Change
     const handleFollowUpChange = (e) => {
@@ -77,6 +81,7 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
         try {
             const _ = await axios.post(`${Config.apiUrl}/addFollowUp`, followUpData);
             fetchLeadsData();
+            fetchFollowUps();
             setOpenAddFollowUp(false);
             setType('');
             setNextType('');
@@ -197,12 +202,12 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
                                 </div>
                                 <div className="mb-3">
                                     <FormControl fullWidth>
-                                        <InputLabel id="type-select-label">Type</InputLabel>
+                                        <InputLabel id="type-select-label">Next Type</InputLabel>
                                         <Select
                                             name='nextType'
                                             labelId="type-select-label"
                                             id="type-select"
-                                            label="Type"
+                                            label="Next Type"
                                             value={nextType}
                                             onChange={handleFollowUpChange}
                                             size='small'

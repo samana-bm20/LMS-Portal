@@ -14,31 +14,42 @@ export const DetailsProvider = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState([]);
   let storedUsername;
 
+  const fetchDetails = async () => {
+    try {
+      const statusResponse = await axios.get(`${Config.apiUrl}/status`);
+      setStatusValues(statusResponse.data);
+
+      const productResponse = await axios.get(`${Config.apiUrl}/products`);
+      setProductValues(productResponse.data);
+
+      const userResponse = await axios.get(`${Config.apiUrl}/users`);
+      setUserValues(userResponse.data);
+
+      const leadResponse = await axios.get(`${Config.apiUrl}/leadDetails`);
+      setLeadValues(leadResponse.data);
+
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        const statusResponse = await axios.get(`${Config.apiUrl}/status`);
-        setStatusValues(statusResponse.data);
-
-        const productResponse = await axios.get(`${Config.apiUrl}/products`);
-        setProductValues(productResponse.data);
-
-        const userResponse = await axios.get(`${Config.apiUrl}/users`);
-        setUserValues(userResponse.data);
-
-        const followUpResponse = await axios.get(`${Config.apiUrl}/followUpDetails`);
-        setFollowUpValues(followUpResponse.data);
-
-        const leadResponse = await axios.get(`${Config.apiUrl}/leadDetails`);
-        setLeadValues(leadResponse.data);
-
-
-      } catch (error) {
-        console.error(error);
-      }
-    };
     fetchDetails();
-  }, [])
+  }, []);
+
+  const fetchFollowUps = async () => {
+    try {
+      const followUpResponse = await axios.get(`${Config.apiUrl}/followUpDetails`);
+      setFollowUpValues(followUpResponse.data);
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchFollowUps();
+  }, []);
 
   const fetchTasks = async () => {
     try {
@@ -72,7 +83,7 @@ export const DetailsProvider = ({ children }) => {
 
   return (
     <DetailsContext.Provider value={{
-      statusValues, productValues, userValues,
+      statusValues, productValues, userValues, fetchFollowUps,
       loggedUser, leadValues, followUpValues, fetchTasks, taskData
     }}>
       {children}

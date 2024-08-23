@@ -13,6 +13,9 @@ const TaskCards = () => {
     const [taskID, setTaskID] = useState();
     const [openEditTask, setOpenEditTask] = useState(false);
 
+    const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
+    const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
+
     const handleEditTask = (tid) => {
         setTaskID(tid);
         setOpenEditTask(true);
@@ -50,16 +53,16 @@ const TaskCards = () => {
                     return (
                         <div
                             key={task.TID}
-                            className={`grid shadow-2xl rounded-lg p-4 m-2`}
-                            style={{ backgroundColor: alpha(theme.palette.background.footer, 0.5) }}
+                            className={`grid shadow-lg rounded-lg p-4 m-2`}
+                            style={{ backgroundColor: alpha(theme.palette.background.card, 0.5) }}
                         >
                             <div className='flex justify-between items-center gap-4 mb-2'>
-                                <div
+                                {/* <div
                                     className='p-1 rounded-lg text-xs'
                                     style={{ backgroundColor: alpha(theme.palette.background.header, 0.5) }}
                                 >
                                     TID-{task.TID}
-                                </div>
+                                </div> */}
 
                                 <div
                                     className='flex items-center p-1 rounded-lg'
@@ -73,6 +76,11 @@ const TaskCards = () => {
                                         {task.taskStatus}
                                     </div>
                                 </div>
+                                {(new Date(task.taskDate) < new Date() && task.taskStatus !== "Done") && (
+                                    <div className='text-xs italic'
+                                        style={{ color: theme.palette.error.light }}>missed!
+                                    </div>
+                                )}
                             </div>
 
                             <div className='text-xl font-semibold mb-2'>{task.title}</div>
@@ -89,7 +97,7 @@ const TaskCards = () => {
                                         <div
                                             className="inline-block p-1 rounded-lg text-sm font-semibold mb-2"
                                             style={{
-                                                backgroundColor: alpha(theme.palette.secondary.main, 0.3),
+                                                backgroundColor: alpha(theme.palette.secondary.main, 0.2),
                                                 color: theme.palette.secondary.main
                                             }}
                                         >
@@ -98,7 +106,7 @@ const TaskCards = () => {
                                         <div
                                             className="inline-block p-1 rounded-lg text-sm font-semibold mb-2"
                                             style={{
-                                                backgroundColor: alpha(theme.palette.warning.main, 0.3),
+                                                backgroundColor: alpha(theme.palette.warning.main, 0.2),
                                                 color: theme.palette.warning.main
                                             }}
                                         >
@@ -108,11 +116,28 @@ const TaskCards = () => {
                                 )}
 
                                 <div
-                                    className="inline-flex p-1 gap-2 rounded-xl text-lg font-semibold mb-2"
+                                    className="inline-flex p-1 gap-2 rounded-xl text-lg font-semibold"
                                     style={{ backgroundColor: alpha(theme.palette.background.header, 0.5) }}
                                 >
                                     <CalendarMonthRounded />
-                                    <p>{task.date} at {task.time}</p>
+                                    <p>{new Date(task.taskDate).toLocaleDateString('en-GB', dateOptions).replace(/ /g, '-')} at {new Date(task.taskDate).toLocaleTimeString([], timeOptions)}</p>
+                                </div>
+                                <div className="text-xs italic mb-2 ml-2">
+                                    {task.edits && (() => {
+                                        const previousDates = task.edits
+                                            .filter(edit => edit.previousDate)
+                                            .map(edit => new Date(edit.previousDate));
+
+                                        if (previousDates.length > 0) {
+                                            const oldestDate = new Date(Math.min(...previousDates));
+
+                                            // Display the oldest previousDate
+                                            return <p style={{ color: theme.palette.text.secondary }}
+                                            >Original date: {oldestDate.toLocaleDateString('en-GB', dateOptions).replace(/ /g, '-')}</p>;
+                                        }
+
+                                        return null;
+                                    })()}
                                 </div>
                             </div>
                             <Divider />

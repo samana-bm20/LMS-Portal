@@ -60,7 +60,7 @@ const CardSummary = () => {
     const fetchTotalCount = async () => {
        
         try {
-            const response = await axios.get(`${Config.apiUrl}/leads-status`);
+            const response = await axios.get(`${Config.apiUrl}/leads-count`);
             if (Array.isArray(response.data) && response.data.length > 0) {
                 const data = response.data[0];
                 const { totalLeads, activeLeads, deadLeads, totalLeadsLastTwoMonths } = data;
@@ -79,27 +79,27 @@ const CardSummary = () => {
     // funtion of productLead count (fetch data of ProductName,ActiveLead,DeadLead,totalProductLead from api)
     const fetchProductLeadCount = async () => {
         try {
-            const response = await axios.get(`${Config.apiUrl}/ProductLead-Status`);
+            const response = await axios.get(`${Config.apiUrl}/productlead-count`);
     
             if (Array.isArray(response.data) && response.data.length > 0) {
                 const transformedData = response.data.map(item => {
                     let colorClass = '';
     
-                    switch (item.productName) {
-                        case 'Business Analyst':
+                    switch (item.PID) {
+                        case 'P1':
                             colorClass = 'bg-purple-500';
                             break;
-                        case 'EIGAP':
+                        case 'P2':
                             colorClass = 'bg-orange-500';
                             break;
-                        case 'LRS':
-                            colorClass = 'bg-pink-500';
-                            break;
-                        case 'Map Data':
+                        case 'P3':
                             colorClass = 'bg-teal-600';
                             break;
+                        case 'P4':
+                            colorClass = 'bg-pink-500';
+                            break;
                         default:
-                            colorClass = 'bg-gray-500'; // Fallback color
+                            colorClass = 'bg-gray-500'; 
                     }
     
                     return {

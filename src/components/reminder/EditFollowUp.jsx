@@ -7,75 +7,74 @@ import { useDetails } from '../../providers/DetailsProvider'
 import Config from '../../Config'
 import axios from 'axios'
 
-const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
-    const { loggedUser, userValues, taskData, fetchTasks } = useDetails();
+const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp }) => {
+    const { loggedUser, userValues, fetchFollowUps } = useDetails();
     const user = userValues.filter((user) => user.username === loggedUser)
     const uid = user[0]?.UID;
     const [assignedTo, setAssignedTo] = useState('');
-    const [taskStatus, setTaskStatus] = useState('');
-    const [taskDate, setTaskDate] = useState('');
-    let selectedTask;
-    const [editTaskData, setEditTaskData] = useState({
+    const [nextType, setNextType] = useState('');
+    const [nextDate, setNextDate] = useState('');
+    const [editFollowUpData, setEditFollowUpData] = useState({
         editedBy: '',
-        taskDate: '',
+        nextDate: '',
+        nextType: '',
         UID: '',
-        taskStatus: '',
     });
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
 
     //#region Fetch Data
-    const getSelectedTask = () => {
-        if (tid) {
-            selectedTask = taskData.filter(task => task.TID === tid);
-            setAssignedTo(selectedTask[0].UID);
-            setTaskStatus(selectedTask[0].taskStatus);
-            const formattedDate = new Date(selectedTask[0].taskDate).toISOString().slice(0, 16);
-            setTaskDate(formattedDate);
-            setEditTaskData((prev) => ({
+    const getSelectedFollowUp = () => {
+        if (selectedFollowUp.length !== 0) {
+            setAssignedTo(selectedFollowUp.UID);
+            setNextType(selectedFollowUp.nextType);
+            const formattedDate = new Date(selectedFollowUp.nextDate).toISOString().slice(0, 16);
+            setNextDate(formattedDate);
+            setEditFollowUpData((prev) => ({
                 ...prev,
-                taskDate: formattedDate,
-                UID: selectedTask[0].UID,
-                taskStatus: selectedTask[0].taskStatus,
+                nextDate: formattedDate,
+                nextType: selectedFollowUp.nextType,
+                UID: selectedFollowUp.UID,
                 editedBy: uid,
             }));
         }
     }
 
     useEffect(() => {
-        getSelectedTask();
-    }, [tid, uid]);
+        getSelectedFollowUp();
+    }, [selectedFollowUp, uid]);
 
     //#region Field Change
-    const handleEditTaskChange = (e) => {
+    const handleEditFollowUpChange = (e) => {
         const { name, value } = e.target;
         if (name === 'UID') {
             setAssignedTo(value);
         }
-        if (name === 'taskStatus') {
-            setTaskStatus(value);
+        if (name === 'nextType') {
+            setNextType(value);
         }
-        if (name === 'taskDate') {
-            setTaskDate(value);
+        if (name === 'nextDate') {
+            setNextDate(value);
         }
-        setEditTaskData((prev) => ({
+        setEditFollowUpData((prev) => ({
             ...prev,
             [name]: value,
         }));
     };
 
-    const handleEditTask = async () => {
-        if (!editTaskData.taskDate || !editTaskData.UID || !editTaskData.taskStatus) {
+    //#region Edit Followup
+    const handleEditFollowUp = async () => {
+        if (!editFollowUpData.nextDate || !editFollowUpData.nextType || !editFollowUpData.UID) {
             setErrorMessage('Required fields cannot be empty.')
             setError(true);
             return;
         }
         try {
-            const _ = await axios.put(`${Config.apiUrl}/editTask/${tid}`, editTaskData);
-            setOpenEditTask(false);
-            fetchTasks();
-            getSelectedTask();
+            const _ = await axios.put(`${Config.apiUrl}/editFollowUp/${selectedFollowUp.FID}`, editFollowUpData);
+            setOpenEditFollowUp(false);
+            fetchFollowUps();
+            getSelectedFollowUp();
             setSuccess(true);
             setErrorMessage('');
         } catch (error) {
@@ -88,9 +87,9 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
         }
     };
 
-    const closeEditTask = () => {
-        setOpenEditTask(false);
-        getSelectedTask();
+    const closeEditFollowUp = () => {
+        setOpenEditFollowUp(false);
+        getSelectedFollowUp();
     }
 
     // #region Snackbar
@@ -111,26 +110,46 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
     return (
         <>
             <Dialog
-                open={openEditTask}
-                onClose={closeEditTask}
+                open={openEditFollowUp}
+                onClose={closeEditFollowUp}
             >
-                <DialogTitle>Edit Task</DialogTitle>
+                <DialogTitle>Edit Follow-up</DialogTitle>
                 <DialogContent>
                     <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
                         <div className="grid grid-cols-1 gap-2">
                             <div className="mb-2">
                                 <TextField
                                     required
-                                    name='taskDate'
+                                    name='nextDate'
                                     id="outlined-required"
-                                    label="Task Date"
+                                    label="Next Date"
                                     size='small'
                                     type="datetime-local"
-                                    value={taskDate}
+                                    value={nextDate}
                                     InputLabelProps={{ shrink: true }}
-                                    onChange={handleEditTaskChange}
+                                    onChange={handleEditFollowUpChange}
                                     fullWidth
                                 />
+                            </div>
+                            
+                            <div className="mb-2">
+                                <FormControl required fullWidth>
+                                    <InputLabel id="demo-simple-select-label">Next Type</InputLabel>
+                                    <Select
+                                        name='nextType'
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        label="Next Type"
+                                        value={nextType}
+                                        onChange={handleEditFollowUpChange}
+                                        size='small'
+                                    >
+                                            <MenuItem value='call'>Call</MenuItem>
+                                            <MenuItem value='email'>Email</MenuItem>
+                                            <MenuItem value='physical'>Physical</MenuItem>
+
+                                    </Select>
+                                </FormControl>
                             </div>
 
                             <div className="mb-2">
@@ -142,7 +161,7 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
                                         id="demo-simple-select"
                                         label="Assigned To"
                                         value={assignedTo}
-                                        onChange={handleEditTaskChange}
+                                        onChange={handleEditFollowUpChange}
                                         size='small'
                                     >
                                         {userValues.map((user) => (
@@ -151,32 +170,13 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
                                     </Select>
                                 </FormControl>
                             </div>
-                            <div className="mb-2">
-                                <FormControl required fullWidth>
-                                    <InputLabel id="demo-simple-select-label">Task Status</InputLabel>
-                                    <Select
-                                        name='taskStatus'
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        label="Task Status"
-                                        value={taskStatus}
-                                        onChange={handleEditTaskChange}
-                                        size='small'
-                                    >
-                                        <MenuItem value="To Do">To Do</MenuItem>
-                                        <MenuItem value="In Progress">In Progress</MenuItem>
-                                        <MenuItem value="Done">Done</MenuItem>
-
-                                    </Select>
-                                </FormControl>
-                            </div>
                         </div>
                     </Paper>
                 </DialogContent>
                 <DialogActions>
                     <div className='m-4'>
-                        <Button onClick={closeEditTask}>Cancel</Button>
-                        <Button variant='contained' onClick={handleEditTask}>Update</Button>
+                        <Button onClick={closeEditFollowUp}>Cancel</Button>
+                        <Button variant='contained' onClick={handleEditFollowUp}>Update</Button>
                     </div>
                 </DialogActions>
             </Dialog>
@@ -196,11 +196,11 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
                 autoHideDuration={2000}
                 onClose={successClose}>
                 <Alert onClose={successClose} severity="success" variant='filled'>
-                    Task updated successfully!
+                    Upcoming follow-up edited successfully!
                 </Alert>
             </Snackbar>
         </>
     )
 }
 
-export default EditTask
+export default EditFollowUp
