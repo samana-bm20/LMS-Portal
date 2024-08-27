@@ -5,7 +5,6 @@ import {
   Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot, TimelineOppositeContent
 } from '@mui/lab';
 import { CallRounded, MailRounded, SupervisorAccountRounded } from '@mui/icons-material';
-import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import axios from 'axios';
 import Config from '../../Config';
 

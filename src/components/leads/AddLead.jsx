@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Paper, TextField, InputLabel, Select, MenuItem, FormControl } from '@mui/material'
-import Config from '../../Config';
-import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 
 const AddLead = ({ handleLeadDataChange }) => {
     const { statusValues, productValues, userValues } = useDetails();
-    const [leadID, setLeadID] = useState('');
     const [product, setProduct] = useState('');
     const [status, setStatus] = useState('');
     const [assignedTo, setAssignedTo] = useState('');
@@ -24,19 +21,6 @@ const AddLead = ({ handleLeadDataChange }) => {
         UID: '',
         source: '',
     });
-
-    //#region Max LID
-    useEffect(() => {
-        const getMaxLID = async () => {
-            try {
-                const response = await axios.get(`${Config.apiUrl}/getMaxLID`);
-                setLeadID(response.data[0].LID);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-        getMaxLID();
-    }, []);
 
     //#region Field Change
     const handleNewLeadChange = (e) => {
@@ -74,8 +58,8 @@ const AddLead = ({ handleLeadDataChange }) => {
 
     return (
         <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div className="mb-2">
+            <div className="grid gap-2">
+                {/* <div className="mb-2">
                     <TextField
                         required
                         name='LID'
@@ -86,7 +70,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                         disabled
                     // onChange={handleNewLeadChange}
                     />
-                </div>
+                </div> */}
                 <div className="mb-2">
                     <TextField
                         required
@@ -95,8 +79,11 @@ const AddLead = ({ handleLeadDataChange }) => {
                         label="Lead Name"
                         size='small'
                         onChange={handleNewLeadChange}
+                        fullWidth
                     />
                 </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="mb-2">
                     <TextField
                         name='mobileNo'
