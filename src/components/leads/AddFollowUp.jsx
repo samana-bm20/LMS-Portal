@@ -28,7 +28,6 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
         UID: '',
         remarks: ''
     });
-    console.log(followUpData)
 
     //#region Set IDs
     useEffect(() => {

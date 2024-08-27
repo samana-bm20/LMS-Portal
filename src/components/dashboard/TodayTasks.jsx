@@ -1,111 +1,159 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
-
-//nested data is ok, see accessorKeys in ColumnDef below
-const data = [
-  {
-    name: {
-      firstName: 'John',
-      lastName: 'Doe',
-    },
-    address: '261 Erdman Ford',
-    city: 'East Daphne',
-    state: 'Kentucky',
-  },
-  {
-    name: {
-      firstName: 'Jane',
-      lastName: 'Doe',
-    },
-    address: '769 Dominic Grove',
-    city: 'Columbus',
-    state: 'Ohio',
-  },
-  {
-    name: {
-      firstName: 'Joe',
-      lastName: 'Doe',
-    },
-    address: '566 Brakus Inlet',
-    city: 'South Linda',
-    state: 'West Virginia',
-  },
-  {
-    name: {
-      firstName: 'Kevin',
-      lastName: 'Vandy',
-    },
-    address: '722 Emie Stream',
-    city: 'Lincoln',
-    state: 'Nebraska',
-  },
-  {
-    name: {
-      firstName: 'Joshua',
-      lastName: 'Rolluffs',
-    },
-    address: '32188 Larkin Turnpike',
-    city: 'Charleston',
-    state: 'South Carolina',
-  },
-];
+import { Box, useTheme } from '@mui/material';
+import { useDetails } from '../../providers/DetailsProvider';
 
 const TodayTasks = () => {
-  //should be memoized or stable
+  const theme = useTheme();
+  const { leadValues, productValues, userValues, taskData } = useDetails();
+  const [data, setData] = useState([]);
+
+  const fetchTaskData = () => {
+    try {
+      const todayTasks = taskData
+      .filter(task => new Date(task.taskDate).setHours(0, 0, 0, 0) == new Date().setHours(0, 0, 0, 0))
+      .sort((a, b) => new Date(a.taskDate) - new Date(b.taskDate));
+
+      setData(todayTasks)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTaskData();
+  }, [taskData]);
+
+  const leadMap = leadValues.reduce((map, lead) => {
+    map[lead.LID] = lead.name;
+    return map;
+  }, {});
+
+  const productMap = productValues.reduce((map, product) => {
+    map[product.PID] = product.pName;
+    return map;
+  }, {});
+  
+  const userMap = userValues.reduce((map, user) => {
+    map[user.UID] = user.uName;
+    return map;
+  }, {});
+
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'name.firstName', //access nested data with dot notation
-        header: 'Task Description',
-        size: 150,
+        accessorKey: 'TID',
+        enableClickToCopy: true,
+        filterVariant: 'autocomplete',
+        header: 'TID',
+        size: 100,
       },
       {
-        accessorKey: 'name.lastName',
-        header: 'Lead Name',
-        size: 150,
+        accessorKey: 'title',
+        enableClickToCopy: true,
+        filterVariant: 'autocomplete',
+        header: 'Task Name',
+        size: 100,
       },
       {
-        accessorKey: 'address', //normal accessorKey
-        header: 'Type',
-        size: 200,
+        accessorKey: 'LID',
+        enableClickToCopy: true,
+        filterVariant: 'autocomplete',
+        header: 'Lead',
+        size: 100,
+        Cell: ({ row }) => row.original.LID ? leadMap[row.original.LID] || 'Unknown' : '--',
       },
       {
-        accessorKey: 'city',
+        accessorKey: 'PID',
+        enableClickToCopy: true,
+        filterVariant: 'autocomplete',
+        header: 'Product',
+        size: 100,
+        Cell: ({ row }) => row.original.PID ? productMap[row.original.PID] || 'Unknown' : '--',
+      },
+      {
+        accessorKey: 'UID',
+        enableClickToCopy: true,
+        filterVariant: 'autocomplete',
+        header: 'Assigned To',
+        size: 100,
+        Cell: ({ row }) => row.original.UID ? userMap[row.original.UID] || 'Unknown' : '--',
+      },
+      {
+        accessorKey: 'taskDate',
         header: 'Time',
-        size: 150,
+        size: 100,
+        Cell: ({ cell }) => {
+          const taskDate = new Date(cell.getValue());
+          const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
+          return taskDate.toLocaleTimeString([], timeOptions);
+        },
       },
       {
-        accessorKey: 'state',
-        header: 'Priority',
-        size: 150,
-      },
-      {
-        accessorKey: 'notes',
-        header: 'Notes',
-        size: 150,
+        accessorKey: 'taskStatus',
+        filterVariant: 'autocomplete',
+        header: 'Status',
+        size: 100,
+        Cell: ({ cell }) => {
+          const theme = useTheme();
+          const status = cell.getValue();
+          let bgColor;
+
+          switch (status) {
+            case 'To Do':
+              bgColor = theme.palette.error.main
+              break;
+            case 'In Progress':
+              bgColor = theme.palette.info.main
+              break;
+            case 'Done':
+              bgColor = theme.palette.success.main
+              break;
+            default:
+              bgColor = theme.palette.background.card
+              break;
+          }
+
+          return (
+            <Box
+              component="span"
+              sx={{
+                backgroundColor: bgColor,
+                borderRadius: '1rem',
+                color: theme.palette.primary.contrastText,
+                maxWidth: '9ch',
+                p: '0.4rem',
+              }}
+            >
+              {status}
+            </Box>
+          );
+        },
       },
     ],
-    [],
+    [leadMap, productMap, userMap],
   );
 
   const table = useMaterialReactTable({
     columns,
-    data, 
+    data,
     enableGlobalFilter: true,
     enableFullScreenToggle: false,
     enableDensityToggle: false,
     enableHiding: true,
-    enableColumnFilters:true,
+    enableColumnFilters: true,
     enablePagination: false,
-    initialState :{
-        showGlobalFilter: true,
+    initialState: {
+      showGlobalFilter: true,
+      density: 'compact',
     },
     muiTableHeadCellProps: {
       sx: {
-        fontWeight: 'bold', 
+        backgroundColor: 'background.header',
+        fontWeight: 'bold',
       },
     },
     muiTableBodyRowProps: {
@@ -117,7 +165,17 @@ const TodayTasks = () => {
     },
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <>
+      {data.length == 0 ? (
+        <div className='m-4 p-4 text-md font semibold text-center italic'
+          style={{ color: theme.palette.text.secondary }}>No tasks for today</div>
+      ) : (
+        <MaterialReactTable table={table} />
+      )}
+
+    </>
+  );
 };
 
 export default TodayTasks;

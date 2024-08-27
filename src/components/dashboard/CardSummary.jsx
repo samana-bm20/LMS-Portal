@@ -7,6 +7,7 @@ import MapData from '../../assets/DashboardCards/mapData.svg'
 import Config from '../../Config';
 import axios from 'axios';
 
+//#region Card Layout
 const Card1 = ({ color, title, count, icon }) => (
     <div className={`${color} text-white shadow-md rounded-lg p-4 m-2 flex`}>
         <div className="flex-grow">
@@ -44,30 +45,24 @@ const Card2 = ({ color, title, total, active, dead, icon, alt }) => (
 );
 
 const CardSummary = () => {
-    //Total Lead count active or dead declare variable (state variable and updater variable = initial value)
-    const [totalCount, setTotalCount] = useState(0);
-    const [activeCount, setActiveCount] = useState(0);
-    const [deadCount, setInactiveCount] = useState(0);
-    const [totalLeadsLastTwoMonths, setTotalLeadsLastTwoMonths] = useState(0);
-
-    //Total Product Lead countdeclare variable (state variable and updater variable = initial value)
+    const [totalLeads, setTotalLeads] = useState(0);
+    const [activeLeads, setActiveLeads] = useState(0);
+    const [deadLeads, setDeadLeads] = useState(0);
+    const [newLeads, setNewLeads] = useState(0);
     const [card2Data, setCard2Data] = useState([]);
-    const cardOrder = ['Business Analyst', 'EIGAP', 'LRS', 'Map Data'];
 
+    //#region Fetch Count Data
+    const fetchLeadCount = async () => {
 
-
-    // funtion of lead count (fetch data of total lead, active lead, new lead, dead lead from api)
-    const fetchTotalCount = async () => {
-       
         try {
             const response = await axios.get(`${Config.apiUrl}/leads-count`);
             if (Array.isArray(response.data) && response.data.length > 0) {
                 const data = response.data[0];
-                const { totalLeads, activeLeads, deadLeads, totalLeadsLastTwoMonths } = data;
-                setTotalCount(totalLeads);
-                setActiveCount(activeLeads);
-                setInactiveCount(deadLeads);
-                setTotalLeadsLastTwoMonths(totalLeadsLastTwoMonths);
+                const { totalLeads, activeLeads, deadLeads, newLeads } = data;
+                setTotalLeads(totalLeads);
+                setActiveLeads(activeLeads);
+                setDeadLeads(deadLeads);
+                setNewLeads(newLeads);
             } else {
                 console.error('Unexpected response format:', response.data);
             }
@@ -76,15 +71,15 @@ const CardSummary = () => {
         }
     };
 
-    // funtion of productLead count (fetch data of ProductName,ActiveLead,DeadLead,totalProductLead from api)
     const fetchProductLeadCount = async () => {
         try {
             const response = await axios.get(`${Config.apiUrl}/productlead-count`);
-    
-            if (Array.isArray(response.data) && response.data.length > 0) {
-                const transformedData = response.data.map(item => {
+
+            if (response.data.length > 0) {
+                const productCountData = response.data.map(item => {
                     let colorClass = '';
-    
+                    let icon;
+
                     switch (item.PID) {
                         case 'P1':
                             colorClass = 'bg-purple-500';
@@ -93,32 +88,43 @@ const CardSummary = () => {
                             colorClass = 'bg-orange-500';
                             break;
                         case 'P3':
-                            colorClass = 'bg-teal-600';
-                            break;
-                        case 'P4':
                             colorClass = 'bg-pink-500';
                             break;
+                        case 'P4':
+                            colorClass = 'bg-teal-600';
+                            break;
                         default:
-                            colorClass = 'bg-gray-500'; 
+                            colorClass = 'bg-gray-500';
                     }
-    
+
+                    switch (item.productName) {
+                        case 'Business Analyst':
+                            icon = BusinessAnalyst;
+                            break;
+                        case 'EIGAP':
+                            icon = EIGAP;
+                            break;
+                        case 'LRS':
+                            icon = LRS;
+                            break;
+                        case 'Map Data':
+                            icon = MapData;
+                            break;
+                        default:
+                            icon = DefaultIcon;
+                    }
+
                     return {
                         color: colorClass,
                         title: item.productName,
                         total: item.totalLeads,
                         active: item.activeLeads,
-                        dead: item.deactiveLeads,
-                        icon: getIcon(item.productName), // Implement getIcon function if needed
+                        dead: item.deadLeads,
+                        icon: icon, 
                         alt: item.productName
                     };
                 });
-    
-                // Sort the transformedData according to the fixed cardOrder
-                const sortedData = transformedData.sort((a, b) => {
-                    return cardOrder.indexOf(a.title) - cardOrder.indexOf(b.title);
-                });
-    
-                setCard2Data(sortedData);
+                setCard2Data(productCountData);
             } else {
                 console.error('Unexpected response format:', response.data);
             }
@@ -126,56 +132,41 @@ const CardSummary = () => {
             console.error('Error fetching data:', error);
         }
     };
-    
-    
-    const getIcon = (productName) => {
-        switch (productName) {
-            case 'Business Analyst':
-                return BusinessAnalyst;
-            case 'EIGAP':
-                return EIGAP;
-            case 'LRS':
-                return LRS;
-            case 'Map Data':
-                return MapData;
-            default:
-                return DefaultIcon; 
-        }
-    };
 
-    // Call function
-useEffect(() => {
-    fetchTotalCount();
-    fetchProductLeadCount();
-}, [totalCount]);
+    useEffect(() => {
+        fetchLeadCount();
+        fetchProductLeadCount();
+    }, []);
 
+    //#region Card1 Data
     const card1Data = [
         {
             color: 'bg-red-500',
             title: 'Total Leads',
-            count: totalCount !== null ? totalCount : 'Loading...',
+            count: totalLeads,
             icon: <AssignmentRounded fontSize="large" />
         },
         {
             color: 'bg-blue-500',
             title: 'New Leads',
-            count: totalLeadsLastTwoMonths !== null ? totalLeadsLastTwoMonths : 'Loading...',
+            count: newLeads,
             icon: <AssignmentIndRounded fontSize="large" />
         },
         {
             color: 'bg-green-600',
             title: 'Active Leads',
-            count: activeCount !== null ? activeCount : 'Loading...',
+            count: activeLeads,
             icon: <AssignmentLateRounded fontSize="large" />
         },
         {
             color: 'bg-gray-500',
             title: 'Dead Leads',
-            count: deadCount !== null ? deadCount : 'Loading...',
+            count: deadLeads,
             icon: <AssistantPhotoRounded fontSize="large" />
         },
     ];
 
+    //#region Display
     return (
         <div className="grid gap-4 lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1">
             {card1Data.map((card, index) => (

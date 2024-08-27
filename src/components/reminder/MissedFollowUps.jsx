@@ -9,6 +9,8 @@ import { useDetails } from '../../providers/DetailsProvider'
 const MissedFollowUps = () => {
     const theme = useTheme();
     const { followUpValues, statusValues, productValues, userValues, leadValues } = useDetails();
+
+    //#region Formatting
     const sidToColor = {
         S1: theme.palette.text.disabled,
         S2: theme.palette.secondary.main,
@@ -42,6 +44,7 @@ const MissedFollowUps = () => {
         return map;
     }, {});
 
+    //#region Data
     const filteredFollowUps = followUpValues.filter(item =>
         item.hasOwnProperty('nextDate') && new Date(item.nextDate) < new Date()
     );

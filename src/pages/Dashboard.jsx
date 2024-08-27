@@ -3,6 +3,7 @@ import { Button, Accordion, AccordionActions, AccordionDetails, AccordionSummary
 import { ExpandMoreRounded } from '@mui/icons-material'
 import CardSummary from '../components/dashboard/CardSummary';
 import TodayTasks from '../components/dashboard/TodayTasks';
+import TodayReminders from '../components/dashboard/TodayReminders';
 
 const Dashboard = () => {
   return (
@@ -23,14 +24,14 @@ const Dashboard = () => {
             aria-controls="panel1-content"
             id="panel1-header"
           >
-            Today's Tasks
+            Tasks
           </AccordionSummary>
           <AccordionDetails>
             <TodayTasks />
           </AccordionDetails>
         </Accordion>
-        
-        <Accordion>
+
+        <Accordion defaultExpanded>
           <AccordionSummary
             className='font-semibold text-lg'
             sx={{
@@ -45,8 +46,7 @@ const Dashboard = () => {
             Reminders
           </AccordionSummary>
           <AccordionDetails>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas deserunt ipsum animi nobis tempore libero autem, atque repellat quasi porro architecto. Molestiae esse deserunt soluta consectetur aliquid maxime unde veniam. Ea inventore minus minima corrupti ut, odio, optio sunt quos dignissimos exercitationem quidem vel obcaecati assumenda eveniet est et magnam?
+            <TodayReminders />
           </AccordionDetails>
         </Accordion>
       </div>

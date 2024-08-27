@@ -4,36 +4,25 @@ import { Paper, Box, Divider, useTheme } from '@mui/material';
 import PropTypes from 'prop-types';
 import Config from '../../Config';
 import axios from 'axios';
+import { useDetails } from '../../providers/DetailsProvider';
 
 const LeadDetails = ({ leadId }) => {
-  // if (!details) return <Typography>Loading...</Typography>;
+  const { leadValues } = useDetails();
   const theme = useTheme();
-  const [leads, setLeads] = useState('All');
-  const [data, setData] = useState([]);
   const [currentLead, setCurrentLead] = useState({});
   let currentLeadData;
+
   const fetchLeadsData = async () => {
     try {
-      const response = await axios.get(`${Config.apiUrl}/leadDetails`);
-      // const response = await axios.get(`http://127.0.0.1:3000/leadDetails`);
-      const leadData = response.data
-      setData(leadData)
-
-      setLeads(leadId)
-      currentLeadData = leadData.filter(lead => lead.LID === leadId)
-
-      // console.log('current lead data is ', currentLeadData[0]);
-      let cData = currentLeadData[0];
-      setCurrentLead(cData)
-      // console.log('lead data ', response.data)
-
+      currentLeadData = leadValues.filter(lead => lead.LID === leadId)
+      setCurrentLead(currentLeadData[0])
     } catch (error) {
       console.error(error);
     }
   };
+
   useEffect(() => {
     fetchLeadsData();
-    // console.log('USe state currentLead',currentLead)
   }, [leadId]);
 
   return (

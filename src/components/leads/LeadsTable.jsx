@@ -19,7 +19,7 @@ import AddFollowUp from './AddFollowUp';
 import AddProduct from './AddProduct';
 
 const LeadsTable = () => {
-    const { fetchLeadsData, data, product, setProduct} = useFetchLeads();
+    const { fetchLeadsData, data, product, setProduct } = useFetchLeads();
     const [openViewProfile, setOpenViewProfile] = useState(false);
     const [openAddFollowUp, setOpenAddFollowUp] = useState(false);
     const [openAddProduct, setOpenAddProduct] = useState(false);
@@ -54,20 +54,20 @@ const LeadsTable = () => {
                 size: 100,
             },
             {
-                accessorKey: 'contact.mobileNo',
+                accessorFn: (row) => row.contact?.mobileNo ?? '--',
                 enableClickToCopy: true,
                 filterVariant: 'autocomplete',
                 header: 'Contact',
                 size: 100,
-                Cell: ({ row }) => row.original.contact?.mobileNo ?? '--',
+                Cell: ({ cell }) => cell.getValue(),
             },
             {
-                accessorKey: 'contact.emailID',
+                accessorFn: (row) => row.contact?.emailID ?? '--',
                 enableClickToCopy: true,
                 filterVariant: 'autocomplete',
                 header: 'Email',
                 size: 100,
-                Cell: ({ row }) => row.original.contact?.emailID ?? '--',
+                Cell: ({ cell }) => cell.getValue(),
             },
             {
                 accessorKey: 'productDetails.sName',
