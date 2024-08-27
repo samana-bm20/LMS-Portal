@@ -14,12 +14,14 @@ import {
 import { AccountCircleRounded, AddCommentRounded, AddShoppingCartRounded } from '@mui/icons-material';
 
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
+import { useDetails } from '../../providers/DetailsProvider';
 import ViewProfile from './ViewProfile';
 import AddFollowUp from './AddFollowUp';
 import AddProduct from './AddProduct';
 
 const LeadsTable = () => {
     const { fetchLeadsData, data, product, setProduct } = useFetchLeads();
+    const { productValues } = useDetails();
     const [openViewProfile, setOpenViewProfile] = useState(false);
     const [openAddFollowUp, setOpenAddFollowUp] = useState(false);
     const [openAddProduct, setOpenAddProduct] = useState(false);
@@ -172,10 +174,10 @@ const LeadsTable = () => {
                             size='small'
                         >
                             <MenuItem value='All'>All</MenuItem>
-                            <MenuItem value='P1'>Business Analyst</MenuItem>
-                            <MenuItem value='P2'>EIGAP</MenuItem>
-                            <MenuItem value='P3'>MapData</MenuItem>
-                            <MenuItem value='P4'>LRS</MenuItem>
+                            {productValues.map((product) => (
+                            <MenuItem key={product.PID} value={product.PID}>{product.pName}</MenuItem>
+                            ))}
+                            <MenuItem value='New'>New</MenuItem>
                         </Select>
                     </FormControl>
                     {/* <Button

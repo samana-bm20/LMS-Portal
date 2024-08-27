@@ -40,7 +40,7 @@ const Card2 = ({ color, title, total, active, dead, icon, alt }) => (
                 <img src={icon} alt={alt} />
             </div>
         </div>
-        <div className='text-xs'>Active: {active} | Dead: {dead}</div>
+        <div className='text-xs'>Active: {active} | Inactive: {dead}</div>
     </div>
 );
 
@@ -160,7 +160,7 @@ const CardSummary = () => {
         },
         {
             color: 'bg-gray-500',
-            title: 'Dead Leads',
+            title: 'Inactive Leads',
             count: deadLeads,
             icon: <AssistantPhotoRounded fontSize="large" />
         },

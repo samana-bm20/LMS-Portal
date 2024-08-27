@@ -1,7 +1,7 @@
 // src/components/AppFooter.js
 import React from 'react';
-import { Box, Typography } from '@mui/material';
-const drawerWidth = 240;
+import { Box } from '@mui/material';
+const drawerWidth = 200;
 
 const AppFooter = ({ open }) => (
   <Box

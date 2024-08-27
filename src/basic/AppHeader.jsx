@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   AppBar as MuiAppBar, Box, Toolbar, IconButton, Typography, Badge, Button, ButtonGroup, Fab, Menu,
   MenuItem, Divider
@@ -12,7 +12,7 @@ import { useAuth } from '../providers/AuthProvider';
 import { useMode } from '../providers/ModeProvider';
 import { useDetails } from '../providers/DetailsProvider';
 //#region Responsive
-const drawerWidth = 240;
+const drawerWidth = 200;
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({

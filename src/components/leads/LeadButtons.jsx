@@ -15,6 +15,8 @@ const LeadButtons = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
+    const phoneRegex = /^[0-9]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     //#region Add Lead Dialog
     const openAddLead = () => {
@@ -34,6 +36,16 @@ const LeadButtons = () => {
         if (!addLeadData.name || !addLeadData.organizationName || !addLeadData.PID ||
             !addLeadData.SID || !addLeadData.source || !addLeadData.UID) {
             setErrorMessage('Required fields cannot be empty.')
+            setError(true);
+            return;
+        }
+        if (addLeadData.contact?.mobileNo && !phoneRegex.test(addLeadData.contact.mobileNo)) {
+            setErrorMessage('Invalid mobile number.')
+            setError(true);
+            return;
+        }
+        if (addLeadData.contact?.emailID && !emailRegex.test(addLeadData.contact.emailID)) {
+            setErrorMessage('Invalid email ID.')
             setError(true);
             return;
         }

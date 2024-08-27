@@ -50,7 +50,7 @@ const UpcomingFollowUps = () => {
     //#region Data & Edit
     const upcomingFollowUps = followUpValues
         .filter(item => item.hasOwnProperty('nextDate') && new Date(item.nextDate) > new Date())
-        .sort((a, b) => new Date(b.nextDate) - new Date(a.nextDate));
+        .sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate));
 
     const handleOpenEditFollowUp = (followUp) => {
         setSelectedFollowUp(followUp)

@@ -8,7 +8,7 @@ import Logo from '../assets/Logo/newLogo.svg';
 import blackLogo from '../assets/Logo/blackLogo.svg';
 import { useMode } from '../providers/ModeProvider';
 
-const drawerWidth = 240;
+const drawerWidth = 200;
 
 const AppDrawer = ({ open, onClose }) => {
   const location = useLocation();
