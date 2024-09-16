@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {
     PersonRounded, RotateLeftRounded, PendingOutlined, CheckCircleOutlineRounded,
-    EditRounded, CalendarMonthRounded, TaskRounded
+    EditRounded, CalendarMonthRounded, TaskRounded, AlarmRounded, CircleNotificationsRounded
 } from '@mui/icons-material'
 import { Divider, useTheme, alpha, IconButton } from '@mui/material'
 import { useDetails } from '../../providers/DetailsProvider'
@@ -9,7 +9,8 @@ import EditTask from './EditTask'
 
 const TaskCards = () => {
     const theme = useTheme();
-    const { taskData } = useDetails();
+    const { taskData, userValues, loggedUser } = useDetails();
+    const user = userValues.filter((user) => user.username == loggedUser);
     const [taskID, setTaskID] = useState();
     const [openEditTask, setOpenEditTask] = useState(false);
 
@@ -21,10 +22,13 @@ const TaskCards = () => {
         setOpenEditTask(true);
     }
 
+    const filteredTaskData = user[0]?.userType === 2 ?
+        taskData.filter((task) => task.UID == user[0]?.UID) : taskData
+
     return (
         <>
             <div className="grid gap-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1">
-                {taskData.map(task => {
+                {filteredTaskData.map(task => {
                     let statusIcon, statusColor, bgColor;
 
                     switch (task.taskStatus) {
@@ -116,13 +120,14 @@ const TaskCards = () => {
                                 )}
 
                                 <div
-                                    className="inline-flex p-1 gap-2 rounded-xl text-lg font-semibold"
+                                    className="inline-flex px-1 gap-2 rounded-xl text-lg font-semibold"
                                     style={{ backgroundColor: alpha(theme.palette.background.header, 0.5) }}
                                 >
                                     <CalendarMonthRounded />
                                     <p>{new Date(task.taskDate).toLocaleDateString('en-GB', dateOptions).replace(/ /g, '-')} at {new Date(task.taskDate).toLocaleTimeString([], timeOptions)}</p>
                                 </div>
-                                <div className="text-xs italic mb-2 ml-2">
+                                {/* Display Edit History */}
+                                <div className="text-xs italic mb-2 ml-8">
                                     {task.edits && (() => {
                                         const previousDates = task.edits
                                             .filter(edit => edit.previousDate)
@@ -133,11 +138,39 @@ const TaskCards = () => {
 
                                             // Display the oldest previousDate
                                             return <p style={{ color: theme.palette.text.secondary }}
-                                            >Original date: {oldestDate.toLocaleDateString('en-GB', dateOptions).replace(/ /g, '-')}</p>;
+                                            >Original date: {oldestDate.toLocaleDateString('en-GB', dateOptions).replace(/ /g, '-')} at {oldestDate.toLocaleTimeString([], timeOptions)}</p>;
                                         }
 
                                         return null;
                                     })()}
+                                </div>
+
+                                {/* Display Reminders by Ambika*/}
+                                {task.reminder && task.reminder.length > 0 && (
+                                    <div className="m-2">
+                                        <div
+                                            className='flex items-center rounded-lg'>
+                                            <CircleNotificationsRounded fontSize='small' color='info' />
+                                            <div
+                                                className='text-xs font-semibold pl-1'
+                                                style={{ color: theme.palette.info.main }}
+                                            >
+                                                Reminder(s)
+                                            </div>
+                                        </div>
+                                        {task.reminder.map((rem, index) => (
+                                            <div
+                                                key={index}
+                                                className=" pl-6 text-xs italic"
+                                                style={{ color: theme.palette.info.main }}
+                                            >
+                                                {rem.notificationTypes.join(', ')} {rem.frequencyValue} {rem.frequencyUnit} before
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <div className=''>
+
                                 </div>
                             </div>
                             <Divider />

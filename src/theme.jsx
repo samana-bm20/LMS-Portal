@@ -12,8 +12,8 @@ export const Theme = ({children}) => {
         ? {
           // palette values for light mode
           primary: {
-            main: '#0245A3',
-            light: '#c9e5ff',
+            main: '#006A62', //'#0245A3',
+            light: '#a2e0db',
           },
           background: {
             default: '#fff',
@@ -26,8 +26,8 @@ export const Theme = ({children}) => {
         : {
           // palette values for dark mode
           primary: {
-            main: '#90caf9',
-            dark: '#5F9ACB',
+            main: '#78ded6',//'#90caf9',
+            dark: '#62b5af',//'#5F9ACB',
           },
           background: {
             default: '#121212',

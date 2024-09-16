@@ -6,6 +6,7 @@ import LRS from '../../assets/DashboardCards/lrs.svg'
 import MapData from '../../assets/DashboardCards/mapData.svg'
 import Config from '../../Config';
 import axios from 'axios';
+import { useDetails } from '../../providers/DetailsProvider';
 
 //#region Card Layout
 const Card1 = ({ color, title, count, icon }) => (
@@ -45,6 +46,8 @@ const Card2 = ({ color, title, total, active, dead, icon, alt }) => (
 );
 
 const CardSummary = () => {
+    const {userValues, loggedUser} = useDetails();
+    const user = userValues.filter((user) => user.username === loggedUser);
     const [totalLeads, setTotalLeads] = useState(0);
     const [activeLeads, setActiveLeads] = useState(0);
     const [deadLeads, setDeadLeads] = useState(0);
@@ -55,7 +58,7 @@ const CardSummary = () => {
     const fetchLeadCount = async () => {
 
         try {
-            const response = await axios.get(`${Config.apiUrl}/leads-count`);
+            const response = await axios.get(`${Config.apiUrl}/leads-count/${user[0]?.UID}`);
             if (Array.isArray(response.data) && response.data.length > 0) {
                 const data = response.data[0];
                 const { totalLeads, activeLeads, deadLeads, newLeads } = data;
@@ -73,7 +76,7 @@ const CardSummary = () => {
 
     const fetchProductLeadCount = async () => {
         try {
-            const response = await axios.get(`${Config.apiUrl}/productlead-count`);
+            const response = await axios.get(`${Config.apiUrl}/productlead-count/${user[0]?.UID}`);
 
             if (response.data.length > 0) {
                 const productCountData = response.data.map(item => {

@@ -13,7 +13,8 @@ const FollowUpHistory = ({ leadId, productId }) => {
   const [currentLeadProducts, setCurrentLeadProducts] = useState([]);
   const [followUpData, setFollowUpData] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const { followUpValues, statusValues, userValues } = useDetails();
+  const { followUpValues, statusValues, userValues, loggedUser } = useDetails();
+  const user = userValues.filter((user) => user.username === loggedUser);
 
   //#region Formatting
   const sidToColor = {
@@ -40,7 +41,7 @@ const FollowUpHistory = ({ leadId, productId }) => {
   //#region Data
   const fetchLeadsData = async () => {
     try {
-      const response = await axios.get(`${Config.apiUrl}/leadData/All`);
+      const response = await axios.get(`${Config.apiUrl}/leadData/${user[0]?.UID}/All`);
       const data = response.data;
       setCurrentLeadProducts(data.filter(product => product.LID === leadId));
       setSelectedProduct(productId);

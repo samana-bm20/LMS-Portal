@@ -21,7 +21,8 @@ import AddProduct from './AddProduct';
 
 const LeadsTable = () => {
     const { fetchLeadsData, data, product, setProduct } = useFetchLeads();
-    const { productValues } = useDetails();
+    const { productValues, userValues, loggedUser } = useDetails();
+    const user = userValues.filter((user) => user.username === loggedUser);
     const [openViewProfile, setOpenViewProfile] = useState(false);
     const [openAddFollowUp, setOpenAddFollowUp] = useState(false);
     const [openAddProduct, setOpenAddProduct] = useState(false);
@@ -113,6 +114,11 @@ const LeadsTable = () => {
                 size: 100,
             },
             {
+                accessorKey: 'productDetails.assignedTo',
+                header: 'Assigned To',
+                size: 100,
+            },
+            {
                 accessorKey: 'organizationName',
                 header: 'Organisation',
                 size: 100,
@@ -175,7 +181,7 @@ const LeadsTable = () => {
                         >
                             <MenuItem value='All'>All</MenuItem>
                             {productValues.map((product) => (
-                            <MenuItem key={product.PID} value={product.PID}>{product.pName}</MenuItem>
+                                <MenuItem key={product.PID} value={product.PID}>{product.pName}</MenuItem>
                             ))}
                             <MenuItem value='New'>New</MenuItem>
                         </Select>
@@ -249,7 +255,7 @@ const LeadsTable = () => {
             const pidValue = row.original.productDetails.PID;
             const sidValue = row.original.productDetails.SID;
 
-            return [
+            const menuItems = [
                 <MenuItem
                     key={0}
                     onClick={() => {
@@ -281,22 +287,31 @@ const LeadsTable = () => {
                     </ListItemIcon>
                     Add Follow-up
                 </MenuItem>,
-                <MenuItem
-                    key={2}
-                    onClick={() => {
-                        setLeadID(lidValue);
-                        setOpenAddProduct(true);
-                        closeMenu();
-                    }}
-                    sx={{ m: 0 }}
-                >
-                    <ListItemIcon>
-                        <AddShoppingCartRounded color='primary' />
-                    </ListItemIcon>
-                    Add Product
-                </MenuItem>,
-            ]
+            ];
+
+            // Conditionally add the "Add Product" menu item if userType is 1
+            if (user[0]?.userType === 1) {
+                menuItems.push(
+                    <MenuItem
+                        key={2}
+                        onClick={() => {
+                            setLeadID(lidValue);
+                            setOpenAddProduct(true);
+                            closeMenu();
+                        }}
+                        sx={{ m: 0 }}
+                    >
+                        <ListItemIcon>
+                            <AddShoppingCartRounded color='primary' />
+                        </ListItemIcon>
+                        Add Product
+                    </MenuItem>
+                );
+            }
+
+            return menuItems;
         },
+
         renderTopToolbar,
     });
 

@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import {
-    Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
-    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete
-} from '@mui/material'
+    Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, Checkbox, FormControlLabel,
+    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete, List, ListItem, ListItemText, IconButton, ListItemIcon,
+
+} from '@mui/material';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import Config from '../../Config';
 import axios from 'axios';
+import SetReminder from './SetRemainder';
 
 const AddTask = ({ openAddTask, setOpenAddTask }) => {
     const { loggedUser, userValues, fetchTasks } = useDetails();
@@ -24,30 +29,55 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         taskStatus: '',
         LID: null,
         PID: null,
+        reminder: [] // reminder
     });
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
-    
+    //set remainder
+    const [reminders, setReminders] = useState([]);
+    const [showAddReminder, setShowAddReminder] = useState(false);
+
+
     useEffect(() => {
         const getCreatedBy = () => {
-            setAddTaskData((prev) => ({...prev, createdBy: uid}))
+            setAddTaskData((prev) => ({ ...prev, createdBy: uid }))
         }
         getCreatedBy();
     }, [uid]);
 
     //#region Field Change
+    // const handleAddTaskChange = (e, dateValue) => {
+    //     const name = e?.target?.name || 'taskDate';
+    //     const value = e?.target?.value || dateValue;
+
+
+    //     if (name === 'UID') {
+    //         setAssignedTo(value);
+    //     } else if (name === 'taskStatus') {
+    //         setTaskStatus(value);
+    //     }
+
+
+    //     const updatedValue = name === 'taskDate' ? new Date(value).toISOString() : value;
+
+    //     setAddTaskData((prev) => ({
+    //         ...prev,
+    //         [name]: updatedValue
+    //     }));
+    // };
+
     const handleAddTaskChange = (e) => {
         const { name, value } = e.target;
+
         if (name === 'UID') {
             setAssignedTo(value);
-        }
-        if (name === 'taskStatus') {
+        } else if (name === 'taskStatus') {
             setTaskStatus(value);
         }
         setAddTaskData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: value
         }));
     };
 
@@ -75,19 +105,21 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
             setError(true);
             return;
         }
+        const formattedTaskDate = new Date(addTaskData.taskDate).toISOString();
+        const taskWithReminders = {
+            ...addTaskData,
+            taskDate: formattedTaskDate,
+            reminder: reminders,
+        };
+
         try {
-            const _ = await axios.post(`${Config.apiUrl}/addTask`, addTaskData);
+
+            const _ = await axios.post(`${Config.apiUrl}/addTask`, taskWithReminders);
+            setSuccess(true);
             setOpenAddTask(false);
             fetchTasks();
-            setAssignedTo('');
-            setTaskStatus('');
-            setAddTaskData((prev) => ({
-                ...prev,
-                LID: null,
-                PID: null
-            }));
-            setSuccess(true);
-            setErrorMessage('');
+            resetTaskForm();
+
         } catch (error) {
             if (error.response && error.response.data) {
                 setError(true);
@@ -98,10 +130,32 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         }
     };
 
+    // Helper function to reset form data
+    const resetTaskForm = () => {
+        setAddTaskData({
+            taskDate: '',
+            title: '',
+            description: '',
+            createdBy: '',
+            UID: '',
+            taskStatus: '',
+            LID: null,
+            PID: null,
+            reminder: []
+        });
+        setAssignedTo('');
+        setTaskStatus('');
+        setReminders([]);
+        setErrorMessage('');
+        setShowAddReminder(false);
+    };
+
     const closeAddTask = () => {
         setOpenAddTask(false);
         setAssignedTo('');
         setTaskStatus('');
+        setReminders([]);
+        setShowAddReminder(false);
     }
 
     // #region Snackbar
@@ -129,8 +183,9 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                 <DialogContent>
                     <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {/* Start Calendar Region */}
                             <div className="mb-2">
-                                <TextField
+                            <TextField
                                     required
                                     name='taskDate'
                                     id="outlined-required"
@@ -141,6 +196,27 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                     onChange={handleAddTaskChange}
                                     fullWidth
                                 />
+                                {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DateTimePicker
+                                        label="Task Date"
+                                        onChange={(date) => handleAddTaskChange({}, date)}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                required
+                                                name="taskDate"
+                                                fullWidth
+                                                InputProps={{
+                                                    ...params.InputProps,
+                                                    size: 'small', // Pass size directly here
+                                                }}
+                                            />
+                                        )}
+                                    // DialogProps={{
+                                    //     style: { position: 'relative' },
+                                    // }}
+                                    />
+                                </LocalizationProvider> */}
                             </div>
                             <div className="mb-2">
                                 <TextField
@@ -150,6 +226,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                     label="Title"
                                     size='small'
                                     onChange={handleAddTaskChange}
+                                    fullWidth
                                 />
                             </div>
                         </div>
@@ -178,9 +255,17 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                         onChange={handleAddTaskChange}
                                         size='small'
                                     >
-                                        {userValues.map((user) => (
-                                            <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
-                                        ))}
+                                        {user[0]?.userType === 1 ? (
+                                            userValues.map((user) => (
+                                                <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
+                                            ))
+                                        ) : (
+                                            userValues
+                                                .filter((userItem) => userItem.UID == user[0]?.UID)
+                                                .map((userItem) => (
+                                                    <MenuItem key={userItem.UID} value={userItem.UID}>{userItem.uName}</MenuItem>
+                                                ))
+                                        )}
                                     </Select>
                                 </FormControl>
                             </div>
@@ -221,6 +306,25 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                 )}
                             />
                         </div>
+
+
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            fullWidth
+                            style={{ marginTop: '10px' }}
+                            onClick={() => setShowAddReminder(!showAddReminder)}
+                        >
+                            {showAddReminder ? 'Hide Reminder' : 'Set Reminder'}
+                        </Button>
+
+                        {showAddReminder && (
+                            <SetReminder reminders={reminders} setReminders={setReminders} reset={() => {
+                                setReminders([]);
+                                setShowAddReminder(false);
+                            }} />
+                        )}
+
                     </Paper>
                 </DialogContent>
                 <DialogActions>

@@ -8,7 +8,8 @@ import { useDetails } from '../../providers/DetailsProvider';
 
 const TodayTasks = () => {
   const theme = useTheme();
-  const { leadValues, productValues, userValues, taskData } = useDetails();
+  const { leadValues, productValues, userValues, taskData, loggedUser } = useDetails();
+  const user = userValues.filter((user) => user.username === loggedUser);
   const [data, setData] = useState([]);
 
   const fetchTaskData = () => {
@@ -26,6 +27,10 @@ const TodayTasks = () => {
   useEffect(() => {
     fetchTaskData();
   }, [taskData]);
+
+  const filteredData = user[0]?.userType === 2
+  ? data.filter((task) => task.UID === user[0]?.UID)
+  : data;
 
   const leadMap = leadValues.reduce((map, lead) => {
     map[lead.LID] = lead.name;
@@ -139,7 +144,7 @@ const TodayTasks = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: filteredData,
     enableGlobalFilter: true,
     enableFullScreenToggle: false,
     enableDensityToggle: false,

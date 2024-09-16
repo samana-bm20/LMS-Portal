@@ -46,10 +46,7 @@ function a11yProps(index) {
 }
 
 const ViewProfile = ({ openViewProfile, setOpenViewProfile, lid, pid }) => {
-    const [data, setData] = useState([]);
-    const [leads, setLeads] = useState('All');
     const [value, setValue] = useState(0);
-
 
     const handleChange = (event, newValue) => {
         setValue(newValue);

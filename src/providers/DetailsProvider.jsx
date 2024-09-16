@@ -14,6 +14,19 @@ export const DetailsProvider = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState([]);
   let storedUsername;
 
+  const fetchUser = () => {
+    const encryptionKey = "my-secure-key-123456";
+
+    storedUsername = sessionStorage.getItem("username");
+    if (storedUsername) {
+      const decryptedUsername = CryptoJS.AES.decrypt(
+        storedUsername,
+        encryptionKey
+      ).toString(CryptoJS.enc.Utf8);
+      setLoggedUser(decryptedUsername)
+    }
+  }
+
   const fetchDetails = async () => {
     try {
       const statusResponse = await axios.get(`${Config.apiUrl}/status`);
@@ -28,15 +41,10 @@ export const DetailsProvider = ({ children }) => {
       const leadResponse = await axios.get(`${Config.apiUrl}/leadDetails`);
       setLeadValues(leadResponse.data);
 
-
     } catch (error) {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    fetchDetails();
-  }, []);
 
   const fetchFollowUps = async () => {
     try {
@@ -46,10 +54,6 @@ export const DetailsProvider = ({ children }) => {
       console.error(error)
     }
   }
-
-  useEffect(() => {
-    fetchFollowUps();
-  }, []);
 
   const fetchTasks = async () => {
     try {
@@ -61,25 +65,12 @@ export const DetailsProvider = ({ children }) => {
   }
 
   useEffect(() => {
+    fetchUser();
+    fetchDetails();
+    fetchFollowUps();
     fetchTasks();
   }, []);
 
-  useEffect(() => {
-    const fetchUser = () => {
-      const encryptionKey = "my-secure-key-123456";
-
-      storedUsername = sessionStorage.getItem("username");
-      if (storedUsername) {
-        const decryptedUsername = CryptoJS.AES.decrypt(
-          storedUsername,
-          encryptionKey
-        ).toString(CryptoJS.enc.Utf8);
-        setLoggedUser(decryptedUsername)
-      }
-    }
-    fetchUser();
-
-  }, [storedUsername])
 
   return (
     <DetailsContext.Provider value={{

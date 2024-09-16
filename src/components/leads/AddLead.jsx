@@ -3,7 +3,8 @@ import { Paper, TextField, InputLabel, Select, MenuItem, FormControl } from '@mu
 import { useDetails } from '../../providers/DetailsProvider';
 
 const AddLead = ({ handleLeadDataChange }) => {
-    const { statusValues, productValues, userValues } = useDetails();
+    const { statusValues, productValues, userValues, loggedUser } = useDetails();
+    const user = userValues.filter((user) => user.username === loggedUser);
     const [product, setProduct] = useState('');
     const [status, setStatus] = useState('');
     const [assignedTo, setAssignedTo] = useState('');
@@ -82,8 +83,8 @@ const AddLead = ({ handleLeadDataChange }) => {
                         fullWidth
                     />
                 </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="mb-2">
                     <TextField
                         name='mobileNo'
@@ -191,11 +192,19 @@ const AddLead = ({ handleLeadDataChange }) => {
                             onChange={handleNewLeadChange}
                             size='small'
                         >
-                            {userValues.map((user) => (
-                                <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
-                            ))}
-                        </Select>
+                            {user[0]?.userType === 1 ? (
+                                userValues.map((user) => (
+                                    <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
+                                ))
+                            ) : (
+                                userValues
+                                .filter((userItem) => userItem.UID == user[0]?.UID)
+                                .map((userItem) => (
+                                    <MenuItem key={userItem.UID} value={userItem.UID}>{userItem.uName}</MenuItem>
+                                ))
+                            )}
 
+                        </Select>
                     </FormControl>
                 </div>
             </div>

@@ -8,7 +8,8 @@ import { useDetails } from '../../providers/DetailsProvider';
 
 const TodayReminders = () => {
     const theme = useTheme();
-    const { leadValues, productValues, statusValues, userValues, followUpValues } = useDetails();
+    const { leadValues, productValues, statusValues, userValues, followUpValues, loggedUser } = useDetails();
+    const user = userValues.filter((user) => user.username === loggedUser)
     const [data, setData] = useState([]);
 
     const fetchReminderData = () => {
@@ -26,6 +27,10 @@ const TodayReminders = () => {
     useEffect(() => {
         fetchReminderData();
     }, [followUpValues]);
+
+    const filteredData = user[0]?.userType === 2
+        ? data.filter((reminder) => reminder.UID === user[0]?.UID)
+        : data;
 
     const leadMap = leadValues.reduce((map, lead) => {
         map[lead.LID] = lead.name;
@@ -165,7 +170,7 @@ const TodayReminders = () => {
 
     const table = useMaterialReactTable({
         columns,
-        data,
+        data: filteredData,
         enableGlobalFilter: true,
         enableFullScreenToggle: false,
         enableDensityToggle: false,

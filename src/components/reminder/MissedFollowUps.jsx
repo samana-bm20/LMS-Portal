@@ -8,7 +8,8 @@ import { useDetails } from '../../providers/DetailsProvider'
 
 const MissedFollowUps = () => {
     const theme = useTheme();
-    const { followUpValues, statusValues, productValues, userValues, leadValues } = useDetails();
+    const { followUpValues, statusValues, productValues, userValues, leadValues, loggedUser } = useDetails();
+    const user = userValues.filter((user) => user.username === loggedUser);
 
     //#region Formatting
     const sidToColor = {
@@ -45,38 +46,29 @@ const MissedFollowUps = () => {
     }, {});
 
     //#region Data
-    const filteredFollowUps = followUpValues.filter(item =>
-        item.hasOwnProperty('nextDate') && new Date(item.nextDate) < new Date()
-    );
+    const filteredFollowUps = user[0]?.userType === 2 ?
+        followUpValues.filter(item =>
+            item.hasOwnProperty('nextDate') &&
+            new Date(item.nextDate) < new Date() &&
+            item.UID == user[0]?.UID) :
+        followUpValues.filter(item =>
+            item.hasOwnProperty('nextDate') &&
+            new Date(item.nextDate) < new Date());
 
     const missedFollowUps = filteredFollowUps.filter(filteredItem => {
         const maxFollowUpDate = followUpValues
-            .filter(followUpItem => 
-                followUpItem.LID === filteredItem.LID && 
+            .filter(followUpItem =>
+                followUpItem.LID === filteredItem.LID &&
                 followUpItem.PID === filteredItem.PID)
             .reduce((maxDate, followUpItem) => {
                 const followUpDate = new Date(followUpItem.date);
                 return followUpDate > maxDate ? followUpDate : maxDate;
-            }, new Date(0)); 
-    
+            }, new Date(0));
+
         const filteredDate = new Date(filteredItem.nextDate);
-    
+
         return filteredDate > maxFollowUpDate;
-    }).sort((a, b) => new Date(b.nextDate) - new Date(a.nextDate));    
-
-    // const missedFollowUps = filteredFollowUps.filter(filteredItem => {
-    //     return !followUpValues.some(followUpItem => {
-    //         const filteredDate = new Date(filteredItem.nextDate).setHours(0, 0, 0, 0);
-    //         const followUpDate = new Date(followUpItem.date).setHours(0, 0, 0, 0);
-
-    //         return (
-    //             filteredItem.LID === followUpItem.LID &&
-    //             filteredItem.PID === followUpItem.PID &&
-    //             filteredDate === followUpDate
-    //         );
-    //     });
-    // })
-    //     .sort((a, b) => new Date(b.nextDate) - new Date(a.nextDate));
+    }).sort((a, b) => new Date(b.nextDate) - new Date(a.nextDate));
 
     return (
         <>
