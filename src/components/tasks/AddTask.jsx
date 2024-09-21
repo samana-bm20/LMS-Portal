@@ -4,9 +4,6 @@ import {
     TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete, List, ListItem, ListItemText, IconButton, ListItemIcon,
 
 } from '@mui/material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import Config from '../../Config';
@@ -24,7 +21,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         taskDate: '',
         title: '',
         description: '',
-        createdBy: '',
+        createdBy: uid,
         UID: '',
         taskStatus: '',
         LID: null,
@@ -44,28 +41,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
             setAddTaskData((prev) => ({ ...prev, createdBy: uid }))
         }
         getCreatedBy();
-    }, [uid]);
-
-    //#region Field Change
-    // const handleAddTaskChange = (e, dateValue) => {
-    //     const name = e?.target?.name || 'taskDate';
-    //     const value = e?.target?.value || dateValue;
-
-
-    //     if (name === 'UID') {
-    //         setAssignedTo(value);
-    //     } else if (name === 'taskStatus') {
-    //         setTaskStatus(value);
-    //     }
-
-
-    //     const updatedValue = name === 'taskDate' ? new Date(value).toISOString() : value;
-
-    //     setAddTaskData((prev) => ({
-    //         ...prev,
-    //         [name]: updatedValue
-    //     }));
-    // };
+    }, []);
 
     const handleAddTaskChange = (e) => {
         const { name, value } = e.target;
@@ -105,6 +81,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
             setError(true);
             return;
         }
+
         const formattedTaskDate = new Date(addTaskData.taskDate).toISOString();
         const taskWithReminders = {
             ...addTaskData,
@@ -113,7 +90,6 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         };
 
         try {
-
             const _ = await axios.post(`${Config.apiUrl}/addTask`, taskWithReminders);
             setSuccess(true);
             setOpenAddTask(false);
@@ -136,7 +112,6 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
             taskDate: '',
             title: '',
             description: '',
-            createdBy: '',
             UID: '',
             taskStatus: '',
             LID: null,
@@ -319,7 +294,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                         </Button>
 
                         {showAddReminder && (
-                            <SetReminder reminders={reminders} setReminders={setReminders} reset={() => {
+                            <SetReminder reminders={reminders} setReminders={setReminders} add={true} reset={() => {
                                 setReminders([]);
                                 setShowAddReminder(false);
                             }} />

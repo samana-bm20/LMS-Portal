@@ -20,10 +20,12 @@ export const FetchLeadsProvider = ({ children }) => {
 
   const fetchLeadsData = async () => {
     try {
-      const userResponse = await axios.get(`${Config.apiUrl}/users`);
-      const user = (userResponse.data).filter((user) => user.username === decryptedUsername);
-      const response = await axios.get(`${Config.apiUrl}/leadData/${user[0]?.UID}/${product}`);
-      setData(response.data);
+      if (storedUsername) {
+        const userResponse = await axios.get(`${Config.apiUrl}/users`);
+        const user = (userResponse.data).filter((user) => user.username === decryptedUsername);
+        const response = await axios.get(`${Config.apiUrl}/leadData/${user[0]?.UID}/${product}`);
+        setData(response.data);
+      }
     } catch (error) {
       console.error(error);
     }

@@ -287,28 +287,22 @@ const LeadsTable = () => {
                     </ListItemIcon>
                     Add Follow-up
                 </MenuItem>,
+                <MenuItem
+                    key={2}
+                    onClick={() => {
+                        setLeadID(lidValue);
+                        setOpenAddProduct(true);
+                        closeMenu();
+                    }}
+                    sx={{ m: 0 }}
+                >
+                    <ListItemIcon>
+                        <AddShoppingCartRounded color='primary' />
+                    </ListItemIcon>
+                    Add Product
+                </MenuItem>
             ];
-
-            // Conditionally add the "Add Product" menu item if userType is 1
-            if (user[0]?.userType === 1) {
-                menuItems.push(
-                    <MenuItem
-                        key={2}
-                        onClick={() => {
-                            setLeadID(lidValue);
-                            setOpenAddProduct(true);
-                            closeMenu();
-                        }}
-                        sx={{ m: 0 }}
-                    >
-                        <ListItemIcon>
-                            <AddShoppingCartRounded color='primary' />
-                        </ListItemIcon>
-                        Add Product
-                    </MenuItem>
-                );
-            }
-
+            
             return menuItems;
         },
 

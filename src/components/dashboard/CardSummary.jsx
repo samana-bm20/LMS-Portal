@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AssignmentRounded, AssignmentIndRounded, AssignmentLateRounded, AssistantPhotoRounded } from '@mui/icons-material';
+import { colors, LinearProgress, useTheme } from '@mui/material';
+
 import BusinessAnalyst from '../../assets/DashboardCards/businessAnalyst.svg'
 import EIGAP from '../../assets/DashboardCards/eigap.svg'
 import LRS from '../../assets/DashboardCards/lrs.svg'
@@ -46,7 +48,11 @@ const Card2 = ({ color, title, total, active, dead, icon, alt }) => (
 );
 
 const CardSummary = () => {
-    const {userValues, loggedUser} = useDetails();
+    const theme = useTheme();
+    const { userValues, loggedUser } = useDetails();
+    if (!userValues.length || !loggedUser) {
+        return <><LinearProgress color='primary' /></>;
+    }
     const user = userValues.filter((user) => user.username === loggedUser);
     const [totalLeads, setTotalLeads] = useState(0);
     const [activeLeads, setActiveLeads] = useState(0);
@@ -58,7 +64,7 @@ const CardSummary = () => {
     const fetchLeadCount = async () => {
 
         try {
-            const response = await axios.get(`${Config.apiUrl}/leads-count/${user[0]?.UID}`);
+            const response = await axios.get(`${Config.apiUrl}/leads-count/${user[0].UID}`);
             if (Array.isArray(response.data) && response.data.length > 0) {
                 const data = response.data[0];
                 const { totalLeads, activeLeads, deadLeads, newLeads } = data;
@@ -123,7 +129,7 @@ const CardSummary = () => {
                         total: item.totalLeads,
                         active: item.activeLeads,
                         dead: item.deadLeads,
-                        icon: icon, 
+                        icon: icon,
                         alt: item.productName
                     };
                 });
@@ -171,29 +177,35 @@ const CardSummary = () => {
 
     //#region Display
     return (
-        <div className="grid gap-4 lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1">
-            {card1Data.map((card, index) => (
-                <Card1
-                    key={index}
-                    color={card.color}
-                    title={card.title}
-                    count={card.count}
-                    icon={card.icon}
-                />
-            ))}
-            {card2Data.map((card, index) => (
-                <Card2
-                    key={index}
-                    color={card.color}
-                    title={card.title}
-                    total={card.total}
-                    active={card.active}
-                    dead={card.dead}
-                    icon={card.icon}
-                    alt={card.alt}
-                />
-            ))}
-        </div>)
+        <>
+            <div className='text-lg pl-3 mb-2 font-bold' style={{color: theme.palette.primary.main}}>
+                Hi, {user[0]?.uName}
+            </div>
+            <div className="grid gap-4 lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1">
+                {card1Data.map((card, index) => (
+                    <Card1
+                        key={index}
+                        color={card.color}
+                        title={card.title}
+                        count={card.count}
+                        icon={card.icon}
+                    />
+                ))}
+                {card2Data.map((card, index) => (
+                    <Card2
+                        key={index}
+                        color={card.color}
+                        title={card.title}
+                        total={card.total}
+                        active={card.active}
+                        dead={card.dead}
+                        icon={card.icon}
+                        alt={card.alt}
+                    />
+                ))}
+            </div>
+        </>
+    )
 }
 
 export default CardSummary;

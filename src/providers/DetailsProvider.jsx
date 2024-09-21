@@ -57,6 +57,7 @@ export const DetailsProvider = ({ children }) => {
 
   const fetchTasks = async () => {
     try {
+      setTaskData([]);
       const response = await axios.get(`${Config.apiUrl}/tasks`);
       setTaskData(response.data);
     } catch (error) {

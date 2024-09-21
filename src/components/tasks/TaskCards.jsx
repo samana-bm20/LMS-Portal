@@ -13,16 +13,17 @@ const TaskCards = () => {
     const user = userValues.filter((user) => user.username == loggedUser);
     const [taskID, setTaskID] = useState();
     const [openEditTask, setOpenEditTask] = useState(false);
-
+    let filteredTaskData;
     const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
     const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
+
 
     const handleEditTask = (tid) => {
         setTaskID(tid);
         setOpenEditTask(true);
     }
 
-    const filteredTaskData = user[0]?.userType === 2 ?
+    filteredTaskData = user[0]?.userType === 2 ?
         taskData.filter((task) => task.UID == user[0]?.UID) : taskData
 
     return (
