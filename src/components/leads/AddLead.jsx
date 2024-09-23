@@ -89,7 +89,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                     <TextField
                         name='mobileNo'
                         id="outlined"
-                        label="Contact"
+                        label="Mobile No."
                         size='small'
                         onChange={handleNestedChange}
                     />

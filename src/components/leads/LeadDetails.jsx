@@ -1,9 +1,6 @@
-import React from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { Paper, Box, Divider, useTheme } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Paper, Box, useTheme } from '@mui/material';
 import PropTypes from 'prop-types';
-import Config from '../../Config';
-import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 
 const LeadDetails = ({ leadId }) => {

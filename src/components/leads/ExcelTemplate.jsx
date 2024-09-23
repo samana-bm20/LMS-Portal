@@ -14,16 +14,16 @@ const ExcelTemplate = () => {
 
         // Add column headers
         worksheet.columns = [
-            { header: "Lead Name", key: "leadName", width: 20 },
+            { header: "Lead Name*", key: "leadName", width: 20 },
             { header: "Mobile No", key: "mobileNo", width: 10 },
             { header: "Email ID", key: "emailId", width: 20 },
             { header: "DesignationDept", key: "designation", width: 20 },
-            { header: "Organization Name", key: "organizationName", width: 20 },
+            { header: "Organization Name*", key: "organizationName", width: 20 },
             { header: "Address", key: "address", width: 20 },
-            { header: "Product Name", key: "productName", width: 15 },
-            { header: "Status", key: "status", width: 10 },
-            { header: "Source", key: "source", width: 10 },
-            { header: "Assigned To", key: "assignedTo", width: 15 }
+            { header: "Product Name*", key: "productName", width: 15 },
+            { header: "Status*", key: "status", width: 10 },
+            { header: "Source*", key: "source", width: 10 },
+            { header: "Assigned To*", key: "assignedTo", width: 15 }
         ];
 
         // Add dropdowns

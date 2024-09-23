@@ -11,13 +11,14 @@ import {
 } from '@mui/material';
 
 //Icons Imports
-import { AccountCircleRounded, AddCommentRounded, AddShoppingCartRounded } from '@mui/icons-material';
+import { AccountCircleRounded, AddCommentRounded, AddShoppingCartRounded, EditRounded } from '@mui/icons-material';
 
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import { useDetails } from '../../providers/DetailsProvider';
 import ViewProfile from './ViewProfile';
 import AddFollowUp from './AddFollowUp';
 import AddProduct from './AddProduct';
+import EditLead from './EditLead';
 
 const LeadsTable = () => {
     const { fetchLeadsData, data, product, setProduct } = useFetchLeads();
@@ -26,6 +27,7 @@ const LeadsTable = () => {
     const [openViewProfile, setOpenViewProfile] = useState(false);
     const [openAddFollowUp, setOpenAddFollowUp] = useState(false);
     const [openAddProduct, setOpenAddProduct] = useState(false);
+    const [openEditLead, setOpenEditLead] = useState(false);
     const [leadID, setLeadID] = useState(0);
     const [productID, setProductID] = useState('');
     const [statusID, setStatusID] = useState('');
@@ -300,6 +302,20 @@ const LeadsTable = () => {
                         <AddShoppingCartRounded color='primary' />
                     </ListItemIcon>
                     Add Product
+                </MenuItem>,
+                <MenuItem
+                    key={3}
+                    onClick={() => {
+                        setLeadID(lidValue);
+                        setOpenEditLead(true);
+                        closeMenu();
+                    }}
+                    sx={{ m: 0 }}
+                >
+                    <ListItemIcon>
+                        <EditRounded color='primary' />
+                    </ListItemIcon>
+                    Edit Lead
                 </MenuItem>
             ];
             
@@ -331,19 +347,14 @@ const LeadsTable = () => {
                 setOpenAddProduct={setOpenAddProduct}
                 lid={leadID}
             />
+            <EditLead
+                openEditLead={openEditLead}
+                setOpenEditLead={setOpenEditLead}
+                lid={leadID}
+            />
         </>
     );
 };
 
 export default LeadsTable;
 
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-
-// const ExampleWithLocalizationProvider = () => (
-//     <LocalizationProvider dateAdapter={AdapterDayjs}>
-//         <LeadsTable />
-//     </LocalizationProvider>
-// );
-
-//export default ExampleWithLocalizationProvider;
