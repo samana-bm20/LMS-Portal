@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AssignmentRounded, AssignmentIndRounded, AssignmentLateRounded, AssistantPhotoRounded } from '@mui/icons-material';
 import { colors, LinearProgress, useTheme } from '@mui/material';
 
+import newLogo from '../../assets/Logo/smallLogo.png'
 import BusinessAnalyst from '../../assets/DashboardCards/businessAnalyst.svg'
 import EIGAP from '../../assets/DashboardCards/eigap.svg'
 import LRS from '../../assets/DashboardCards/lrs.svg'
@@ -120,7 +121,7 @@ const CardSummary = () => {
                             icon = MapData;
                             break;
                         default:
-                            icon = DefaultIcon;
+                            icon = newLogo;
                     }
 
                     return {

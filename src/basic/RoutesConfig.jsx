@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  HomeRounded, MapRounded, DynamicFormRounded, AssignmentRounded, AlarmRounded, EventRounded
+  HomeRounded, MapRounded, DynamicFormRounded, AssignmentRounded, AlarmRounded, SwitchAccountRounded, EventRounded
 } from '@mui/icons-material'
 
 const RoutesConfig = [
@@ -9,11 +9,6 @@ const RoutesConfig = [
     to: '/dashboard',
     icon: <HomeRounded />,
   },
-  // {
-  //   name: 'Products',
-  //   to: '/products',
-  //   icon: <MapRounded />,
-  // },
   {
     name: 'Leads',
     to: '/leads',
@@ -28,6 +23,16 @@ const RoutesConfig = [
     name: 'Reminder',
     to: '/reminder',
     icon: <AlarmRounded />,
+  },
+  {
+    name: 'Products',
+    to: '/products',
+    icon: <MapRounded />,
+  },
+  {
+    name: 'Users',
+    to: '/users',
+    icon: <SwitchAccountRounded />,
   },
   // {
   //   name: 'Calendar',

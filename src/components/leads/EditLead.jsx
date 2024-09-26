@@ -23,6 +23,7 @@ const EditLead = ({ openEditLead, setOpenEditLead, lid }) => {
         address: '',
     });
 
+    //#region Fetch Details
     const getLeadData = async () => {
         try {
             currentLead = data.filter(lead => lead.LID === lid)
@@ -48,6 +49,7 @@ const EditLead = ({ openEditLead, setOpenEditLead, lid }) => {
         }
     }, [lid, openEditLead]);
 
+    //#region Edit Lead
     const handleEditLeadChange = (e) => {
         const { name, value } = e.target;
         if (name == 'mobileNo' || name == 'emailID') {
@@ -67,7 +69,6 @@ const EditLead = ({ openEditLead, setOpenEditLead, lid }) => {
     }
 
     const handleEditLead = async () => {
-        debugger
         if (!editLeadData.name || !editLeadData.organizationName) {
             setErrorMessage('Required fields cannot be empty.')
             setError(true);

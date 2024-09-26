@@ -39,6 +39,8 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
         { label: 'WhatsApp', value: 'WhatsApp' },
     ];
 
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
+
     // Fetch Task Data on Task ID Change
     const getSelectedTask = () => {
         if (tid) {
@@ -60,8 +62,10 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
     }
 
     useEffect(() => {
-        getSelectedTask();
-    }, [tid, uid]);
+        if(openEditTask) {
+            getSelectedTask();
+        }
+    }, [tid, openEditTask]);
 
     //#region Field Change
     const handleEditTaskChange = (e) => {
@@ -144,7 +148,6 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
         setOpenEditTask(false);
         setReminders([]);
         setShowAddReminder(false);
-        getSelectedTask();
         fetchTasks();
     }
 
@@ -202,7 +205,7 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
                                         onChange={handleEditTaskChange}
                                         size='small'
                                     >
-                                        {userValues.map((user) => (
+                                        {activeUsers.map((user) => (
                                             <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                         ))}
                                     </Select>

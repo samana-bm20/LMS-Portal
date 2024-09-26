@@ -23,6 +23,7 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
 
     //#region Fetch Data
     const getSelectedFollowUp = () => {
@@ -164,7 +165,7 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
                                         onChange={handleEditFollowUpChange}
                                         size='small'
                                     >
-                                        {userValues.map((user) => (
+                                        {activeUsers.map((user) => (
                                             <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                         ))}
                                     </Select>

@@ -29,7 +29,7 @@ const ExcelTemplate = () => {
         // Add dropdowns
         const productNames = productValues.map(product => product.pName);
         const statusNames = statusValues.map(status => status.sName);
-        const userNames = userValues.map(user => user.uName);
+        const userNames = userValues.filter((userItem) => userItem.uStatus == 'Active').map(user => user.uName);
 
         worksheet.dataValidations.add('G2:G99999', {
             type: 'list',

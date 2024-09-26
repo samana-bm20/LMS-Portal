@@ -24,6 +24,8 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
         UID: '',
         source: '',
     });
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
+
 
     //#region Set LID
     useEffect(() => {
@@ -102,7 +104,7 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
                 open={openAddProduct}
                 onClose={closeAddProduct}
             >
-                <DialogTitle>Add New Product</DialogTitle>
+                <DialogTitle>Add Product</DialogTitle>
                 <DialogContent>
                     <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -165,7 +167,7 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
                                         onChange={handleDataChange}
                                         size='small'
                                     >
-                                        {userValues.map((user) => (
+                                        {activeUsers.map((user) => (
                                             <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                         ))}
                                     </Select>

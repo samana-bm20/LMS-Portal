@@ -32,12 +32,6 @@ export const DetailsProvider = ({ children }) => {
       const statusResponse = await axios.get(`${Config.apiUrl}/status`);
       setStatusValues(statusResponse.data);
 
-      const productResponse = await axios.get(`${Config.apiUrl}/products`);
-      setProductValues(productResponse.data);
-
-      const userResponse = await axios.get(`${Config.apiUrl}/users`);
-      setUserValues(userResponse.data);
-
       const leadResponse = await axios.get(`${Config.apiUrl}/leadDetails`);
       setLeadValues(leadResponse.data);
 
@@ -45,6 +39,24 @@ export const DetailsProvider = ({ children }) => {
       console.error(error);
     }
   };
+
+  const fetchUsers = async () => {
+    try {
+      const userResponse = await axios.get(`${Config.apiUrl}/users`);
+      setUserValues(userResponse.data);
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchProducts = async () => {
+    try {
+      const productResponse = await axios.get(`${Config.apiUrl}/products`);
+      setProductValues(productResponse.data);
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const fetchFollowUps = async () => {
     try {
@@ -67,7 +79,9 @@ export const DetailsProvider = ({ children }) => {
 
   useEffect(() => {
     fetchUser();
+    fetchUsers();
     fetchDetails();
+    fetchProducts();
     fetchFollowUps();
     fetchTasks();
   }, []);
@@ -75,8 +89,8 @@ export const DetailsProvider = ({ children }) => {
 
   return (
     <DetailsContext.Provider value={{
-      statusValues, productValues, userValues, fetchFollowUps,
-      loggedUser, leadValues, followUpValues, fetchTasks, taskData
+      statusValues, productValues, userValues, fetchUsers, fetchProducts, 
+      fetchFollowUps, loggedUser, leadValues, followUpValues, fetchTasks, taskData
     }}>
       {children}
     </DetailsContext.Provider>

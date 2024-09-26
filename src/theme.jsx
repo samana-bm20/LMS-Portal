@@ -14,13 +14,14 @@ export const Theme = ({children}) => {
           primary: {
             main: '#006A62', //'#0245A3',
             light: '#a2e0db',
+            contrastSecondary: 'rgba(255, 255, 255, 0.7)'
           },
           background: {
             default: '#fff',
             paper: '#fff',
             footer: '#eee',
             header: '#e0e0e0',
-            card: '#D1D5DB',
+            card: '#fff',
           },
         }
         : {
@@ -28,6 +29,7 @@ export const Theme = ({children}) => {
           primary: {
             main: '#78ded6',//'#90caf9',
             dark: '#62b5af',//'#5F9ACB',
+            contrastSecondary: 'rgba(0, 0, 0, 0.6)'
           },
           background: {
             default: '#121212',

@@ -34,14 +34,16 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
     //set remainder
     const [reminders, setReminders] = useState([]);
     const [showAddReminder, setShowAddReminder] = useState(false);
-
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
 
     useEffect(() => {
         const getCreatedBy = () => {
-            setAddTaskData((prev) => ({ ...prev, createdBy: uid }))
+            if(openAddTask){
+                setAddTaskData((prev) => ({ ...prev, createdBy: uid }))
+            }
         }
         getCreatedBy();
-    }, []);
+    }, [openAddTask]);
 
     const handleAddTaskChange = (e) => {
         const { name, value } = e.target;
@@ -171,27 +173,6 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                     onChange={handleAddTaskChange}
                                     fullWidth
                                 />
-                                {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DateTimePicker
-                                        label="Task Date"
-                                        onChange={(date) => handleAddTaskChange({}, date)}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                required
-                                                name="taskDate"
-                                                fullWidth
-                                                InputProps={{
-                                                    ...params.InputProps,
-                                                    size: 'small', // Pass size directly here
-                                                }}
-                                            />
-                                        )}
-                                    // DialogProps={{
-                                    //     style: { position: 'relative' },
-                                    // }}
-                                    />
-                                </LocalizationProvider> */}
                             </div>
                             <div className="mb-2">
                                 <TextField
@@ -231,7 +212,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                         size='small'
                                     >
                                         {user[0]?.userType === 1 ? (
-                                            userValues.map((user) => (
+                                            activeUsers.map((user) => (
                                                 <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                             ))
                                         ) : (

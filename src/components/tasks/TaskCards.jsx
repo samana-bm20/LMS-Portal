@@ -58,17 +58,12 @@ const TaskCards = () => {
                     return (
                         <div
                             key={task.TID}
-                            className={`grid shadow-lg rounded-lg p-4 m-2`}
-                            style={{ backgroundColor: alpha(theme.palette.background.card, 0.5) }}
+                            className={`grid shadow-lg rounded-lg p-4 m-2 border`}
+                            style={{ backgroundColor: alpha(theme.palette.background.card, 0.5),
+                                borderColor: theme.palette.primary.main
+                             }}
                         >
                             <div className='flex justify-between items-center gap-4 mb-2'>
-                                {/* <div
-                                    className='p-1 rounded-lg text-xs'
-                                    style={{ backgroundColor: alpha(theme.palette.background.header, 0.5) }}
-                                >
-                                    TID-{task.TID}
-                                </div> */}
-
                                 <div
                                     className='flex items-center p-1 rounded-lg'
                                     style={{ backgroundColor: bgColor }}

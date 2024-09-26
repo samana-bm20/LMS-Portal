@@ -9,6 +9,8 @@ import Dashboard from '../pages/Dashboard'
 import Leads from '../pages/Leads'
 import Tasks from '../pages/Tasks';
 import Reminder from "../pages/Reminder"
+import Products from '../pages/Products';
+import Users from '../pages/Users';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -36,6 +38,14 @@ const AppRoutes = () => {
         {
           path: '/reminder',
           element: <Reminder />
+        },
+        {
+          path: '/products',
+          element: <Products />
+        },
+        {
+          path: '/users',
+          element: <Users />
         },
       ],
     },

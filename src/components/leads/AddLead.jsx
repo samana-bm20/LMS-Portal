@@ -22,6 +22,7 @@ const AddLead = ({ handleLeadDataChange }) => {
         UID: '',
         source: '',
     });
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
 
     //#region Field Change
     const handleNewLeadChange = (e) => {
@@ -60,18 +61,6 @@ const AddLead = ({ handleLeadDataChange }) => {
     return (
         <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
             <div className="grid gap-2">
-                {/* <div className="mb-2">
-                    <TextField
-                        required
-                        name='LID'
-                        id="outlined-required"
-                        label="LID"
-                        size='small'
-                        value={leadID + 1}
-                        disabled
-                    // onChange={handleNewLeadChange}
-                    />
-                </div> */}
                 <div className="mb-2">
                     <TextField
                         required
@@ -193,7 +182,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                             size='small'
                         >
                             {user[0]?.userType === 1 ? (
-                                userValues.map((user) => (
+                                activeUsers.map((user) => (
                                     <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                 ))
                             ) : (

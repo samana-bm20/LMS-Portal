@@ -82,7 +82,7 @@ const MissedFollowUps = () => {
                             <p className='text-sm font-semibold'>Date: {new Date(followUp.nextDate).toLocaleDateString('en-GB', dateOptions).replace(/ /g, '-')}</p>
                         </div>
 
-                        <div className="flex justify-between items-center gap-4 p-2 rounded-lg shadow-md"
+                        <div className="flex justify-between items-center gap-4 p-2 rounded-lg shadow-md border"
                             style={{ backgroundColor: theme.palette.background.card }}>
                             <div className="grid p-4 place-items-center rounded-lg w-[120px]"
                                 style={{ backgroundColor: theme.palette.error.main }}>
