@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   const fetchUserData = async () => {
     try {
       const response = await axios.get(`${Config.apiUrl}/users`);
-      const userData = response.data;
+      const userData = Config.decryptData(response.data);
       user = userData.filter((user) => user.username === decryptedUsername);
       setUsersDetails(user)
 

@@ -89,8 +89,8 @@ const UserList = () => {
                 {user.UID}
               </div>
               {loguser[0]?.userType == 1 && (
-                <IconButton aria-label="edit" sx={{ mx: 1 }} >
-                  <EditRounded color='primary' onClick={() => handleEditUser(user.UID)} />
+                <IconButton aria-label="edit" sx={{ mx: 1 }}  onClick={() => handleEditUser(user.UID)} >
+                  <EditRounded color='primary'/>
                 </IconButton>
               )}
             </div>

@@ -5,6 +5,7 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js';
 
 export const FetchLeadsProvider = ({ children }) => {
+ 
   const encryptionKey = "my-secure-key-123456";
   const storedUsername = sessionStorage.getItem("username");
   let decryptedUsername
@@ -22,9 +23,9 @@ export const FetchLeadsProvider = ({ children }) => {
     try {
       if (storedUsername) {
         const userResponse = await axios.get(`${Config.apiUrl}/users`);
-        const user = (userResponse.data).filter((user) => user.username === decryptedUsername);
+        const user = (Config.decryptData(userResponse.data)).filter((user) => user.username === decryptedUsername);
         const response = await axios.get(`${Config.apiUrl}/leadData/${user[0]?.UID}/${product}`);
-        setData(response.data);
+        setData(Config.decryptData(response.data));
       }
     } catch (error) {
       console.error(error);

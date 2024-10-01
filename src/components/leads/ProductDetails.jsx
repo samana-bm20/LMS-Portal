@@ -24,7 +24,7 @@ const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
   const fetchProductData = async () => {
     try {
       const response = await axios.get(`${Config.apiUrl}/productDetails`);
-      const productData = response.data;
+      const productData = Config.decryptData(response.data);
       const filteredProducts = productData.filter(product => product.LID === leadId);
       setLeadProducts(filteredProducts);
 

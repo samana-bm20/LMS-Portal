@@ -30,10 +30,10 @@ export const DetailsProvider = ({ children }) => {
   const fetchDetails = async () => {
     try {
       const statusResponse = await axios.get(`${Config.apiUrl}/status`);
-      setStatusValues(statusResponse.data);
+      setStatusValues(Config.decryptData(statusResponse.data));
 
       const leadResponse = await axios.get(`${Config.apiUrl}/leadDetails`);
-      setLeadValues(leadResponse.data);
+      setLeadValues(Config.decryptData(leadResponse.data));
 
     } catch (error) {
       console.error(error);
@@ -43,7 +43,7 @@ export const DetailsProvider = ({ children }) => {
   const fetchUsers = async () => {
     try {
       const userResponse = await axios.get(`${Config.apiUrl}/users`);
-      setUserValues(userResponse.data);
+      setUserValues(Config.decryptData(userResponse.data));
     } catch (error) {
       console.error(error)
     }
@@ -52,7 +52,7 @@ export const DetailsProvider = ({ children }) => {
   const fetchProducts = async () => {
     try {
       const productResponse = await axios.get(`${Config.apiUrl}/products`);
-      setProductValues(productResponse.data);
+      setProductValues(Config.decryptData(productResponse.data));
     } catch (error) {
       console.error(error)
     }
@@ -61,7 +61,7 @@ export const DetailsProvider = ({ children }) => {
   const fetchFollowUps = async () => {
     try {
       const followUpResponse = await axios.get(`${Config.apiUrl}/followUpDetails`);
-      setFollowUpValues(followUpResponse.data);
+      setFollowUpValues(Config.decryptData(followUpResponse.data));
     } catch (error) {
       console.error(error)
     }
@@ -71,7 +71,7 @@ export const DetailsProvider = ({ children }) => {
     try {
       setTaskData([]);
       const response = await axios.get(`${Config.apiUrl}/tasks`);
-      setTaskData(response.data);
+      setTaskData(Config.decryptData(response.data));
     } catch (error) {
       console.error(error)
     }

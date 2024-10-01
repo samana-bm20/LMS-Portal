@@ -42,7 +42,7 @@ const FollowUpHistory = ({ leadId, productId }) => {
   const fetchLeadsData = async () => {
     try {
       const response = await axios.get(`${Config.apiUrl}/leadData/${user[0]?.UID}/All`);
-      const data = response.data;
+      const data = Config.decryptData(response.data);
       setCurrentLeadProducts(data.filter(product => product.LID === leadId));
       setSelectedProduct(productId);
     } catch (error) {
