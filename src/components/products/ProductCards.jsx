@@ -23,7 +23,7 @@ const ProductCards = () => {
 
     return (
         <>
-            <div className="grid gap-6 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
+            <div className="grid gap-6 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1">
                 {productValues.map(product => (
                     <Card key={product.PID} className='flex flex-col border' sx={{
                         borderColor: theme.palette.primary.main

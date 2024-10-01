@@ -40,8 +40,12 @@ const FollowUpHistory = ({ leadId, productId }) => {
   
   //#region Data
   const fetchLeadsData = async () => {
+    const params = {
+      uid: user[0]?.UID,
+      pid: 'All'
+    }
     try {
-      const response = await axios.get(`${Config.apiUrl}/leadData/${user[0]?.UID}/All`);
+      const response = await axios.post(`${Config.apiUrl}/leadData`, params);
       const data = Config.decryptData(response.data);
       setCurrentLeadProducts(data.filter(product => product.LID === leadId));
       setSelectedProduct(productId);

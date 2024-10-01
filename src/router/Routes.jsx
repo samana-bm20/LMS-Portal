@@ -11,6 +11,7 @@ import Tasks from '../pages/Tasks';
 import Reminder from "../pages/Reminder"
 import Products from '../pages/Products';
 import Users from '../pages/Users';
+import MLSoftwaresInfo from '../pages/ml_softwares_info'
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -46,6 +47,10 @@ const AppRoutes = () => {
         {
           path: '/users',
           element: <Users />
+        },
+        {
+          path: '/softwares-info',
+          element: <MLSoftwaresInfo />
         },
       ],
     },

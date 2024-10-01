@@ -12,6 +12,7 @@ export const DetailsProvider = ({ children }) => {
   const [followUpValues, setFollowUpValues] = useState([]);
   const [taskData, setTaskData] = useState([]);
   const [loggedUser, setLoggedUser] = useState([]);
+  const [esriProducts, setEsriProducts] = useState([]);
   let storedUsername;
 
   const fetchUser = () => {
@@ -29,10 +30,10 @@ export const DetailsProvider = ({ children }) => {
 
   const fetchDetails = async () => {
     try {
-      const statusResponse = await axios.get(`${Config.apiUrl}/status`);
+      const statusResponse = await axios.post(`${Config.apiUrl}/status`);
       setStatusValues(Config.decryptData(statusResponse.data));
 
-      const leadResponse = await axios.get(`${Config.apiUrl}/leadDetails`);
+      const leadResponse = await axios.post(`${Config.apiUrl}/leadDetails`);
       setLeadValues(Config.decryptData(leadResponse.data));
 
     } catch (error) {
@@ -42,7 +43,7 @@ export const DetailsProvider = ({ children }) => {
 
   const fetchUsers = async () => {
     try {
-      const userResponse = await axios.get(`${Config.apiUrl}/users`);
+      const userResponse = await axios.post(`${Config.apiUrl}/users`);
       setUserValues(Config.decryptData(userResponse.data));
     } catch (error) {
       console.error(error)
@@ -51,7 +52,7 @@ export const DetailsProvider = ({ children }) => {
 
   const fetchProducts = async () => {
     try {
-      const productResponse = await axios.get(`${Config.apiUrl}/products`);
+      const productResponse = await axios.post(`${Config.apiUrl}/products`);
       setProductValues(Config.decryptData(productResponse.data));
     } catch (error) {
       console.error(error)
@@ -60,7 +61,7 @@ export const DetailsProvider = ({ children }) => {
 
   const fetchFollowUps = async () => {
     try {
-      const followUpResponse = await axios.get(`${Config.apiUrl}/followUpDetails`);
+      const followUpResponse = await axios.post(`${Config.apiUrl}/followUpDetails`);
       setFollowUpValues(Config.decryptData(followUpResponse.data));
     } catch (error) {
       console.error(error)
@@ -70,12 +71,23 @@ export const DetailsProvider = ({ children }) => {
   const fetchTasks = async () => {
     try {
       setTaskData([]);
-      const response = await axios.get(`${Config.apiUrl}/tasks`);
+      const response = await axios.post(`${Config.apiUrl}/tasks`);
       setTaskData(Config.decryptData(response.data));
     } catch (error) {
       console.error(error)
     }
   }
+
+  const fetchESRIProducts = async () => {
+    try {
+      setEsriProducts([]);
+      const response = await axios.post(`${Config.apiUrl}/getESRIProduct`);
+      setEsriProducts(Config.decryptData(response.data));
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
 
   useEffect(() => {
     fetchUser();
@@ -84,13 +96,15 @@ export const DetailsProvider = ({ children }) => {
     fetchProducts();
     fetchFollowUps();
     fetchTasks();
+    fetchESRIProducts();
   }, []);
 
 
   return (
     <DetailsContext.Provider value={{
       statusValues, productValues, userValues, fetchUsers, fetchProducts, 
-      fetchFollowUps, loggedUser, leadValues, followUpValues, fetchTasks, taskData
+      fetchFollowUps, loggedUser, leadValues, followUpValues, fetchTasks, taskData,
+      setEsriProducts,esriProducts,fetchESRIProducts
     }}>
       {children}
     </DetailsContext.Provider>

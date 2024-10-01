@@ -87,7 +87,7 @@ const AppDrawer = ({ open, onClose }) => {
               // },
             }}
           >
-            <ListItemIcon sx={{ color: 'primary.contrastText' }}>{route.icon}</ListItemIcon>
+            <ListItemIcon sx={{ color: 'primary.contrastText', minWidth: '41px' }}>{route.icon}</ListItemIcon>
             <ListItemText primary={route.name} />
           </ListItemButton>
         ))}

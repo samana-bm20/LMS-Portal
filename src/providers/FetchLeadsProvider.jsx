@@ -22,9 +22,13 @@ export const FetchLeadsProvider = ({ children }) => {
   const fetchLeadsData = async () => {
     try {
       if (storedUsername) {
-        const userResponse = await axios.get(`${Config.apiUrl}/users`);
+        const userResponse = await axios.post(`${Config.apiUrl}/users`);
         const user = (Config.decryptData(userResponse.data)).filter((user) => user.username === decryptedUsername);
-        const response = await axios.get(`${Config.apiUrl}/leadData/${user[0]?.UID}/${product}`);
+        const params = {
+          uid: user[0]?.UID,
+          pid: product
+        }
+        const response = await axios.post(`${Config.apiUrl}/leadData`, params);
         setData(Config.decryptData(response.data));
       }
     } catch (error) {

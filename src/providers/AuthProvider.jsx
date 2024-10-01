@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`${Config.apiUrl}/users`);
+      const response = await axios.post(`${Config.apiUrl}/users`);
       const userData = Config.decryptData(response.data);
       user = userData.filter((user) => user.username === decryptedUsername);
       setUsersDetails(user)
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       if (decryptedUsername == username && decryptedPassword == password) {
         setIsAuthenticated(true);
         sessionStorage.setItem("isAuthenticated", "true");
-        window.location.href = "/dashboard";
+        // window.location.href = "/dashboard";
       } else {
         setErrorOpen(true);
       }

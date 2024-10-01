@@ -1,6 +1,7 @@
 import React from "react";
 import {
-  HomeRounded, MapRounded, DynamicFormRounded, AssignmentRounded, AlarmRounded, SwitchAccountRounded, EventRounded
+  HomeRounded, MapRounded, DynamicFormRounded, AssignmentRounded, AlarmRounded, SwitchAccountRounded, 
+  MoreTimeRounded, EventRounded
 } from '@mui/icons-material'
 
 const RoutesConfig = [
@@ -33,6 +34,11 @@ const RoutesConfig = [
     name: 'Users',
     to: '/users',
     icon: <SwitchAccountRounded />,
+  },
+  {
+    name: 'ML Softwares',
+    to: '/softwares-info',
+    icon: <MoreTimeRounded />,
   },
   // {
   //   name: 'Calendar',

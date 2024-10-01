@@ -93,8 +93,11 @@ const CardSummary = () => {
     useEffect(() => {
         const fetchLeadCount = async () => {
             if (user) {
+                const params = {
+                    uid: user.UID
+                }
                 try {
-                    const response = await axios.get(`${Config.apiUrl}/leads-count/${user.UID}`);
+                    const response = await axios.post(`${Config.apiUrl}/leads-count`, params);
                     const decryptData = Config.decryptData(response.data)
 
                     if (Array.isArray(decryptData) && decryptData.length > 0) {
@@ -115,8 +118,11 @@ const CardSummary = () => {
 
         const fetchProductLeadCount = async () => {
             if (user) {
+                const params = {
+                    uid: user.UID
+                }
                 try {
-                    const response = await axios.get(`${Config.apiUrl}/productlead-count/${user.UID}`);
+                    const response = await axios.post(`${Config.apiUrl}/productlead-count`, params);
                     const decryptData = Config.decryptData(response.data)
                     if (decryptData.length > 0) {
                         const colors = [
