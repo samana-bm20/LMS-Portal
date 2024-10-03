@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { useAuth } from '../providers/AuthProvider';
+import { useDetails } from '../providers/DetailsProvider';
 import MainLayout from '../layout/MainLayout';
 
 //pages
@@ -12,9 +13,14 @@ import Reminder from "../pages/Reminder"
 import Products from '../pages/Products';
 import Users from '../pages/Users';
 import MLSoftwaresInfo from '../pages/ml_softwares_info'
+import ErrorPage from '../pages/ErrorPage';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
+  const { userValues, loggedUser } = useDetails();
+  const user = userValues && loggedUser
+  ? userValues.find((user) => user.username === loggedUser)
+  : null;
   const router = isAuthenticated ? createBrowserRouter([
     {
       path: '/',
@@ -25,32 +31,32 @@ const AppRoutes = () => {
         //   element: <Navigate to='/dashboard' replace />
         // },
         {
-          path: '/dashboard',
+          path: '/lms/dashboard',
           element: <Dashboard />
         },
         {
-          path: '/leads',
+          path: '/lms/leads',
           element: <Leads />
         },
         {
-          path: '/tasks',
+          path: '/lms/tasks',
           element: <Tasks />
         },
         {
-          path: '/reminder',
+          path: '/lms/reminder',
           element: <Reminder />
         },
         {
-          path: '/products',
+          path: '/lms/products',
           element: <Products />
         },
         {
-          path: '/users',
+          path: '/lms/users',
           element: <Users />
         },
         {
-          path: '/softwares-info',
-          element: <MLSoftwaresInfo />
+          path: '/lms/softwares-info',
+          element: user?.userType === 1 ? <MLSoftwaresInfo /> : <ErrorPage />
         },
       ],
     },

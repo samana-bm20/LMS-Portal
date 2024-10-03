@@ -6,7 +6,7 @@ import AppHeader from '../basic/AppHeader';
 import AppDrawer from '../basic/AppDrawer'
 import AppFooter from '../basic/AppFooter'
 import { Outlet } from 'react-router-dom';
-const drawerWidth = 200;
+const drawerWidth = 180;
 
 const MainLayout = () => {
   const drawerShow = useSelector((state) => state.drawerShow)

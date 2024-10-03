@@ -23,13 +23,27 @@ function stringToColor(string) {
 }
 
 function stringAvatar(name) {
+  if (!name) {
+    return {
+      sx: {
+        bgcolor: '#ccc', // Default color if name is not provided
+      },
+      children: 'ML', // Default placeholder if name is empty
+    };
+  }
+
+  const nameParts = name.split(' ');
+  const firstInitial = nameParts[0] ? nameParts[0][0] : '';
+  const secondInitial = nameParts[1] ? nameParts[1][0] : '';
+
   return {
     sx: {
       bgcolor: stringToColor(name),
     },
-    children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+    children: `${firstInitial}${secondInitial}`,
   };
 }
+
 
 const UserList = () => {
   const theme = useTheme();

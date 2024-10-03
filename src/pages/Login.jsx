@@ -75,7 +75,7 @@ const Login = () => {
       login();
       if (isAuthenticated) {
         setSuccessOpen(true);
-        navigate('/dashboard')
+        // navigate('/lms/dashboard')
       }
     }
   };

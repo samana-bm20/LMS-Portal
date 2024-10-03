@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       if (decryptedUsername == username && decryptedPassword == password) {
         setIsAuthenticated(true);
         sessionStorage.setItem("isAuthenticated", "true");
-        // window.location.href = "/dashboard";
+        window.location.href = "/lms/dashboard";
       } else {
         setErrorOpen(true);
       }
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     sessionStorage.clear();
     setIsAuthenticated(false);
-    window.location.href = "/";
+    window.location.href = "/lms/";
   };
 
   return (

@@ -13,7 +13,7 @@ import { useMode } from '../providers/ModeProvider';
 import { useDetails } from '../providers/DetailsProvider';
 import AppNotifications from './AppNotifications';
 //#region Responsive
-const drawerWidth = 200;
+const drawerWidth = 180;
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({

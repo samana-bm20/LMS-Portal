@@ -3,7 +3,7 @@ import {
     AssignmentRounded, AssignmentIndRounded, AssignmentLateRounded, AssistantPhotoRounded,
     ArrowBackIos, ArrowForwardIos
 } from '@mui/icons-material';
-import { colors, LinearProgress, useTheme, alpha, IconButton } from '@mui/material';
+import { LinearProgress, useTheme, alpha, IconButton } from '@mui/material';
 import ESRI from '../../assets/DashboardCards/owner_esri.svg'
 import ML from '../../assets/DashboardCards/owner_ml.svg'
 import Config from '../../Config';

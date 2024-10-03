@@ -8,9 +8,10 @@ import Logo from '../assets/Logo/newLogo.svg';
 import blackLogo from '../assets/Logo/blackLogo.svg';
 import { useMode } from '../providers/ModeProvider';
 
-const drawerWidth = 200;
+const drawerWidth = 180;
 
 const AppDrawer = ({ open, onClose }) => {
+  const routes = RoutesConfig();
   const location = useLocation();
   const [selectedIndex, setSelectedIndex] = useState(null);
   const { mode } = useMode();
@@ -19,7 +20,7 @@ const AppDrawer = ({ open, onClose }) => {
   
   useEffect(() => {
     const currentPath = location.pathname;
-    const selectedItemIndex = RoutesConfig.findIndex(item => item.to === currentPath);
+    const selectedItemIndex = routes.findIndex(item => item.to === currentPath);
 
     setSelectedIndex(selectedItemIndex);
 
@@ -65,7 +66,7 @@ const AppDrawer = ({ open, onClose }) => {
       </div>
       <Divider sx={{ backgroundColor: 'divider' }} />
       <List>
-        {RoutesConfig.map((route, index) => (
+        {routes.map((route, index) => (
           <ListItemButton
             component={Link}
             to={route.to}
@@ -79,15 +80,15 @@ const AppDrawer = ({ open, onClose }) => {
                 borderRadius: '10px',
                 ml: '5px', mr: '5px', mt: '1px', mb: '1px'
               },
-              // '&:hover': {
-              //   backgroundColor: 'primary.dark',
-              //   color: 'primary.contrastText',
-              //   borderRadius: '10px',
-              //   ml: '5px', mr: '5px', mt: '1px', mb: '1px'
-              // },
+              '&:hover': {
+                backgroundColor: 'primary.dark',
+                color: 'primary.contrastText',
+                // borderRadius: '10px',
+                // ml: '5px', mr: '5px', mt: '1px', mb: '1px'
+              },
             }}
           >
-            <ListItemIcon sx={{ color: 'primary.contrastText', minWidth: '41px' }}>{route.icon}</ListItemIcon>
+            <ListItemIcon sx={{ color: 'primary.contrastText', marginRight: '-20px' }}>{route.icon}</ListItemIcon>
             <ListItemText primary={route.name} />
           </ListItemButton>
         ))}

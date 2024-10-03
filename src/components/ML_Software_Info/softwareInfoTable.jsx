@@ -6,7 +6,7 @@ import {
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
 } from "material-react-table";
-import { AddCircleRounded, FileUploadRounded } from '@mui/icons-material'
+import { AddCircleRounded } from '@mui/icons-material'
 
 import {
   Box,
@@ -18,33 +18,27 @@ import {
   InputLabel,
   Select,
   useTheme,
+  alpha,
   Tabs,
   Tab,
 } from "@mui/material";
 
 //Icons Imports
 import {
-  AccountCircleRounded,
-  AddCommentRounded,
-  AddShoppingCartRounded,
   EditRounded,
 } from "@mui/icons-material";
 
-import { useFetchLeads } from "../../providers/FetchLeadsProvider";
 import { useDetails } from "../../providers/DetailsProvider";
-// import ViewProfile from './ViewProfile';
-// import AddFollowUp from './AddFollowUp';
-// import AddProduct from './AddProduct';
 import UpdateRecord from "./updateInfo";
 import AddNewRecord from "./addNewRecord"
 
 const SoftwaresInfoTable = () => {
+  const theme = useTheme();
   const [product, setProduct] = useState("All");
   const [tableSNO, setTableSNO] = useState();
   const [copyEsriProducts, setCopyEsriProducts] = useState("All");
   const [showAddNewRecord, setShowAddNewRecord] = useState(false);
   const {
-    productValues,
     userValues,
     loggedUser,
     esriProducts,
@@ -64,7 +58,6 @@ const SoftwaresInfoTable = () => {
   }, [esriProducts]);
 
   const handleProductChange = (event) => {
-    debugger;
     let selectedPro = event.target.value;
     setProduct(selectedPro);
     if (selectedPro !== "All") {
@@ -182,42 +175,6 @@ const SoftwaresInfoTable = () => {
         header: "Tenure",
         size: 100,
       },
-      // {
-      //     accessorKey: 'productDetails.sName',
-      //     filterVariant: 'autocomplete',
-      //     header: 'Status',
-      //     size: 100,
-      //     Cell: ({ cell }) => {
-      //         const theme = useTheme();
-      //         const sid = cell.row.original.productDetails.SID;
-      //         const sName = cell.getValue();
-
-      //         const sidToColor = {
-      //             S1: theme.palette.disabled,
-      //             S2: theme.palette.secondary.main,
-      //             S3: theme.palette.warning.main,
-      //             S4: theme.palette.success.main,
-      //             S5: theme.palette.error.main,
-      //         };
-
-      //         const backgroundColor = sidToColor[sid] || theme.palette.grey[500];
-
-      //         return (
-      //             <Box
-      //                 component="span"
-      //                 sx={{
-      //                     backgroundColor: backgroundColor,
-      //                     borderRadius: '1rem',
-      //                     color: theme.palette.primary.contrastText,
-      //                     maxWidth: '9ch',
-      //                     p: '0.4rem',
-      //                 }}
-      //             >
-      //                 {sName}
-      //             </Box>
-      //         );
-      //     },
-      // },
       {
         accessorKey: "City",
         header: "City",
@@ -241,25 +198,6 @@ const SoftwaresInfoTable = () => {
     ],
     []
   );
-
-  //#region Top Toolbar
-  // const handleDeactivate = () => {
-  //     table.getSelectedRowModel().flatRows.map((row) => {
-  //         alert('deactivating ' + row.getValue('name'));
-  //     });
-  // };
-
-  // const handleActivate = () => {
-  //     table.getSelectedRowModel().flatRows.map((row) => {
-  //         alert('activating ' + row.getValue('name'));
-  //     });
-  // };
-
-  // const handleContact = () => {
-  //     table.getSelectedRowModel().flatRows.map((row) => {
-  //         alert('contact ' + row.getValue('name'));
-  //     });
-  // };
 
   const renderTopToolbar = ({ table }) => (
     <Box
@@ -306,30 +244,6 @@ const SoftwaresInfoTable = () => {
               {/* <MenuItem value="New">New</MenuItem> */}
             </Select>
           </FormControl>
-          {/* <Button
-                        color="error"
-                        disabled={!table.getIsSomeRowsSelected()}
-                        onClick={handleDeactivate}
-                        variant="contained"
-                    >
-                        Deactivate
-                    </Button>
-                    <Button
-                        color="success"
-                        disabled={!table.getIsSomeRowsSelected()}
-                        onClick={handleActivate}
-                        variant="contained"
-                    >
-                        Activate
-                    </Button>
-                    <Button
-                        color="info"
-                        disabled={!table.getIsSomeRowsSelected()}
-                        onClick={handleContact}
-                        variant="contained"
-                    >
-                        Contact
-                    </Button> */}
         </Box>
       </Box>
     </Box>
@@ -449,29 +363,29 @@ const SoftwaresInfoTable = () => {
         value={value}
         onChange={handleChange}
         // textColor="secondary"
-        indicatorColor="secondary"
+        indicatorColor="primary"
         aria-label="customized tabs"
         sx={{
           "& .MuiTabs-indicator": {
-            backgroundColor: "green",
-            textColor: "green",
+            backgroundColor: theme.palette.primary.main,
+            textColor: theme.palette.primary.main,
           },
         }}
       >
         <Tab
           value="one"
           label="ESRI Products"
-          sx={{ "&:hover": { backgroundColor: "#e2e2e2", color: "#006A62" } }}
+          sx={{ "&:hover": { backgroundColor: alpha(theme.palette.primary.main, 0.2), color: theme.palette.primary.main } }}
         />
         <Tab
           value="two"
           label="ML Softwares"
-          sx={{ "&:hover": { backgroundColor: "#e2e2e2", color: "#006A62" } }}
+          sx={{ "&:hover": { backgroundColor: alpha(theme.palette.primary.main, 0.2), color: theme.palette.primary.main } }}
         />
         <Tab
           value="three"
           label="Server Domain/IP"
-          sx={{ "&:hover": { backgroundColor: "#e2e2e2", color: "#006A62" } }}
+          sx={{ "&:hover": { backgroundColor: alpha(theme.palette.primary.main, 0.2), color: theme.palette.primary.main } }}
         />
       </Tabs>
       <Box sx={{ marginTop: 2 }}>
@@ -479,7 +393,7 @@ const SoftwaresInfoTable = () => {
           <>
             <MaterialReactTable table={table} />
             <Button
-              sx={{ m: "5px",top: '8px', right: '6px' }}
+              sx={{ m: "5px", top: '8px', right: '6px' }}
               variant="contained"
               startIcon={<AddCircleRounded />}
               onClick={onClickAddRecord}
@@ -491,10 +405,10 @@ const SoftwaresInfoTable = () => {
               setOpenUpdateRecord={setOpenUpdateRecord}
               tableSNO={tableSNO}
             />
-            { showAddNewRecord && <AddNewRecord 
-             setShowAddNewRecord={setShowAddNewRecord}
-             showAddNewRecord = {showAddNewRecord}
-              />}
+            {showAddNewRecord && <AddNewRecord
+              setShowAddNewRecord={setShowAddNewRecord}
+              showAddNewRecord={showAddNewRecord}
+            />}
           </>
         )}
         {value === "two" && <h5>Table Two</h5>}
