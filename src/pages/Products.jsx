@@ -2,18 +2,16 @@ import React, { useState } from 'react'
 import { Button } from '@mui/material'
 import { AddLocationRounded } from '@mui/icons-material'
 
-import { useDetails } from '../providers/DetailsProvider'
 import AddNewProduct from '../components/products/AddNewProduct'
 import ProductCards from '../components/products/ProductCards'
 
 const Products = () => {
-  const { userValues, loggedUser } = useDetails();
-  const user = userValues.filter((user) => user.username == loggedUser);
-  const [openAddProduct, setOpenAddProduct] = useState(false)
+  const user = JSON.parse(sessionStorage.getItem('user'));
+    const [openAddProduct, setOpenAddProduct] = useState(false)
 
   return (
     <>
-      {user[0]?.userType == 1 && (
+      {user.userType == 1 && (
         <div className="flex flex-col md:flex-row justify-end space-x-reverse p-2 ">
           <Button
             sx={{ m: '5px' }}

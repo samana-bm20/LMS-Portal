@@ -11,9 +11,9 @@ const UpcomingFollowUps = () => {
     const theme = useTheme();
     const [selectedFollowUp, setSelectedFollowUp] = useState([]);
     const [openEditFollowUp, setOpenEditFollowUp] = useState(false);
-    const { followUpValues, statusValues, productValues, userValues, leadValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser);
-
+    const { followUpValues, statusValues, productValues, userValues, leadValues } = useDetails();
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    
     //#region Formatting
     const sidToColor = {
         S1: theme.palette.text.disabled,
@@ -49,11 +49,11 @@ const UpcomingFollowUps = () => {
     }, {});
 
     //#region Data & Edit
-    const upcomingFollowUps = user[0]?.userType === 2 ? followUpValues
+    const upcomingFollowUps = user.userType === 2 ? followUpValues
         .filter(item => 
             item.hasOwnProperty('nextDate') && 
             new Date(item.nextDate) > new Date() &&
-            item.UID == user[0]?.UID) 
+            item.UID == user.UID) 
         .sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate)) : followUpValues
         .filter(item => 
             item.hasOwnProperty('nextDate') && 

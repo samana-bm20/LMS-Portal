@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { IconButton, Fab, useTheme } from '@mui/material'
+import React from 'react'
+import { Fab, useTheme } from '@mui/material'
 import {
     NotificationImportantRounded, PersonRounded, BusinessRounded,
     PhoneDisabledRounded, UnsubscribeRounded, PersonOffRounded
@@ -8,9 +8,9 @@ import { useDetails } from '../../providers/DetailsProvider'
 
 const MissedFollowUps = () => {
     const theme = useTheme();
-    const { followUpValues, statusValues, productValues, userValues, leadValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser);
-
+    const { followUpValues, statusValues, productValues, userValues, leadValues } = useDetails();
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    
     //#region Formatting
     const sidToColor = {
         S1: theme.palette.text.disabled,
@@ -46,11 +46,11 @@ const MissedFollowUps = () => {
     }, {});
 
     //#region Data
-    const filteredFollowUps = user[0]?.userType === 2 ?
+    const filteredFollowUps = user.userType === 2 ?
         followUpValues.filter(item =>
             item.hasOwnProperty('nextDate') &&
             new Date(item.nextDate) < new Date() &&
-            item.UID == user[0]?.UID) :
+            item.UID == user.UID) :
         followUpValues.filter(item =>
             item.hasOwnProperty('nextDate') &&
             new Date(item.nextDate) < new Date());

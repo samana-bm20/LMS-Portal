@@ -5,8 +5,8 @@ import { useDetails } from '../../providers/DetailsProvider';
 import EditProduct from './EditProduct';
 
 const ProductCards = () => {
-    const { productValues, userValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username == loggedUser);
+    const { productValues } = useDetails();
+    const user = JSON.parse(sessionStorage.getItem('user'));
     const theme = useTheme();
     const [expandedProductId, setExpandedProductId] = useState(null);
     const [productID, setProductID] = useState();
@@ -60,10 +60,10 @@ const ProductCards = () => {
                                 </span>
                             </div>
                         </CardContent>
-                        {user[0]?.userType == 1 && (
+                        {user.userType == 1 && (
                             <div className="flex justify-end mb-2">
-                                <IconButton aria-label="edit" sx={{ mx: 1 }}  onClick={() => handleEditProduct(product.PID)} >
-                                    <EditRounded color='primary'/>
+                                <IconButton aria-label="edit" sx={{ mx: 1 }} onClick={() => handleEditProduct(product.PID)} >
+                                    <EditRounded color='primary' />
                                 </IconButton>
                             </div>
                         )}

@@ -4,13 +4,14 @@ import {
     Snackbar, Alert, useTheme, alpha
 } from '@mui/material';
 import { CloseRounded, CloudUploadRounded, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import ExcelTemplate from './ExcelTemplate';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 
 const ImportLead = ({ openImportLead, setOpenImportLead }) => {
     const theme = useTheme();
+    const token = sessionStorage.getItem('token');
     const { fetchLeadsData } = useFetchLeads();
     const [selectedFile, setSelectedFile] = useState(null);
     const [iconOpacity, setIconOpacity] = useState(0.5);  // Initial opacity set to 50%
@@ -36,80 +37,23 @@ const ImportLead = ({ openImportLead, setOpenImportLead }) => {
         }
     };
 
-    // const handleImportLead = async () => {
-    //     if (selectedFile) {
-    //         const formData = new FormData();
-    //         formData.append('file', selectedFile);
-
-    //         try {
-    //             const response = await axios.post(`${Config.apiUrl}/importLead`, formData, {
-    //                 headers: {
-    //                     'Content-Type': 'multipart/form-data',
-    //                 },
-    //             });
-
-    //             if (response.status === 201) {
-    //                 const { successfulInserts, duplicateCount, reportFilePath, message } = response.data;
-    //                 setSuccess(true);
-    //                 setSnackbarMessage(message)
-    //                 fetchLeadsData();
-    //                 setSnackbarOpen(true);
-    //                 setOpenImportLead(false);
-    //             } else if (response.status === 208) {
-    //                 // successfulInserts, duplicateCount, 
-    //                 setWarning(true);
-    //                 const { successfulInserts, duplicateCount, reportFilePath, message } = response.data;
-    //                 setSnackbarMessage(message);
-    //                 if (reportFilePath) {
-    //                     setReportFilePath(`${Config.apiUrl}${reportFilePath}`);
-    //                 }
-    //                 setSnackbarOpen(true);
-    //                 setOpenImportLead(false);
-    //             } else if (response.status === 207) {
-    //                 // successfulInserts, duplicateCount, 
-    //                 setInfo(true);
-    //                 const { successfulInserts, duplicateCount, reportFilePath, message } = response.data;
-    //                 setSnackbarMessage(message);
-    //                 if (reportFilePath) {
-    //                     setReportFilePath(`${Config.apiUrl}${reportFilePath}`);
-    //                 }
-    //                 fetchLeadsData();
-    //                 setSnackbarOpen(true);
-    //                 setOpenImportLead(false);
-    //             } else if (response.status === 400) {
-    //                 const { successfulInserts, duplicateCount, reportFilePath, message } = response.data;
-    //                 setError(true);
-    //                 setSnackbarMessage(message)
-    //                 setSnackbarOpen(true);
-    //                 setOpenImportLead(false);
-    //             }
-    //         } catch (error) {
-    //             if (error.response && error.response.data) {
-    //                 setError(true);
-    //                 setSnackbarMessage(error.response.data);
-    //             } else {
-    //                 setSnackbarMessage('An unexpected error occurred.');
-    //             }
-    //         }
-    //     }
-    // };
-
     const handleImportLead = async () => {
         if (selectedFile) {
             const formData = new FormData();
             formData.append('file', selectedFile);
-    
+
             try {
                 const response = await axios.post(`${Config.apiUrl}/importLead`, formData, {
                     headers: {
+                        'Authorization': token,
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-    
+
                 console.log(response); // Debug log to check the response structure
-    
+
                 const { successfulInserts, duplicateCount, reportFilePath, message } = response.data;
-    
+
                 switch (response.status) {
                     case 201: // All leads imported successfully
                         setSuccess(true);
@@ -117,7 +61,7 @@ const ImportLead = ({ openImportLead, setOpenImportLead }) => {
                         fetchLeadsData();
                         setOpenImportLead(false);
                         break;
-    
+
                     case 208: // All leads are duplicates
                         setWarning(true);
                         setSnackbarMessage(message);
@@ -126,7 +70,7 @@ const ImportLead = ({ openImportLead, setOpenImportLead }) => {
                         }
                         setOpenImportLead(false);
                         break;
-    
+
                     case 207: // Some leads imported, some are duplicates
                         setInfo(true);
                         setSnackbarMessage(message);
@@ -136,13 +80,13 @@ const ImportLead = ({ openImportLead, setOpenImportLead }) => {
                         fetchLeadsData();
                         setOpenImportLead(false);
                         break;
-    
+
                     case 400: // No leads to import or invalid file
                         setError(true);
                         setSnackbarMessage(message);
                         setOpenImportLead(false);
                         break;
-    
+
                     default:
                         setError(true);
                         setSnackbarMessage('Unexpected status code received.');
@@ -158,7 +102,7 @@ const ImportLead = ({ openImportLead, setOpenImportLead }) => {
             }
         }
     };
-    
+
     const closeImportLead = () => {
         setOpenImportLead(false);
     };

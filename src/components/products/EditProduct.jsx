@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import {
-  Paper, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, 
+  Paper, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, FormControl,
   InputLabel, Select, MenuItem, Snackbar, Alert,
 } from '@mui/material';
 import { useDetails } from '../../providers/DetailsProvider'
 import axios from 'axios';
-import Config from '../../Config';
+import { Config } from '../../Config';
 
 const EditProduct = ({ openEditProduct, setOpenEditProduct, pid }) => {
+  const token = sessionStorage.getItem('token');
   const { fetchProducts, productValues } = useDetails();
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState(false);
@@ -56,8 +57,16 @@ const EditProduct = ({ openEditProduct, setOpenEditProduct, pid }) => {
       return;
     }
 
+    const params = {
+      PID: pid,
+      data: editProductData
+    }
     try {
-      await axios.put(`${Config.apiUrl}/editProduct/${pid}`, editProductData);
+      await axios.put(`${Config.apiUrl}/editProduct`, params, {
+        headers: {
+          'Authorization': token
+        }
+      });
       setOpenEditProduct(false);
       fetchProducts();
       setSuccess(true);
@@ -99,7 +108,7 @@ const EditProduct = ({ openEditProduct, setOpenEditProduct, pid }) => {
       >
         <DialogTitle>Edit Product</DialogTitle>
         <DialogContent>
-        <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
+          <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
             <div className="mb-4">
               <TextField
                 required

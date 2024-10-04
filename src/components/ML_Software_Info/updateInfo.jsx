@@ -1,39 +1,25 @@
 import React, { useEffect, useState } from "react";
 import {
-  Paper,
-  Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert,
+  Paper, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
 } from "@mui/material";
-import { useFetchLeads } from "../../providers/FetchLeadsProvider";
 import axios from "axios";
-import Config from "../../Config";
+import { Config } from "../../Config";
 import { useDetails } from "../../providers/DetailsProvider";
 
 const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
-  const {
-    productValues,
-    userValues,
-    loggedUser,
-    esriProducts,
-    setEsriProducts,
-    fetchESRIProducts
-  } = useDetails();
+  const { esriProducts, fetchESRIProducts } = useDetails();
+  const token = sessionStorage.getItem('token');
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [formDataDocFile, setFormDataDocFile] = useState({});
   let currentESRIProduct;
   const [editRecordsData, setEditRecordsData] = useState({
     ClientName: "",
     ClientAddress: "",
     City: "",
     State: "",
-    Pincode: '',
+    Pincode: "",
     Contact: "",
     Phone: "",
     Email: "",
@@ -41,16 +27,15 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
     PODate: "",
     POValue: "",
     Product: "",
-    ProductVersion: '',
+    ProductVersion: "",
     Description: "",
-    NumberOfLicenses: '',
+    NumberOfLicenses: "",
     LicenseDate: "",
     Tenure: "",
     RenewalDueDate: "",
   });
 
   const getEditTableRowData = async () => {
-    debugger;
     try {
       currentESRIProduct = esriProducts.filter((pro) => pro.SNO === tableSNO);
       setEditRecordsData((prev) => ({
@@ -93,6 +78,45 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
     }));
   };
 
+  const uploadDocFile = async (selectedFile, SNO) => {
+    if (!selectedFile) {
+      console.error("No file selected.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("SNO", SNO);
+    try {
+      const response = await axios.post(`${Config.apiUrl}/uploadDoc`, formData, {
+        headers: {
+          'Authorization': token,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("File uploaded successfully:", response.data);
+    } catch (error) {
+      console.error(
+        "Error uploading file:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
+  const handleFileUpload = (e) => {
+    const { name, files } = e.target;
+    if (files.length > 0) {
+      const selectedFile = files[0];
+      setFormDataDocFile((prevState) => ({
+        ...prevState,
+        [name]: selectedFile,
+      }));
+    } else {
+      setFormDataDocFile((prevState) => ({
+        ...prevState,
+        [name]: null,
+      }));
+    }
+  };
+
   const handleUpdateClick = async () => {
     if (
       !editRecordsData.ClientName
@@ -114,14 +138,19 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
     }
 
     try {
-        const params = {
-            data: Config.encryptData(editRecordsData),
-            SNO: tableSNO
+      const params = {
+        data: editRecordsData,
+        SNO: tableSNO,
+      };
+      await axios.post(`${Config.apiUrl}/updateESRIProduct`, params, {
+        headers: {
+          'Authorization': token
         }
-      await axios.post(`${Config.apiUrl}/updateESRIProduct`, params);
+      });
       setOpenUpdateRecord(false);
       setEditRecordsData({});
       fetchESRIProducts();
+      uploadDocFile(formDataDocFile.InstallationCertificate, tableSNO);
       setSuccess(true);
       setErrorMessage("");
     } catch (error) {
@@ -140,7 +169,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
       ClientAddress: "",
       City: "",
       State: "",
-      Pincode: '',
+      Pincode: "",
       Contact: "",
       Phone: "",
       Email: "",
@@ -148,9 +177,9 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
       PODate: "",
       POValue: "",
       Product: "",
-      ProductVersion: '',
+      ProductVersion: "",
       Description: "",
-      NumberOfLicenses: '',
+      NumberOfLicenses: "",
       LicenseDate: "",
       Tenure: "",
       RenewalDueDate: "",
@@ -364,7 +393,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   shrink: true,
                 }}
                 // value={formDataDocFile?.InstallationCertificate}
-                onChange={handleEditChange}
+                onChange={handleFileUpload}
               />
             </div>
             <div className="mt-2 mb-4">

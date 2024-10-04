@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import {
-    Paper, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, 
+    Paper, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
 } from '@mui/material';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import axios from 'axios';
-import Config from '../../Config';
+import { Config } from '../../Config';
 
 const EditLead = ({ openEditLead, setOpenEditLead, lid }) => {
+    const token = sessionStorage.getItem('token');
     const { fetchLeadsData, data } = useFetchLeads();
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
@@ -74,15 +75,23 @@ const EditLead = ({ openEditLead, setOpenEditLead, lid }) => {
             setError(true);
             return;
         }
-        if ((editLeadData.contact.mobileNo == null || editLeadData.contact.mobileNo == "") && 
-        (editLeadData.contact.emailID == null || editLeadData.contact.emailID == "")) {
+        if ((editLeadData.contact.mobileNo == null || editLeadData.contact.mobileNo == "") &&
+            (editLeadData.contact.emailID == null || editLeadData.contact.emailID == "")) {
             setErrorMessage('Fill atleast one contact field.')
             setError(true);
             return;
         }
 
+        const params = {
+            lid: lid,
+            editLeadData: editLeadData
+        }
         try {
-            await axios.put(`${Config.apiUrl}/editLead/${lid}`, editLeadData);
+            await axios.put(`${Config.apiUrl}/editLead`, params, {
+                headers: {
+                    'Authorization': token
+                }
+            });
             setOpenEditLead(false);
             setEditLeadData({});
             fetchLeadsData();

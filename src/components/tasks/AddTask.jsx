@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import {
-    Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, Checkbox, FormControlLabel,
-    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete, List, ListItem, ListItemText, IconButton, ListItemIcon,
+    Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
+    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete, 
 
 } from '@mui/material';
 import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import SetReminder from './SetRemainder';
 
 const AddTask = ({ openAddTask, setOpenAddTask }) => {
-    const { loggedUser, userValues, fetchTasks } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser)
-    let uid = user[0]?.UID
+    const { userValues, fetchTasks } = useDetails();
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    let uid = user.UID
     const { data } = useFetchLeads();
     const [assignedTo, setAssignedTo] = useState('');
     const [taskStatus, setTaskStatus] = useState('');
@@ -38,7 +39,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
 
     useEffect(() => {
         const getCreatedBy = () => {
-            if(openAddTask){
+            if (openAddTask) {
                 setAddTaskData((prev) => ({ ...prev, createdBy: uid }))
             }
         }
@@ -92,7 +93,11 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         };
 
         try {
-            const _ = await axios.post(`${Config.apiUrl}/addTask`, taskWithReminders);
+            const _ = await axios.post(`${Config.apiUrl}/addTask`, taskWithReminders, {
+                headers: {
+                    'Authorization': token
+                }
+            });
             setSuccess(true);
             setOpenAddTask(false);
             fetchTasks();
@@ -162,7 +167,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {/* Start Calendar Region */}
                             <div className="mb-2">
-                            <TextField
+                                <TextField
                                     required
                                     name='taskDate'
                                     id="outlined-required"
@@ -211,13 +216,13 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                         onChange={handleAddTaskChange}
                                         size='small'
                                     >
-                                        {user[0]?.userType === 1 ? (
+                                        {user.userType === 1 ? (
                                             activeUsers.map((user) => (
                                                 <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                             ))
                                         ) : (
                                             userValues
-                                                .filter((userItem) => userItem.UID == user[0]?.UID)
+                                                .filter((userItem) => userItem.UID == user.UID)
                                                 .map((userItem) => (
                                                     <MenuItem key={userItem.UID} value={userItem.UID}>{userItem.uName}</MenuItem>
                                                 ))

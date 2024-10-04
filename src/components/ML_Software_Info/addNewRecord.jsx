@@ -1,29 +1,12 @@
 import React, { useEffect, useState } from "react";
-import {
-  Paper,
-  Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import { useFetchLeads } from "../../providers/FetchLeadsProvider";
+import { Paper, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from "@mui/material";
 import axios from "axios";
-import Config from "../../Config";
+import { Config } from "../../Config";
 import { useDetails } from "../../providers/DetailsProvider";
 
 const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
-  const {
-    productValues,
-    userValues,
-    loggedUser,
-    esriProducts,
-    setEsriProducts,
-    fetchESRIProducts,
-  } = useDetails();
+  const token = sessionStorage.getItem('token');
+  const { fetchESRIProducts } = useDetails();
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -39,49 +22,53 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
   };
 
   const handleFileUpload = (e) => {
-    debugger
     const { name, files } = e.target;
     if (files.length > 0) {
-        const selectedFile = files[0];
-        setFormDataDocFile((prevState) => ({
-            ...prevState,
-            [name]: selectedFile, 
-        }));
+      const selectedFile = files[0];
+      setFormDataDocFile((prevState) => ({
+        ...prevState,
+        [name]: selectedFile,
+      }));
     } else {
-        setFormDataDocFile((prevState) => ({
-            ...prevState,
-            [name]: null,
-        }));
+      setFormDataDocFile((prevState) => ({
+        ...prevState,
+        [name]: null,
+      }));
     }
   };
 
-  const uploadDocFile  = async (selectedFile,SNO) =>{
-    debugger
+  const uploadDocFile = async (selectedFile, SNO) => {
     if (!selectedFile) {
-        console.error("No file selected.");
-        return;
+      console.error("No file selected.");
+      return;
     }
     const formData = new FormData();
-    formData.append("file", selectedFile); 
-    formData.append("SNO", SNO); 
+    formData.append("file", selectedFile);
+    formData.append("SNO", SNO);
     try {
-        const response = await axios.post(`${Config.apiUrl}/uploadDoc`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
-        console.log("File uploaded successfully:", response.data);
+      const response = await axios.post(`${Config.apiUrl}/uploadDoc`, formData, {
+        headers: {
+          'Authorization': token,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("File uploaded successfully:", response.data);
     } catch (error) {
-        console.error("Error uploading file:", error.response ? error.response.data : error.message);
+      console.error(
+        "Error uploading file:",
+        error.response ? error.response.data : error.message
+      );
     }
-  }
+  };
 
   useEffect(() => {
     const getLastRecordindexESRIProducts = async () => {
-      const response = await axios.post(
-        `${Config.apiUrl}/getLastIndexESRIProduct`
-      );
-      const SNO = parseInt(Config.decryptData(response.data)) + 1;
+      const response = await axios.post(`${Config.apiUrl}/getLastIndexESRIProduct`, {}, {
+        headers: {
+          'Authorization': token
+        }
+      });
+      const SNO = parseInt(response.data) + 1;
       setFormData((prevState) => ({
         ...prevState,
         SNO: SNO,
@@ -91,20 +78,19 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
   }, [formData.SNO]);
 
   const handleAddNewRecord = async () => {
-    
     if (
-      !formData.ClientName ||
-        !formData.PONumber ||
-        !formData.PODate ||
-        !formData.POValue ||
-        !formData.Product ||
-        !formData.ProductVersion ||
-        !formData.NumberOfLicense ||
-        !formData.LicenseDate ||
-        !formData.RenewalDueDate ||
-        !formData.Tenure ||
-        !formData.City ||
-        !formData.State
+      !formData.ClientName
+      //   !formData.PONumber ||
+      //   !formData.PODate ||
+      //   !formData.POValue ||
+      //   !formData.Product ||
+      //   !formData.ProductVersion ||
+      //   !formData.NumberOfLicense ||
+      //   !formData.LicenseDate ||
+      //   !formData.RenewalDueDate ||
+      //   !formData.Tenure ||
+      //   !formData.City ||
+      //   !formData.State
     ) {
       setErrorMessage("Required fields cannot be empty.");
       setError(true);
@@ -112,14 +98,15 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
     }
     setSuccess(true);
     try {
-      const res = await axios.post(
-        `${Config.apiUrl}/insertESRIProduct`,
-        formData
-      );
+      const res = await axios.post(`${Config.apiUrl}/insertESRIProduct`, formData, {
+        headers: {
+          'Authorization': token
+        }
+      });
       setShowAddNewRecord(false);
-    //   setSuccess(true);
+      //   setSuccess(true);
       setErrorMessage("");
-      uploadDocFile(formDataDocFile.InstallationCertificate,formData.SNO);
+      uploadDocFile(formDataDocFile.InstallationCertificate, formData.SNO);
       fetchESRIProducts();
     } catch (error) {
       if (error.response && error.response.data) {

@@ -3,11 +3,12 @@ import {
   Paper, Button, MenuItem, FormControl, TextField, InputLabel, Select, Dialog,
   DialogTitle, DialogContent, DialogActions, Snackbar, Alert
 } from '@mui/material';
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 
 const AddNewProduct = ({ openAddProduct, setOpenAddProduct }) => {
+  const token = sessionStorage.getItem('token');
   const { fetchProducts } = useDetails();
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState(false);
@@ -46,7 +47,11 @@ const AddNewProduct = ({ openAddProduct, setOpenAddProduct }) => {
       return;
     }
     try {
-      const _ = await axios.post(`${Config.apiUrl}/addNewProduct`, addProductData);
+      const _ = await axios.post(`${Config.apiUrl}/addNewProduct`, addProductData, {
+        headers: {
+          'Authorization': token
+        }
+      });
       setOpenAddProduct(false);
       fetchProducts();
       setSuccess(true);
@@ -60,7 +65,7 @@ const AddNewProduct = ({ openAddProduct, setOpenAddProduct }) => {
       }
     }
   };
-  
+
   //#region Snackbar
   const errorClose = (event, reason) => {
     if (reason === 'clickaway') {

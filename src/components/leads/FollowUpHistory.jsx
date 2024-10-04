@@ -6,15 +6,15 @@ import {
 } from '@mui/lab';
 import { CallRounded, MailRounded, SupervisorAccountRounded } from '@mui/icons-material';
 import axios from 'axios';
-import Config from '../../Config';
+import { Config } from '../../Config';
 
 const FollowUpHistory = ({ leadId, productId }) => {
   const theme = useTheme();
+  const token = sessionStorage.getItem('token');
   const [currentLeadProducts, setCurrentLeadProducts] = useState([]);
   const [followUpData, setFollowUpData] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { followUpValues, statusValues, userValues, loggedUser } = useDetails();
-  const user = userValues.filter((user) => user.username === loggedUser);
 
   //#region Formatting
   const sidToColor = {
@@ -27,7 +27,7 @@ const FollowUpHistory = ({ leadId, productId }) => {
 
   const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
   const dateOptions = { day: '2-digit', month: 'short', year: '2-digit' };
-  
+
   const statusMap = statusValues.reduce((map, status) => {
     map[status.SID] = status.sName;
     return map;
@@ -37,15 +37,15 @@ const FollowUpHistory = ({ leadId, productId }) => {
     map[user.UID] = user.uName;
     return map;
   }, {});
-  
+
   //#region Data
   const fetchLeadsData = async () => {
-    const params = {
-      uid: user[0]?.UID,
-      pid: 'All'
-    }
     try {
-      const response = await axios.post(`${Config.apiUrl}/leadData`, params);
+      const response = await axios.post(`${Config.apiUrl}/leadData`, { pid: 'All' }, {
+        headers: {
+          'Authorization': token
+        }
+      });
       const data = Config.decryptData(response.data);
       setCurrentLeadProducts(data.filter(product => product.LID === leadId));
       setSelectedProduct(productId);

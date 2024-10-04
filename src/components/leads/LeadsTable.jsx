@@ -22,8 +22,7 @@ import EditLead from './EditLead';
 
 const LeadsTable = () => {
     const { fetchLeadsData, data, product, setProduct } = useFetchLeads();
-    const { productValues, userValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser);
+    const { productValues } = useDetails();
     const [openViewProfile, setOpenViewProfile] = useState(false);
     const [openAddFollowUp, setOpenAddFollowUp] = useState(false);
     const [openAddProduct, setOpenAddProduct] = useState(false);

@@ -6,45 +6,31 @@ import {
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
 } from "material-react-table";
-import { AddCircleRounded } from '@mui/icons-material'
-
+import { AddCircleRounded } from "@mui/icons-material";
 import {
-  Box,
-  Button,
-  ListItemIcon,
-  MenuItem,
-  lighten,
-  FormControl,
-  InputLabel,
-  Select,
-  useTheme,
-  alpha,
-  Tabs,
-  Tab,
+  Box, Button, Snackbar, Alert, MenuItem, lighten, FormControl, InputLabel,
+  Select, Tabs, Tab, IconButton, useTheme, alpha
 } from "@mui/material";
 
 //Icons Imports
-import {
-  EditRounded,
-} from "@mui/icons-material";
+import { EditRounded, SimCardDownloadRounded } from "@mui/icons-material";
 
+import { Config } from "../../Config";
 import { useDetails } from "../../providers/DetailsProvider";
 import UpdateRecord from "./updateInfo";
-import AddNewRecord from "./addNewRecord"
+import AddNewRecord from "./addNewRecord";
 
 const SoftwaresInfoTable = () => {
   const theme = useTheme();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [product, setProduct] = useState("All");
   const [tableSNO, setTableSNO] = useState();
   const [copyEsriProducts, setCopyEsriProducts] = useState("All");
   const [showAddNewRecord, setShowAddNewRecord] = useState(false);
-  const {
-    userValues,
-    loggedUser,
-    esriProducts,
-    setEsriProducts,
-  } = useDetails();
-  const user = userValues.filter((user) => user.username === loggedUser);
+  const { esriProducts } = useDetails();
+  const token = sessionStorage.getItem('token');
   const [openUpdateRecord, setOpenUpdateRecord] = useState(false);
 
   const [value, setValue] = React.useState("one");
@@ -71,8 +57,70 @@ const SoftwaresInfoTable = () => {
   };
 
   const onClickAddRecord = () => {
-    setShowAddNewRecord(true)
-  }
+    setShowAddNewRecord(true);
+  };
+
+  const errorClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setError(false);
+  };
+
+  const successClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSuccess(false);
+  };
+
+  const handleDownload = (fid) => {
+    const url = `${Config.apiUrl}/download`;
+    fetch(url, {
+      method: "POST",
+      headers: {
+        'Authorization': token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ viewmode: fid }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError(true);
+            setErrorMessage("Document Not Found!");
+            throw new Error("Network response was not ok");
+          }
+        } else {
+          const disposition = response.headers.get("Content-Disposition");
+          let fileName = "downloaded-file";
+          if (disposition && disposition.indexOf("attachment") !== -1) {
+            const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(
+              disposition
+            );
+            if (matches != null && matches[1]) {
+              fileName = matches[1].replace(/['"]/g, ""); // Remove quotes if present
+            }
+          }
+          return response.blob().then((blob) => ({ blob, fileName }));
+        }
+      })
+      .then(({ blob, fileName }) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName || "downloaded-file"; // Use dynamic file name
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        setSuccess(true);
+      })
+      .catch((error) => {
+        console.error("Error fetching the file:", error);
+      });
+  };
 
   //#region Table Column
   const columns = useMemo(
@@ -241,7 +289,6 @@ const SoftwaresInfoTable = () => {
                   {uniqueProduct}
                 </MenuItem>
               ))}
-              {/* <MenuItem value="New">New</MenuItem> */}
             </Select>
           </FormControl>
         </Box>
@@ -258,7 +305,29 @@ const SoftwaresInfoTable = () => {
     enableColumnOrdering: true,
     enableColumnActions: true,
     enableRowActions: true,
-    enableRowSelection: true,
+    renderRowActions: ({ row }) => (
+      <Box>
+        <IconButton
+          onClick={() => {
+            const s_no = parseInt(row.original.SNO);
+            setTableSNO(s_no);
+            setOpenUpdateRecord(true);
+            // closeMenu();
+          }}
+        >
+          <EditRounded color="primary"/>
+        </IconButton>
+        <IconButton
+          onClick={() => {
+            const s_no = parseInt(row.original.SNO);
+            handleDownload(s_no);
+          }}
+        >
+          <SimCardDownloadRounded color="primary" />
+        </IconButton>
+      </Box>
+    ),
+    // enableRowSelection: true,
     initialState: {
       showGlobalFilter: true,
       density: "compact",
@@ -284,76 +353,6 @@ const SoftwaresInfoTable = () => {
       shape: "rounded",
       variant: "outlined",
     },
-    renderRowActionMenuItems: ({ row, closeMenu }) => {
-      const s_no = parseInt(row.original.SNO);
-      // const pidValue = row.original.productDetails.PID;
-      // const sidValue = row.original.productDetails.SID;
-
-      const menuItems = [
-        // <MenuItem
-        //     key={0}
-        //     onClick={() => {
-        //         // setLeadID(lidValue);
-        //         // setProductID(pidValue);
-        //         // setOpenViewProfile(true);
-        //         closeMenu();
-        //     }}
-        //     sx={{ m: 0 }}
-        // >
-        //     <ListItemIcon>
-        //         <AccountCircleRounded color='primary' />
-        //     </ListItemIcon>
-        //     View Profile
-        // </MenuItem>,
-        // <MenuItem
-        //     key={1}
-        //     onClick={() => {
-        //         // setLeadID(lidValue);
-        //         // setProductID(pidValue);
-        //         // setStatusID(sidValue);
-        //         // setOpenAddFollowUp(true);
-        //         closeMenu();
-        //     }}
-        //     sx={{ m: 0 }}
-        // >
-        //     <ListItemIcon>
-        //         <AddCommentRounded color='primary' />
-        //     </ListItemIcon>
-        //     Add Follow-up
-        // </MenuItem>,
-        // <MenuItem
-        //     key={2}
-        //     onClick={() => {
-        //         // setLeadID(lidValue);
-        //         // setOpenAddProduct(true);
-        //         closeMenu();
-        //     }}
-        //     sx={{ m: 0 }}
-        // >
-        //     <ListItemIcon>
-        //         <AddShoppingCartRounded color='primary' />
-        //     </ListItemIcon>
-        //     Add Product
-        // </MenuItem>,
-        <MenuItem
-          key={3}
-          onClick={() => {
-            setTableSNO(s_no);
-            setOpenUpdateRecord(true);
-            closeMenu();
-          }}
-          sx={{ m: 0 }}
-        >
-          <ListItemIcon>
-            <EditRounded color="primary" />
-          </ListItemIcon>
-          Edit
-        </MenuItem>,
-      ];
-
-      return menuItems;
-    },
-
     renderTopToolbar,
   });
 
@@ -393,7 +392,7 @@ const SoftwaresInfoTable = () => {
           <>
             <MaterialReactTable table={table} />
             <Button
-              sx={{ m: "5px", top: '8px', right: '6px' }}
+              sx={{ m: "5px", top: "8px", right: "6px" }}
               variant="contained"
               startIcon={<AddCircleRounded />}
               onClick={onClickAddRecord}
@@ -405,15 +404,37 @@ const SoftwaresInfoTable = () => {
               setOpenUpdateRecord={setOpenUpdateRecord}
               tableSNO={tableSNO}
             />
-            {showAddNewRecord && <AddNewRecord
-              setShowAddNewRecord={setShowAddNewRecord}
-              showAddNewRecord={showAddNewRecord}
-            />}
+            {showAddNewRecord && (
+              <AddNewRecord
+                setShowAddNewRecord={setShowAddNewRecord}
+                showAddNewRecord={showAddNewRecord}
+              />
+            )}
           </>
         )}
         {value === "two" && <h5>Table Two</h5>}
         {value === "three" && <h5>Table Three</h5>}
       </Box>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={error}
+        autoHideDuration={2000}
+        onClose={errorClose}
+      >
+        <Alert onClose={errorClose} severity="error" variant="filled">
+          {errorMessage}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={success}
+        autoHideDuration={2000}
+        onClose={successClose}
+      >
+        <Alert onClose={successClose} severity="success" variant="filled">
+          Document download successfully!
+        </Alert>
+      </Snackbar>
     </>
   );
 };

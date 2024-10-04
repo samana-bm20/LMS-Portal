@@ -9,8 +9,8 @@ import EditTask from './EditTask'
 
 const TaskCards = () => {
     const theme = useTheme();
-    const { taskData, userValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username == loggedUser);
+    const { taskData } = useDetails();
+    const user = JSON.parse(sessionStorage.getItem('user'));
     const [taskID, setTaskID] = useState();
     const [openEditTask, setOpenEditTask] = useState(false);
     let filteredTaskData;
@@ -23,8 +23,8 @@ const TaskCards = () => {
         setOpenEditTask(true);
     }
 
-    filteredTaskData = user[0]?.userType === 2 ?
-        taskData.filter((task) => task.UID == user[0]?.UID) : taskData
+    filteredTaskData = user.userType === 2 ?
+        taskData.filter((task) => task.UID == user.UID) : taskData
 
     return (
         <>
@@ -59,9 +59,10 @@ const TaskCards = () => {
                         <div
                             key={task.TID}
                             className={`grid shadow-lg rounded-lg p-4 m-2 border`}
-                            style={{ backgroundColor: alpha(theme.palette.background.card, 0.5),
+                            style={{
+                                backgroundColor: alpha(theme.palette.background.card, 0.5),
                                 borderColor: theme.palette.primary.main
-                             }}
+                            }}
                         >
                             <div className='flex justify-between items-center gap-4 mb-2'>
                                 <div

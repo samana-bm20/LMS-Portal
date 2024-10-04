@@ -7,14 +7,15 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import axios from 'axios';
 import SetReminder from './SetRemainder';
 import { useDetails } from '../../providers/DetailsProvider';
-import Config from '../../Config';
+import { Config } from '../../Config';
 
 
 const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
     const theme = useTheme();
-    const { loggedUser, userValues, taskData, fetchTasks } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser);
-    const uid = user[0]?.UID;
+    const { userValues, taskData, fetchTasks } = useDetails();
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const uid = user.UID;
     const [assignedTo, setAssignedTo] = useState('');
     const [taskStatus, setTaskStatus] = useState('');
     const [taskDate, setTaskDate] = useState('');
@@ -62,7 +63,7 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
     }
 
     useEffect(() => {
-        if(openEditTask) {
+        if (openEditTask) {
             getSelectedTask();
         }
     }, [tid, openEditTask]);
@@ -98,7 +99,7 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
 
     const handleFrequencyValueChange = (e, index) => {
         const value = e.target.value;
-        if (/^\d*$/.test(value)) { 
+        if (/^\d*$/.test(value)) {
             const updatedReminders = [...reminders];
             updatedReminders[index].frequencyValue = value;
             setReminders(updatedReminders);
@@ -127,8 +128,16 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
             ...editTaskData,
             reminders
         };
+        const params = {
+            TID: tid,
+            data: taskWithUpdatedReminders
+        }
         try {
-            await axios.put(`${Config.apiUrl}/editTask/${tid}`, taskWithUpdatedReminders);
+            await axios.put(`${Config.apiUrl}/editTask`, params, {
+                headers: {
+                    'Authorization': token
+                }
+            });
             setOpenEditTask(false);
             fetchTasks();
             getSelectedTask();
@@ -231,7 +240,7 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
                             </div>
                         </div>
                         {reminders.length > 0 && (
-                        <div key='remind' className="mb-4 pl-1">Reminder(s)</div>
+                            <div key='remind' className="mb-4 pl-1">Reminder(s)</div>
                         )}
 
                         {reminders.length > 0 ? (
@@ -292,7 +301,7 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
 
                             ))
                         ) : (
-                            <div className="px-2 mb-4 text-center italic text-sm" style={{color: theme.palette.text.secondary}}>
+                            <div className="px-2 mb-4 text-center italic text-sm" style={{ color: theme.palette.text.secondary }}>
                                 No reminder for this task
                             </div>
                         )}

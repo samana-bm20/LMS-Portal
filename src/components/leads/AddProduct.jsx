@@ -3,12 +3,13 @@ import {
     Paper, Button, MenuItem, FormControl, TextField, InputLabel, Select, Dialog,
     DialogTitle, DialogContent, DialogActions, Snackbar, Alert
 } from '@mui/material';
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 
 const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
+    const token = sessionStorage.getItem('token');
     const { fetchLeadsData } = useFetchLeads();
     const { statusValues, productValues, userValues } = useDetails();
     const [errorMessage, setErrorMessage] = useState('');
@@ -68,7 +69,11 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
             return;
         }
         try {
-            const _ = await axios.post(`${Config.apiUrl}/addProduct`, productData);
+            const _ = await axios.post(`${Config.apiUrl}/addProduct`, productData, {
+                headers: {
+                    'Authorization': token
+                }
+            });
             fetchLeadsData();
             setOpenAddProduct(false);
             setSuccess(true);

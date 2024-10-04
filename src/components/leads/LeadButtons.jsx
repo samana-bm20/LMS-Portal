@@ -2,12 +2,13 @@ import React, { useState, useCallback } from 'react'
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from '@mui/material'
 import { AddCircleRounded, FileUploadRounded } from '@mui/icons-material'
 import AddLead from './AddLead'
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import ImportLead from './ImportLead';
 
 const LeadButtons = () => {
+    const token = sessionStorage.getItem('token');
     const { fetchLeadsData } = useFetchLeads();
     const [openAddLeadDialog, setOpenAddLeadDialog] = useState(false);
     const [openImportLead, setOpenImportLead] = useState(false);
@@ -50,7 +51,11 @@ const LeadButtons = () => {
             return;
         }
         try {
-            const _ = await axios.post(`${Config.apiUrl}/addLead`, addLeadData);
+            const _ = await axios.post(`${Config.apiUrl}/addLead`, addLeadData, {
+                headers: {
+                    'Authorization': token
+                }
+            });
             fetchLeadsData();
             setOpenAddLeadDialog(false);
             setSuccess(true);

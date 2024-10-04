@@ -6,10 +6,8 @@ import {
 import { LinearProgress, useTheme, alpha, IconButton } from '@mui/material';
 import ESRI from '../../assets/DashboardCards/owner_esri.svg'
 import ML from '../../assets/DashboardCards/owner_ml.svg'
-import Config from '../../Config';
+import { Config } from "../../Config";
 import axios from 'axios';
-
-import { useDetails } from '../../providers/DetailsProvider';
 
 //#region Card Layout
 const Card1 = ({ color, title, count, icon }) => (
@@ -61,7 +59,8 @@ const Card2 = ({ color, title, total, active, dead, owner, alt }) => {
 
 const CardSummary = () => {
     const theme = useTheme();
-    const { userValues, loggedUser } = useDetails();
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user'));
     const [totalLeads, setTotalLeads] = useState(0);
     const [activeLeads, setActiveLeads] = useState(0);
     const [deadLeads, setDeadLeads] = useState(0);
@@ -84,20 +83,16 @@ const CardSummary = () => {
         }
     };
 
-    // Check if user exists in userValues
-    const user = userValues && loggedUser
-        ? userValues.find((user) => user.username === loggedUser)
-        : null;
-
-    // Always call hooks
+    //#region Fetch Data
     useEffect(() => {
         const fetchLeadCount = async () => {
             if (user) {
-                const params = {
-                    uid: user.UID
-                }
                 try {
-                    const response = await axios.post(`${Config.apiUrl}/leads-count`, params);
+                    const response = await axios.post(`${Config.apiUrl}/leadsCount`, {}, {
+                        headers: {
+                            'Authorization': token
+                        }
+                    });
                     const decryptData = Config.decryptData(response.data)
 
                     if (Array.isArray(decryptData) && decryptData.length > 0) {
@@ -118,11 +113,12 @@ const CardSummary = () => {
 
         const fetchProductLeadCount = async () => {
             if (user) {
-                const params = {
-                    uid: user.UID
-                }
                 try {
-                    const response = await axios.post(`${Config.apiUrl}/productlead-count`, params);
+                    const response = await axios.post(`${Config.apiUrl}/productleadCount`, {}, {
+                        headers: {
+                            'Authorization': token
+                        }
+                    });
                     const decryptData = Config.decryptData(response.data)
                     if (decryptData.length > 0) {
                         const colors = [
@@ -154,7 +150,7 @@ const CardSummary = () => {
         fetchLeadCount();
         fetchProductLeadCount();
         setLoading(false);
-    }, [user]);
+    }, []);
 
     //#region Card1 Data
     const card1Data = [

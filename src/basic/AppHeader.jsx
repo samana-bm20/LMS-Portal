@@ -12,6 +12,8 @@ import { useAuth } from '../providers/AuthProvider';
 import { useMode } from '../providers/ModeProvider';
 import { useDetails } from '../providers/DetailsProvider';
 import AppNotifications from './AppNotifications';
+import { useNavigate } from 'react-router-dom';
+
 //#region Responsive
 const drawerWidth = 180;
 const AppBar = styled(MuiAppBar, {
@@ -33,6 +35,8 @@ const AppBar = styled(MuiAppBar, {
 //#end region
 
 const AppHeader = ({ onMenuClick, open }) => {
+  const navigate = useNavigate();
+  const user = JSON.parse(sessionStorage.getItem('user'));
   const { logout } = useAuth();
   const { mode, toggleColorMode } = useMode();
   const [anchorElUser, setAnchorElUser] = useState('');
@@ -42,12 +46,12 @@ const AppHeader = ({ onMenuClick, open }) => {
   let userName
   //#region Menu
 
-  const fetchUser = () => {
+  // const fetchUser = () => {
 
-    const username = userValues.filter((user) => user.username === loggedUser)
-    userName = username[0]?.uName
-  }
-  fetchUser();
+  //   const username = userValues.filter((user) => user.username === loggedUser)
+  //   userName = username[0]?.uName
+  // }
+  // fetchUser();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -69,7 +73,7 @@ const AppHeader = ({ onMenuClick, open }) => {
 
   const settings = [
     {
-      name: userName,
+      name: user.uName,
       icon: <FaceRounded color='primary' />
     },
     {
@@ -206,7 +210,7 @@ const AppHeader = ({ onMenuClick, open }) => {
                   </MenuItem>
                 ))}
                 <Divider />
-                <MenuItem onClick={() => { logout() }}>
+                <MenuItem onClick={() => { logout(); navigate('/lms/') }}>
                   <div className='flex'>
                     <div><PowerSettingsNewRounded color='primary' /></div>
                     <div className='ml-2'>

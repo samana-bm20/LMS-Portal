@@ -1,19 +1,12 @@
 import React from "react";
 import {
   HomeRounded, MapRounded, DynamicFormRounded, AssignmentRounded, AlarmRounded, SwitchAccountRounded, 
-  MoreTimeRounded, EventRounded
+  WebhookRounded, EventRounded
 } from '@mui/icons-material';
-import { useDetails } from '../providers/DetailsProvider';
 
 const RoutesConfig = () => {
-  const { userValues, loggedUser } = useDetails();
+  const user = JSON.parse(sessionStorage.getItem('user'));
   
-  // Find the logged-in user based on `userValues` and `loggedUser`
-  const user = userValues && loggedUser
-    ? userValues.find((user) => user.username === loggedUser)
-    : null;
-
-  // Default Routes
   const routes = [
     {
       name: 'Dashboard',
@@ -47,12 +40,11 @@ const RoutesConfig = () => {
     },
   ];
 
-  // Conditionally add the "ML Softwares" route if userType is 1
-  if (user?.userType === 1) {
+  if (user.userType === 1) {
     routes.push({
       name: 'ML Softwares',
       to: '/lms/softwares-info',
-      icon: <MoreTimeRounded />,
+      icon: <WebhookRounded />,
     });
   }
 

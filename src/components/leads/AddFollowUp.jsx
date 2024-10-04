@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import {
-    Paper, Button, TextField, InputLabel, Select, MenuItem, FormControl, 
+    Paper, Button, TextField, InputLabel, Select, MenuItem, FormControl,
     Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert
 } from '@mui/material'
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 
 const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => {
     const { fetchLeadsData } = useFetchLeads();
-    const { loggedUser, userValues, statusValues, fetchFollowUps } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser)
-    const uid = user[0]?.UID;
+    const { statusValues, fetchFollowUps } = useDetails();
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const uid = user.UID;
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -78,7 +79,11 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
             return;
         }
         try {
-            const _ = await axios.post(`${Config.apiUrl}/addFollowUp`, followUpData);
+            const _ = await axios.post(`${Config.apiUrl}/addFollowUp`, followUpData, {
+                headers: {
+                    'Authorization': token
+                }
+            });
             fetchLeadsData();
             fetchFollowUps();
             setOpenAddFollowUp(false);

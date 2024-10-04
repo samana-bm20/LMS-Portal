@@ -3,11 +3,12 @@ import {
   Paper, Button, MenuItem, FormControl, TextField, InputLabel, Select, Dialog,
   DialogTitle, DialogContent, DialogActions, Snackbar, Alert
 } from '@mui/material';
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 
-const AddUser = ({openAddUser, setOpenAddUser}) => {
+const AddUser = ({ openAddUser, setOpenAddUser }) => {
+  const token = sessionStorage.getItem('token');
   const { fetchUsers } = useDetails();
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState(false);
@@ -43,14 +44,18 @@ const AddUser = ({openAddUser, setOpenAddUser}) => {
 
   //#region Add Product
   const handleAddUser = async () => {
-    if (!addUserData.uName || !addUserData.username || !addUserData.password || !addUserData.email || 
+    if (!addUserData.uName || !addUserData.username || !addUserData.password || !addUserData.email ||
       !addUserData.mobile || !addUserData.userType || !addUserData.uStatus) {
       setErrorMessage('Required fields cannot be empty.')
       setError(true);
       return;
     }
     try {
-      const _ = await axios.post(`${Config.apiUrl}/addUser`, addUserData);
+      const _ = await axios.post(`${Config.apiUrl}/addUser`, addUserData, {
+        headers: {
+          'Authorization': token
+        }
+      });
       setOpenAddUser(false);
       fetchUsers();
       setSuccess(true);
@@ -64,7 +69,7 @@ const AddUser = ({openAddUser, setOpenAddUser}) => {
       }
     }
   };
-  
+
   //#region Snackbar
   const errorClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -102,84 +107,84 @@ const AddUser = ({openAddUser, setOpenAddUser}) => {
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div className="mb-4">
-              <TextField
-                required
-                name='username'
-                id="outlined-required"
-                label="Username"
-                size='small'
-                value={addUserData?.username}
-                onChange={handleDataChange}
-              />
-            </div>
-            <div className="mb-4">
-              <TextField
-                required
-                type='password'
-                name='password'
-                id="outlined-required"
-                label="Password"
-                size='small'
-                value={addUserData?.password}
-                onChange={handleDataChange}
-                autoComplete='new-password'
-              />
-            </div>
-            <div className="mb-4">
-              <TextField
-                required
-                name='email'
-                id="outlined-required"
-                label="Email"
-                size='small'
-                value={addUserData?.email}
-                onChange={handleDataChange}
-              />
-            </div>
-            <div className="mb-4">
-              <TextField
-                required
-                name='mobile'
-                id="outlined-required"
-                label="Mobile"
-                size='small'
-                value={addUserData?.mobile}
-                onChange={handleDataChange}
-              />
-            </div>
-            <div className="mb-4">
-              <FormControl required fullWidth>
-                <InputLabel id="demo-simple-select-label">User Type</InputLabel>
-                <Select
-                  name='userType'
-                  id="demo-simple-select"
-                  label="User Type"
-                  value={addUserData?.userType}
-                  onChange={handleDataChange}
+              <div className="mb-4">
+                <TextField
+                  required
+                  name='username'
+                  id="outlined-required"
+                  label="Username"
                   size='small'
-                >
-                  <MenuItem value='1'>Admin</MenuItem>
-                  <MenuItem value='2'>User</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-            <div className="mb-4">
-              <FormControl required fullWidth>
-                <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                <Select
-                  name='uStatus'
-                  id="demo-simple-select"
-                  label="Status"
-                  value={addUserData?.uStatus}
+                  value={addUserData?.username}
                   onChange={handleDataChange}
+                />
+              </div>
+              <div className="mb-4">
+                <TextField
+                  required
+                  type='password'
+                  name='password'
+                  id="outlined-required"
+                  label="Password"
                   size='small'
-                >
-                  <MenuItem value='Active'>Active</MenuItem>
-                  <MenuItem value='Inactive'>Inactive</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
+                  value={addUserData?.password}
+                  onChange={handleDataChange}
+                  autoComplete='new-password'
+                />
+              </div>
+              <div className="mb-4">
+                <TextField
+                  required
+                  name='email'
+                  id="outlined-required"
+                  label="Email"
+                  size='small'
+                  value={addUserData?.email}
+                  onChange={handleDataChange}
+                />
+              </div>
+              <div className="mb-4">
+                <TextField
+                  required
+                  name='mobile'
+                  id="outlined-required"
+                  label="Mobile"
+                  size='small'
+                  value={addUserData?.mobile}
+                  onChange={handleDataChange}
+                />
+              </div>
+              <div className="mb-4">
+                <FormControl required fullWidth>
+                  <InputLabel id="demo-simple-select-label">User Type</InputLabel>
+                  <Select
+                    name='userType'
+                    id="demo-simple-select"
+                    label="User Type"
+                    value={addUserData?.userType}
+                    onChange={handleDataChange}
+                    size='small'
+                  >
+                    <MenuItem value='1'>Admin</MenuItem>
+                    <MenuItem value='2'>User</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+              <div className="mb-4">
+                <FormControl required fullWidth>
+                  <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                  <Select
+                    name='uStatus'
+                    id="demo-simple-select"
+                    label="Status"
+                    value={addUserData?.uStatus}
+                    onChange={handleDataChange}
+                    size='small'
+                  >
+                    <MenuItem value='Active'>Active</MenuItem>
+                    <MenuItem value='Inactive'>Inactive</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
             </div>
           </Paper>
         </DialogContent>

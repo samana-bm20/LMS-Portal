@@ -47,8 +47,8 @@ function stringAvatar(name) {
 
 const UserList = () => {
   const theme = useTheme();
-  const { userValues, loggedUser } = useDetails();
-  const loguser = userValues.filter((user) => user.username == loggedUser);
+  const { userValues } = useDetails();
+  const loguser = JSON.parse(sessionStorage.getItem('user'));
   const [userID, setUserID] = useState();
   const [openEditUser, setOpenEditUser] = useState(false);
 
@@ -102,9 +102,9 @@ const UserList = () => {
               }}>
                 {user.UID}
               </div>
-              {loguser[0]?.userType == 1 && (
-                <IconButton aria-label="edit" sx={{ mx: 1 }}  onClick={() => handleEditUser(user.UID)} >
-                  <EditRounded color='primary'/>
+              {loguser.userType == 1 && (
+                <IconButton aria-label="edit" sx={{ mx: 1 }} onClick={() => handleEditUser(user.UID)} >
+                  <EditRounded color='primary' />
                 </IconButton>
               )}
             </div>
