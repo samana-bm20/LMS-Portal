@@ -6,7 +6,7 @@ import {
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
 } from "material-react-table";
-import { AddCircleRounded } from "@mui/icons-material";
+import { LibraryAddRounded } from "@mui/icons-material";
 import {
   Box, Button, Snackbar, Alert, MenuItem, lighten, FormControl, InputLabel,
   Select, Tabs, Tab, IconButton, useTheme, alpha
@@ -394,7 +394,7 @@ const SoftwaresInfoTable = () => {
             <Button
               sx={{ m: "5px", top: "8px", right: "6px" }}
               variant="contained"
-              startIcon={<AddCircleRounded />}
+              startIcon={<LibraryAddRounded />}
               onClick={onClickAddRecord}
             >
               Add New Record

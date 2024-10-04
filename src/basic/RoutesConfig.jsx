@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  HomeRounded, MapRounded, DynamicFormRounded, AssignmentRounded, AlarmRounded, SwitchAccountRounded, 
+  HomeRounded, MapRounded, DynamicFormRounded, AssignmentRounded, WatchLaterRounded, SwitchAccountRounded, 
   WebhookRounded, EventRounded
 } from '@mui/icons-material';
 
@@ -26,7 +26,7 @@ const RoutesConfig = () => {
     {
       name: 'Reminder',
       to: '/lms/reminder',
-      icon: <AlarmRounded />,
+      icon: <WatchLaterRounded />,
     },
     {
       name: 'Products',

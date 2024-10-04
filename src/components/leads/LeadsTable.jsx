@@ -7,7 +7,7 @@ import {
 } from 'material-react-table';
 
 import {
-    Box, Button, ListItemIcon, MenuItem, lighten, FormControl, InputLabel, Select, useTheme
+    Box, Button, ListItemIcon, MenuItem, lighten, FormControl, InputLabel, Select, useTheme, alpha
 } from '@mui/material';
 
 //Icons Imports
@@ -21,6 +21,7 @@ import AddProduct from './AddProduct';
 import EditLead from './EditLead';
 
 const LeadsTable = () => {
+    const theme = useTheme();
     const { fetchLeadsData, data, product, setProduct } = useFetchLeads();
     const { productValues } = useDetails();
     const [openViewProfile, setOpenViewProfile] = useState(false);
@@ -79,7 +80,6 @@ const LeadsTable = () => {
                 header: 'Status',
                 size: 100,
                 Cell: ({ cell }) => {
-                    const theme = useTheme();
                     const sid = cell.row.original.productDetails.SID;
                     const sName = cell.getValue();
 
@@ -168,6 +168,12 @@ const LeadsTable = () => {
                 <MRT_GlobalFilterTextField table={table} />
                 <MRT_ToggleFiltersButton table={table} />
             </Box>
+            <div className="flex items-center">
+                <span className="text-sm font-semibold rounded-md text-center"
+                    style={{ color: theme.palette.primary.main }}>
+                    Records Count: {data.length}
+                </span>
+            </div>
             <Box>
                 <Box sx={{ display: 'flex', gap: '0.5rem', minWidth: 200 }}>
                     <FormControl fullWidth>
@@ -317,7 +323,7 @@ const LeadsTable = () => {
                     Edit Lead
                 </MenuItem>
             ];
-            
+
             return menuItems;
         },
 
