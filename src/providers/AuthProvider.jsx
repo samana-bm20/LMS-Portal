@@ -1,35 +1,65 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from "../context";
+import { io } from 'socket.io-client';
+import { Config } from '../Config';
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState(null);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
       setIsAuthenticated(true);
+      connectSocket(storedToken);
     } else {
-      return
+      setIsAuthenticated(false);
     }
   }, []);
 
-  const login = (jwtToken) => {
+  const connectSocket = (jwtToken) => {
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    if (user) {
+      const socketInstance = io(Config.apiUrl, {
+        auth: {
+          token: jwtToken,
+        },
+      });
+
+      socketInstance.on("connect", () => {
+        console.log("Socket connected with UID:", user.UID, socketInstance.id);
+      });
+
+      setSocket(socketInstance);
+    }
+  };
+
+
+  const login = (jwtToken, user) => {
     sessionStorage.setItem('token', jwtToken);
+    sessionStorage.setItem('user', JSON.stringify(user));
     setToken(jwtToken);
     setIsAuthenticated(true);
+    connectSocket(jwtToken);
   };
 
   const logout = () => {
+    const user = JSON.parse(sessionStorage.getItem('user'));
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
     setToken(null);
     setIsAuthenticated(false);
+    if (socket) {
+      socket.disconnect();
+      console.log("Socket disconnected with UID:", user.UID);
+      setSocket(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, socket }}>
       {children}
     </AuthContext.Provider>
   );

@@ -36,8 +36,7 @@ const Login = () => {
       try {
         const response = await axios.post(`${Config.apiUrl}/login`, { username, password });
         const { token, user } = response.data;
-        login(token);
-        sessionStorage.setItem('user', JSON.stringify(user)); 
+        login(token, user);
         navigate('/lms/dashboard');
       } catch (error) {
         console.error('Error during login', error);

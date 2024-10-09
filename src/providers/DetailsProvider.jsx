@@ -2,11 +2,10 @@ import React, { useState, useContext, useEffect } from 'react';
 import { DetailsContext } from '../context'
 import { Config } from "../Config";
 import axios from 'axios';
-import CryptoJS from "crypto-js";
 
 export const DetailsProvider = ({ children }) => {
-  const user = Config.user;
   const token = sessionStorage.getItem('token'); 
+  const [notifications, setNotifications] = useState([]);
   const [statusValues, setStatusValues] = useState([]);
   const [productValues, setProductValues] = useState([]);
   const [leadValues, setLeadValues] = useState([]);
@@ -103,9 +102,22 @@ export const DetailsProvider = ({ children }) => {
     }
   }
 
+  const fetchNotifications = async () => {
+    try {
+      const notifResponse = await axios.post(`${Config.apiUrl}/notifications`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setNotifications(Config.decryptData(notifResponse.data));
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   useEffect(() => {
     fetchUsers();
+    fetchNotifications();
     fetchDetails();
     fetchProducts();
     fetchFollowUps();
@@ -118,7 +130,7 @@ export const DetailsProvider = ({ children }) => {
     <DetailsContext.Provider value={{
       statusValues, productValues, userValues, fetchUsers, fetchProducts, 
       fetchFollowUps, leadValues, followUpValues, fetchTasks, taskData,
-      setEsriProducts,esriProducts,fetchESRIProducts
+      setEsriProducts,esriProducts,fetchESRIProducts, fetchNotifications, notifications
     }}>
       {children}
     </DetailsContext.Provider>

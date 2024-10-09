@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js';
 
-// const mainDomain = "http://localhost:5055"; //samana 
-const mainDomain = "https://mlinfomap.org/LMS-API"; //live 
+const mainDomain = "http://localhost:5055"; //samana 
+// const mainDomain = "https://mlinfomap.org/LMS-API"; //live 
 // const mainDomain = "http://192.168.1.168:3000"; //ip
 
 export let Config = {

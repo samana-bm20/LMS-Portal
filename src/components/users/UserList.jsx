@@ -26,9 +26,9 @@ function stringAvatar(name) {
   if (!name) {
     return {
       sx: {
-        bgcolor: '#ccc', // Default color if name is not provided
+        bgcolor: '#ccc',
       },
-      children: 'ML', // Default placeholder if name is empty
+      children: 'ML',
     };
   }
 

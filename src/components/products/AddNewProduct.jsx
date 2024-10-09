@@ -6,9 +6,12 @@ import {
 import { Config } from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
+import { useAuth } from '../../providers/AuthProvider';
 
 const AddNewProduct = ({ openAddProduct, setOpenAddProduct }) => {
   const token = sessionStorage.getItem('token');
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  const { socket } = useAuth();
   const { fetchProducts } = useDetails();
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState(false);
@@ -52,6 +55,8 @@ const AddNewProduct = ({ openAddProduct, setOpenAddProduct }) => {
           'Authorization': token
         }
       });
+
+      socket.emit('newProduct', addProductData.pName, user.UID);
       setOpenAddProduct(false);
       fetchProducts();
       setSuccess(true);
