@@ -7,9 +7,11 @@ import { Config } from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
+import { useAuth } from '../../providers/AuthProvider';
 
 const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => {
     const { fetchLeadsData } = useFetchLeads();
+    const { socket } = useAuth();
     const { statusValues, fetchFollowUps } = useDetails();
     const token = sessionStorage.getItem('token');
     const user = JSON.parse(sessionStorage.getItem('user'));
@@ -84,6 +86,7 @@ const AddFollowUp = ({ openAddFollowUp, setOpenAddFollowUp, lid, pid, sid }) => 
                     'Authorization': token
                 }
             });
+            socket.emit('addFollowup', followUpData);
             fetchLeadsData();
             fetchFollowUps();
             setOpenAddFollowUp(false);

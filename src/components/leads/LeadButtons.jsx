@@ -5,11 +5,14 @@ import AddLead from './AddLead'
 import { Config } from '../../Config';
 import axios from 'axios';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
+import { useAuth } from '../../providers/AuthProvider';
 import ImportLead from './ImportLead';
 
 const LeadButtons = () => {
     const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user'));
     const { fetchLeadsData } = useFetchLeads();
+    const {socket} = useAuth();
     const [openAddLeadDialog, setOpenAddLeadDialog] = useState(false);
     const [openImportLead, setOpenImportLead] = useState(false);
     const [addLeadData, setAddLeadData] = useState([]);
@@ -18,6 +21,8 @@ const LeadButtons = () => {
     const [success, setSuccess] = useState(false);
     const phoneRegex = /^[0-9]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    
 
     //#region Add Lead Dialog
     const openAddLead = () => {
@@ -56,6 +61,8 @@ const LeadButtons = () => {
                     'Authorization': token
                 }
             });
+            console.log(socket);
+            socket.emit('addLead', addLeadData, user.UID);
             fetchLeadsData();
             setOpenAddLeadDialog(false);
             setSuccess(true);

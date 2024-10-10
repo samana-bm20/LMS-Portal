@@ -75,14 +75,19 @@ const AppNotifications = ({ anchorNotif, handleCloseNotification, fetchNotifCoun
 
   //#region Type-Message
   const typeMessage = {
-    "newLead": "assigned a new lead",
+    "newLead": "assigned you a new lead",
     "newLeadUser": "added a new lead",
-    "newUser": "added a new user",
+    "newFollowup": "added a new follow-up for lead",
+    "newFollowupNext": "added a new and scheduled next follow-up for lead",
     "newProduct": "added a new product",
+    "leadProduct": "assigned you a new product for",
+    "leadProductSelf": "added a new product for",
+    "leadProductUser": "assigned someone a new product for",
+    "editLead": "updated details of lead ",
     "newTask": "assigned a new task",
     "newTaskUser": "scheduled a new task",
-    "newFollowup": "added a new follow-up for",
-    "nextFollowup": "assigned a new follow-up for"
+    "nextFollowup": "assigned a new follow-up for",
+    "newUser": "added a new user"
   }
 
   //#region Time Difference
@@ -125,8 +130,8 @@ const AppNotifications = ({ anchorNotif, handleCloseNotification, fetchNotifCoun
     }
   }
 
-  //#region Fetch & Read
-  const fetchAndRead = async (notification) => {
+  //#region Mark As Read
+  const markAsRead = async (notification) => {
     const targetUser = notification.targetUsers.find(target => target.uid === user.UID);
     if (targetUser && !targetUser.hasRead) {
       const params = {
@@ -188,7 +193,7 @@ const AppNotifications = ({ anchorNotif, handleCloseNotification, fetchNotifCoun
                 backgroundColor: alpha(theme.palette.primary.main, 0.2),
               }
             }}
-            onClick={() => fetchAndRead(notif)}
+            onClick={() => markAsRead(notif)}
           >
             <div className='flex items-center'>
               <div>

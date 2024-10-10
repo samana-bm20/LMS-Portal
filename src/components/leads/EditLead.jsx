@@ -5,10 +5,12 @@ import {
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import axios from 'axios';
 import { Config } from '../../Config';
+import { useAuth } from '../../providers/AuthProvider';
 
 const EditLead = ({ openEditLead, setOpenEditLead, lid }) => {
     const token = sessionStorage.getItem('token');
     const { fetchLeadsData, data } = useFetchLeads();
+    const { socket } = useAuth();
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -92,6 +94,7 @@ const EditLead = ({ openEditLead, setOpenEditLead, lid }) => {
                     'Authorization': token
                 }
             });
+            socket.emit('editLead', editLeadData, lid);
             setOpenEditLead(false);
             setEditLeadData({});
             fetchLeadsData();

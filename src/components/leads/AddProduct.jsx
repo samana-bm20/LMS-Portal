@@ -7,10 +7,12 @@ import { Config } from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
+import { useAuth } from '../../providers/AuthProvider';
 
 const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
     const token = sessionStorage.getItem('token');
     const { fetchLeadsData } = useFetchLeads();
+    const { socket } = useAuth();
     const { statusValues, productValues, userValues } = useDetails();
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
@@ -26,7 +28,6 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
         source: '',
     });
     const activeUsers = userValues.filter(user => user.uStatus == 'Active');
-
 
     //#region Set LID
     useEffect(() => {
@@ -59,6 +60,9 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
 
     const closeAddProduct = () => {
         setOpenAddProduct(false);
+        setProduct('');
+        setStatus('');
+        setAssignedTo('');
     }
 
     //#region Add Product
@@ -74,9 +78,20 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
                     'Authorization': token
                 }
             });
+            socket.emit('leadProduct', productData);
             fetchLeadsData();
             setOpenAddProduct(false);
             setSuccess(true);
+            setProductData({
+                LID: 0,
+                PID: '',
+                SID: '',
+                UID: '',
+                source: '',
+            });
+            setProduct('');
+            setStatus('');
+            setAssignedTo('');
             setErrorMessage('');
         } catch (error) {
             if (error.response && error.response.data) {

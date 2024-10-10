@@ -10,7 +10,6 @@ import { useAuth } from '../../providers/AuthProvider';
 
 const AddNewProduct = ({ openAddProduct, setOpenAddProduct }) => {
   const token = sessionStorage.getItem('token');
-  const user = JSON.parse(sessionStorage.getItem('user'));
   const { socket } = useAuth();
   const { fetchProducts } = useDetails();
   const [errorMessage, setErrorMessage] = useState('');
@@ -56,7 +55,7 @@ const AddNewProduct = ({ openAddProduct, setOpenAddProduct }) => {
         }
       });
 
-      socket.emit('newProduct', addProductData.pName, user.UID);
+      socket.emit('newProduct', addProductData.pName);
       setOpenAddProduct(false);
       fetchProducts();
       setSuccess(true);
