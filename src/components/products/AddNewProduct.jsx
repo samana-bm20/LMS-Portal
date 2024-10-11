@@ -55,7 +55,7 @@ const AddNewProduct = ({ openAddProduct, setOpenAddProduct }) => {
         }
       });
 
-      socket.emit('newProduct', addProductData.pName);
+      socket.emit('newProduct', addProductData);
       setOpenAddProduct(false);
       fetchProducts();
       setSuccess(true);

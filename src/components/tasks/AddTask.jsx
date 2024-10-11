@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
     Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
-    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete, 
+    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete,
 
 } from '@mui/material';
 import { useDetails } from '../../providers/DetailsProvider';
@@ -9,9 +9,11 @@ import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import { Config } from '../../Config';
 import axios from 'axios';
 import SetReminder from './SetRemainder';
+import { useAuth } from '../../providers/AuthProvider';
 
 const AddTask = ({ openAddTask, setOpenAddTask }) => {
     const { userValues, fetchTasks } = useDetails();
+    const { socket } = useAuth();
     const token = sessionStorage.getItem('token');
     const user = JSON.parse(sessionStorage.getItem('user'));
     let uid = user.UID
@@ -98,6 +100,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                     'Authorization': token
                 }
             });
+            socket.emit('addTask', taskWithReminders);
             setSuccess(true);
             setOpenAddTask(false);
             fetchTasks();

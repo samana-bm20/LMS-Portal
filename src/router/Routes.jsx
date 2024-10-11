@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
 import { useAuth } from '../providers/AuthProvider';
 import MainLayout from '../layout/MainLayout';
 
@@ -15,9 +16,13 @@ import MLSoftwaresInfo from '../pages/ml_softwares_info'
 import ErrorPage from '../pages/ErrorPage';
 
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const user = JSON.parse(sessionStorage.getItem('user'));
-  
+
+  if (loading) {
+    return <><CircularProgress color='primary' /></>;
+  }
+
   const router = isAuthenticated ? createBrowserRouter([
     {
       path: '/',

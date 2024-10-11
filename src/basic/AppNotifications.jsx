@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
-import {
-  Menu, MenuItem, Avatar, useTheme, alpha,
-} from '@mui/material';
+import { Menu, MenuItem, Avatar, useTheme, alpha } from '@mui/material';
 import { FiberManualRecordRounded } from '@mui/icons-material';
 import { useDetails } from '../providers/DetailsProvider';
 import { useAuth } from '../providers/AuthProvider';
@@ -78,16 +76,21 @@ const AppNotifications = ({ anchorNotif, handleCloseNotification, fetchNotifCoun
     "newLead": "assigned you a new lead",
     "newLeadUser": "added a new lead",
     "newFollowup": "added a new follow-up for lead",
-    "newFollowupNext": "added a new and scheduled next follow-up for lead",
-    "newProduct": "added a new product",
-    "leadProduct": "assigned you a new product for",
-    "leadProductSelf": "added a new product for",
-    "leadProductUser": "assigned someone a new product for",
-    "editLead": "updated details of lead ",
-    "newTask": "assigned a new task",
+    "nextFollowup": "added a new and scheduled next follow-up for lead",
+    "newTask": "assigned you a new task",
     "newTaskUser": "scheduled a new task",
-    "nextFollowup": "assigned a new follow-up for",
-    "newUser": "added a new user"
+    "newProduct": "added a new product",
+    "newUser": "added a new user",
+    "leadProduct": "assigned you a new product for lead",
+    "leadProductSelf": "added a new product for lead",
+    "leadProductUser": "assigned someone a new product for lead",
+    "editLead": "updated details of lead",
+    "editTask": "updated details of task",
+    "editProduct": "updated details of product",
+    "editUser": "updated details of user",
+    "editFollowup": "changed the next follow-up of lead",
+    "assignFollowup": "assigned you the next follow-up of lead",
+    "adminFollowup": "assigned someone the next follow-up of lead"
   }
 
   //#region Time Difference
@@ -151,6 +154,7 @@ const AppNotifications = ({ anchorNotif, handleCloseNotification, fetchNotifCoun
       }
     }
     navigate(`/lms/${notification.redirect}`);
+    window.location.reload(); 
     handleCloseNotification();
   };
 
@@ -180,47 +184,51 @@ const AppNotifications = ({ anchorNotif, handleCloseNotification, fetchNotifCoun
         }
       }}
     >
-      {userNotifications.map((notif, index) => {
-        const currentUser = userValues.find((user) => user.UID === notif.sentBy);
-        const userName = currentUser.uName
-        return (
-          <MenuItem key={index}
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              padding: 1,
-              '&:hover': {
-                backgroundColor: alpha(theme.palette.primary.main, 0.2),
-              }
-            }}
-            onClick={() => markAsRead(notif)}
-          >
-            <div className='flex items-center'>
-              <div>
-                <Avatar {...stringAvatar(userName)} className='mr-4 p-5 w-20 h-20' />
-              </div>
-              <div className="grid">
-                <div
-                  className='text-sm pr-1 text-wrap'
-                  style={{
-                    color: notif.targetUsers.find(target => target.uid === user.UID)?.hasRead ?
-                      theme.palette.text.secondary : theme.palette.text.primary
-                  }}
-                >
-                  <b>{userName}</b> {typeMessage[notif.eventType]} <b>{notif.keyword}</b>
-                </div>
-                <div className="text-xs" style={{ color: theme.palette.text.secondary }} >{formatTimeDifference(notif.time)}</div>
-              </div>
-            </div>
-            <div
-              className='flex'
-              style={{ visibility: !notif.targetUsers.find(target => target.uid === user.UID)?.hasRead ? 'visible' : 'hidden' }}
+      {userNotifications.length == 0 ? (
+        <div className='m-2 p-2 text-md font semibold text-center italic'
+          style={{ color: theme.palette.text.secondary }}>No notifications</div>
+      ) : (
+        userNotifications.map((notif, index) => {
+          const currentUser = userValues.find((user) => user.UID === notif.sentBy);
+          const userName = currentUser.uName
+          return (
+            <MenuItem key={index}
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: 1,
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                }
+              }}
+              onClick={() => markAsRead(notif)}
             >
-              <FiberManualRecordRounded color='primary' fontSize='small' />
-            </div>
-          </MenuItem>
-        );
-      })}
+              <div className='flex items-center'>
+                <div>
+                  <Avatar {...stringAvatar(userName)} className='mr-4 p-5 w-20 h-20' />
+                </div>
+                <div className="grid">
+                  <div
+                    className='text-sm pr-1 text-wrap'
+                    style={{
+                      color: notif.targetUsers.find(target => target.uid === user.UID)?.hasRead ?
+                        theme.palette.text.secondary : theme.palette.text.primary
+                    }}
+                  >
+                    <b>{userName}</b> {typeMessage[notif.eventType]} <b>{notif.keyword}</b>
+                  </div>
+                  <div className="text-xs" style={{ color: theme.palette.text.secondary }} >{formatTimeDifference(notif.time)}</div>
+                </div>
+              </div>
+              <div
+                className='flex'
+                style={{ visibility: !notif.targetUsers.find(target => target.uid === user.UID)?.hasRead ? 'visible' : 'hidden' }}
+              >
+                <FiberManualRecordRounded color='primary' fontSize='small' />
+              </div>
+            </MenuItem>
+          );
+        }))}
     </Menu>
   )
 }

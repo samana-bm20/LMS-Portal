@@ -6,10 +6,12 @@ import {
 import { Config } from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
+import { useAuth } from '../../providers/AuthProvider';
 
 const AddUser = ({ openAddUser, setOpenAddUser }) => {
   const token = sessionStorage.getItem('token');
   const { fetchUsers } = useDetails();
+  const {socket} = useAuth();
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -56,6 +58,7 @@ const AddUser = ({ openAddUser, setOpenAddUser }) => {
           'Authorization': token
         }
       });
+      socket.emit('newUser', addUserData);
       setOpenAddUser(false);
       fetchUsers();
       setSuccess(true);

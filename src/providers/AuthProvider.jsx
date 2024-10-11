@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem('token');
@@ -17,6 +18,7 @@ export const AuthProvider = ({ children }) => {
     } else {
       setIsAuthenticated(false);
     }
+    setLoading(false); 
   }, []);
 
   const connectSocket = (jwtToken) => {
@@ -59,7 +61,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, socket }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, socket, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,12 +4,14 @@ import {
   InputLabel, Select, MenuItem, Snackbar, Alert,
 } from '@mui/material';
 import { useDetails } from '../../providers/DetailsProvider'
+import { useAuth } from '../../providers/AuthProvider';
 import axios from 'axios';
 import { Config } from '../../Config';
 
 const EditProduct = ({ openEditProduct, setOpenEditProduct, pid }) => {
   const token = sessionStorage.getItem('token');
   const { fetchProducts, productValues } = useDetails();
+  const { socket } = useAuth();
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -21,6 +23,7 @@ const EditProduct = ({ openEditProduct, setOpenEditProduct, pid }) => {
     owner: '',
   });
 
+  //#region Fetch Data
   const getProductData = async () => {
     try {
       currentProduct = productValues.filter(product => product.PID === pid)
@@ -50,6 +53,7 @@ const EditProduct = ({ openEditProduct, setOpenEditProduct, pid }) => {
     }));
   }
 
+  //#region Edit Product
   const handleEditProduct = async () => {
     if (!editProductData.pName || !editProductData.tagline || !editProductData.owner || !editProductData.pDescription) {
       setErrorMessage('Required fields cannot be empty.')
@@ -67,6 +71,7 @@ const EditProduct = ({ openEditProduct, setOpenEditProduct, pid }) => {
           'Authorization': token
         }
       });
+      socket.emit('editProduct', editProductData, pid);
       setOpenEditProduct(false);
       fetchProducts();
       setSuccess(true);

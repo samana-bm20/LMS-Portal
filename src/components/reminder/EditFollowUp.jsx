@@ -4,11 +4,13 @@ import {
     TextField, InputLabel, Select, MenuItem, FormControl
 } from '@mui/material'
 import { useDetails } from '../../providers/DetailsProvider'
+import { useAuth } from '../../providers/AuthProvider'
 import { Config } from '../../Config'
 import axios from 'axios'
 
 const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp }) => {
     const { userValues, fetchFollowUps } = useDetails();
+    const { socket } = useAuth();
     const token = sessionStorage.getItem('token');
     const user = JSON.parse(sessionStorage.getItem('user'));
     const uid = user.UID;
@@ -82,6 +84,7 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
                     'Authorization': token
                 }
             });
+            socket.emit('editFollowup', editFollowUpData, selectedFollowUp);
             setOpenEditFollowUp(false);
             fetchFollowUps();
             getSelectedFollowUp();
@@ -186,7 +189,7 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
                 <DialogActions>
                     <div className='m-4'>
                         <Button onClick={closeEditFollowUp}>Cancel</Button>
-                        <Button variant='contained' onClick={handleEditFollowUp}>Update</Button>
+                        <Button variant='contained' onClick={handleEditFollowUp}>Edit</Button>
                     </div>
                 </DialogActions>
             </Dialog>

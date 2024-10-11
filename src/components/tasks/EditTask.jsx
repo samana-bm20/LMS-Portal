@@ -8,11 +8,13 @@ import axios from 'axios';
 import SetReminder from './SetRemainder';
 import { useDetails } from '../../providers/DetailsProvider';
 import { Config } from '../../Config';
+import { useAuth } from '../../providers/AuthProvider';
 
 
 const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
     const theme = useTheme();
     const { userValues, taskData, fetchTasks } = useDetails();
+    const { socket } = useAuth();
     const token = sessionStorage.getItem('token');
     const user = JSON.parse(sessionStorage.getItem('user'));
     const uid = user.UID;
@@ -138,6 +140,7 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
                     'Authorization': token
                 }
             });
+            socket.emit('editTask', taskWithUpdatedReminders, tid)
             setOpenEditTask(false);
             fetchTasks();
             getSelectedTask();
@@ -214,9 +217,20 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
                                         onChange={handleEditTaskChange}
                                         size='small'
                                     >
-                                        {activeUsers.map((user) => (
+                                        {/* {activeUsers.map((user) => (
                                             <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
-                                        ))}
+                                        ))} */}
+                                        {user.userType === 1 ? (
+                                            activeUsers.map((user) => (
+                                                <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
+                                            ))
+                                        ) : (
+                                            userValues
+                                                .filter((userItem) => userItem.UID == user.UID)
+                                                .map((userItem) => (
+                                                    <MenuItem key={userItem.UID} value={userItem.UID}>{userItem.uName}</MenuItem>
+                                                ))
+                                        )}
                                     </Select>
                                 </FormControl>
                             </div>
@@ -302,7 +316,7 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
                             ))
                         ) : (
                             <div className="px-2 mb-4 text-center italic text-sm" style={{ color: theme.palette.text.secondary }}>
-                                No reminder for this task
+                                No reminders for this task
                             </div>
                         )}
 
@@ -326,7 +340,7 @@ const EditTask = ({ openEditTask, setOpenEditTask, tid }) => {
                 <DialogActions>
                     <div className='m-4'>
                         <Button onClick={closeEditTask}>Cancel</Button>
-                        <Button variant='contained' onClick={handleEditTask}>Update</Button>
+                        <Button variant='contained' onClick={handleEditTask}>Edit</Button>
                     </div>
                 </DialogActions>
             </Dialog>

@@ -95,8 +95,9 @@ const TaskCards = () => {
                                 </div>
                                 {task.LID && task.PID && (
                                     <>
+                                    {/* inline-block */}
                                         <div
-                                            className="inline-block p-1 rounded-lg text-sm font-semibold mb-2"
+                                            className=" p-1 rounded-lg text-sm font-semibold mb-2"
                                             style={{
                                                 backgroundColor: alpha(theme.palette.secondary.main, 0.2),
                                                 color: theme.palette.secondary.main
@@ -105,7 +106,7 @@ const TaskCards = () => {
                                             <p>Lead: {task.lName}-{task.organization}</p>
                                         </div>
                                         <div
-                                            className="inline-block p-1 rounded-lg text-sm font-semibold mb-2"
+                                            className=" p-1 rounded-lg text-sm font-semibold mb-2"
                                             style={{
                                                 backgroundColor: alpha(theme.palette.warning.main, 0.2),
                                                 color: theme.palette.warning.main

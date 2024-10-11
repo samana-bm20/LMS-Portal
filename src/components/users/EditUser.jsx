@@ -4,12 +4,14 @@ import {
   InputLabel, Select, MenuItem, Snackbar, Alert,
 } from '@mui/material';
 import { useDetails } from '../../providers/DetailsProvider'
+import { useAuth } from '../../providers/AuthProvider';
 import axios from 'axios';
 import { Config } from '../../Config';
 
 const EditUser = ({ openEditUser, setOpenEditUser, uid }) => {
   const token = sessionStorage.getItem('token');
   const { fetchUsers, userValues } = useDetails();
+  const { socket } = useAuth();
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -24,6 +26,7 @@ const EditUser = ({ openEditUser, setOpenEditUser, uid }) => {
     uStatus: '',
   });
 
+  //#region Fetch Data
   const getUserData = async () => {
     try {
       currentUser = userValues.filter(user => user.UID === uid)
@@ -56,6 +59,7 @@ const EditUser = ({ openEditUser, setOpenEditUser, uid }) => {
     }));
   }
 
+  //#region Edit User
   const handleEditUser = async () => {
     if (!editUserData.uName || !editUserData.username || !editUserData.password ||
       !editUserData.email || !editUserData.mobile) {
@@ -74,6 +78,7 @@ const EditUser = ({ openEditUser, setOpenEditUser, uid }) => {
           'Authorization': token
         }
       });
+      socket.emit('editUser', editUserData, uid);
       setOpenEditUser(false);
       fetchUsers();
       setSuccess(true);

@@ -8,8 +8,8 @@ import { useDetails } from '../../providers/DetailsProvider';
 
 const TodayTasks = () => {
   const theme = useTheme();
-  const { leadValues, productValues, userValues, taskData, loggedUser } = useDetails();
-  const user = userValues.filter((user) => user.username === loggedUser);
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  const { leadValues, productValues, userValues, taskData } = useDetails();
   const [data, setData] = useState([]);
 
   const fetchTaskData = () => {
@@ -28,8 +28,8 @@ const TodayTasks = () => {
     fetchTaskData();
   }, [taskData]);
 
-  const filteredData = user[0]?.userType === 2
-  ? data.filter((task) => task.UID === user[0]?.UID)
+  const filteredData = user.userType === 2
+  ? data.filter((task) => task.UID === user.UID)
   : data;
 
   const leadMap = leadValues.reduce((map, lead) => {
