@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AppBar as MuiAppBar, Box, Toolbar, IconButton, Typography, Badge, Button, ButtonGroup, Fab, Menu,
-  MenuItem, Divider, Avatar
+  MenuItem, Divider, Avatar, Avatar
 } from '@mui/material';
 import {
   MenuRounded, NotificationsRounded, PersonRounded, LightModeRounded, DarkModeRounded,
@@ -14,7 +15,10 @@ import { useDetails } from '../providers/DetailsProvider';
 import AppNotifications from './AppNotifications';
 import { useNavigate } from 'react-router-dom';
 
+import { useNavigate } from 'react-router-dom';
+
 //#region Responsive
+const drawerWidth = 180;
 const drawerWidth = 180;
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -37,9 +41,26 @@ const AppBar = styled(MuiAppBar, {
 const AppHeader = ({ onMenuClick, open }) => {
   const navigate = useNavigate();
   const user = JSON.parse(sessionStorage.getItem('user'));
+  const navigate = useNavigate();
+  const user = JSON.parse(sessionStorage.getItem('user'));
   const { logout } = useAuth();
   const { mode, toggleColorMode } = useMode();
   const [anchorElUser, setAnchorElUser] = useState('');
+  const [anchorNotif, setAnchorNotif] = useState('');
+  const { notifications } = useDetails();
+  const [unreadCount, setUnreadCount] = useState();
+
+  const fetchNotifCount = () => {
+    const unreadNotifications = notifications
+      .filter(notification => notification.targetUsers
+        .some(target => target.uid === user.UID && target.hasRead === false));
+    setUnreadCount(unreadNotifications.length);
+  }
+
+  useEffect(() => {
+    fetchNotifCount();
+  }, [notifications]);
+
   const [anchorNotif, setAnchorNotif] = useState('');
   const { notifications } = useDetails();
   const [unreadCount, setUnreadCount] = useState();
@@ -67,6 +88,14 @@ const AppHeader = ({ onMenuClick, open }) => {
   const handleOpenNotification = (event) => {
     setAnchorNotif(event.currentTarget);
   };
+  const handleOpenNotification = (event) => {
+    setAnchorNotif(event.currentTarget);
+  };
+
+  const handleCloseNotification = () => {
+    setAnchorNotif(null);
+  };
+
 
   const handleCloseNotification = () => {
     setAnchorNotif(null);
@@ -76,6 +105,7 @@ const AppHeader = ({ onMenuClick, open }) => {
 
   const settings = [
     {
+      name: user.uName,
       name: user.uName,
       icon: <FaceRounded color='primary' />
     },
@@ -200,7 +230,9 @@ const AppHeader = ({ onMenuClick, open }) => {
 
             {/* Notification */}
             <IconButton
+            <IconButton
               aria-label="new notifications"
+              sx={{ mr: 2, pt: 0, pb: 0, '&:focus': { outline: 'none' } }}
               sx={{ mr: 2, pt: 0, pb: 0, '&:focus': { outline: 'none' } }}
               color='primary'
               aria-controls="menu-appbar"
@@ -208,12 +240,16 @@ const AppHeader = ({ onMenuClick, open }) => {
               onClick={handleOpenNotification}
             >
               <Badge badgeContent={unreadCount} color="error">
+            >
+              <Badge badgeContent={unreadCount} color="error">
                 <NotificationsRounded color='primary' />
               </Badge>
+            </IconButton>
             </IconButton>
 
             {/* User */}
             <Box className='flex-grow'>
+              {/* <Fab
               {/* <Fab
                 color="primary"
                 aria-label="account"
@@ -224,6 +260,15 @@ const AppHeader = ({ onMenuClick, open }) => {
                 sx={{ ml: 1, mr: 2, '&:focus': { outline: 'none' } }}
               >
                 <PersonRounded />
+              </Fab> */}
+
+              <Avatar {...stringAvatar(user.uName)}
+                aria-label="account"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenUserMenu}
+                style={{ cursor: 'pointer' }}
+              />
               </Fab> */}
 
               <Avatar {...stringAvatar(user.uName)}
@@ -263,6 +308,7 @@ const AppHeader = ({ onMenuClick, open }) => {
                 ))}
                 <Divider />
                 <MenuItem onClick={() => { logout(); navigate('/lms/') }}>
+                <MenuItem onClick={() => { logout(); navigate('/lms/') }}>
                   <div className='flex'>
                     <div><PowerSettingsNewRounded color='primary' /></div>
                     <div className='ml-2'>
@@ -274,6 +320,11 @@ const AppHeader = ({ onMenuClick, open }) => {
             </Box>
           </Box>
         </Toolbar>
+        <AppNotifications
+          anchorNotif={anchorNotif}
+          handleCloseNotification={handleCloseNotification}
+          fetchNotifCount={fetchNotifCount}
+        />
         <AppNotifications
           anchorNotif={anchorNotif}
           handleCloseNotification={handleCloseNotification}

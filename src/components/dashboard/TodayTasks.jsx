@@ -10,6 +10,8 @@ const TodayTasks = () => {
   const theme = useTheme();
   const user = JSON.parse(sessionStorage.getItem('user'));
   const { leadValues, productValues, userValues, taskData } = useDetails();
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  const { leadValues, productValues, userValues, taskData } = useDetails();
   const [data, setData] = useState([]);
 
   const fetchTaskData = () => {

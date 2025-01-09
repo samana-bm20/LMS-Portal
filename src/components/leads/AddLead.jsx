@@ -5,6 +5,8 @@ import { useDetails } from '../../providers/DetailsProvider';
 const AddLead = ({ handleLeadDataChange }) => {
     const { statusValues, productValues, userValues } = useDetails();
     const user = JSON.parse(sessionStorage.getItem('user'));
+    const { statusValues, productValues, userValues } = useDetails();
+    const user = JSON.parse(sessionStorage.getItem('user'));
     const [product, setProduct] = useState('');
     const [status, setStatus] = useState('');
     const [assignedTo, setAssignedTo] = useState('');
@@ -22,6 +24,7 @@ const AddLead = ({ handleLeadDataChange }) => {
         UID: '',
         source: '',
     });
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
     const activeUsers = userValues.filter(user => user.uStatus == 'Active');
 
     //#region Field Change
@@ -183,10 +186,16 @@ const AddLead = ({ handleLeadDataChange }) => {
                         >
                             {user.userType === 1 ? (
                                 activeUsers.map((user) => (
+                            {user.userType === 1 ? (
+                                activeUsers.map((user) => (
                                     <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                 ))
                             ) : (
                                 userValues
+                                    .filter((userItem) => userItem.UID == user.UID)
+                                    .map((userItem) => (
+                                        <MenuItem key={userItem.UID} value={userItem.UID}>{userItem.uName}</MenuItem>
+                                    ))
                                     .filter((userItem) => userItem.UID == user.UID)
                                     .map((userItem) => (
                                         <MenuItem key={userItem.UID} value={userItem.UID}>{userItem.uName}</MenuItem>

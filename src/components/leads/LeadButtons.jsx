@@ -25,6 +25,8 @@ const LeadButtons = () => {
     const { fetchDetails } = useDetails();
     
 
+    
+
     //#region Add Lead Dialog
     const openAddLead = () => {
         setOpenAddLeadDialog(true);

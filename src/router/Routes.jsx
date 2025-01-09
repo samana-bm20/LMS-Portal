@@ -85,6 +85,10 @@ const AppRoutes = () => {
           element: <Navigate to='/lms/dashboard' replace />
         },
         {
+          path: '/',
+          element: <Navigate to='/lms/dashboard' replace />
+        },
+        {
           path: '/lms/dashboard',
           element: ( <AuthGuard><Dashboard /></AuthGuard>)
         },

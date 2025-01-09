@@ -6,6 +6,14 @@ import { useDetails } from '../providers/DetailsProvider';
 import { useAuth } from '../providers/AuthProvider';
 import axios from 'axios';
 import { Config } from '../Config';
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
+import { Menu, MenuItem, Avatar, useTheme, alpha } from '@mui/material';
+import { FiberManualRecordRounded } from '@mui/icons-material';
+import { useDetails } from '../providers/DetailsProvider';
+import { useAuth } from '../providers/AuthProvider';
+import axios from 'axios';
+import { Config } from '../Config';
 
 const AppNotifications = ({ anchorNotif, handleCloseNotification, fetchNotifCount }) => {
   const theme = useTheme();
@@ -168,6 +176,75 @@ const AppNotifications = ({ anchorNotif, handleCloseNotification, fetchNotifCoun
 
   return (
     <Menu
+      sx={{ mt: '45px' }}
+      id="menu-appbar"
+      anchorEl={anchorNotif}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={Boolean(anchorNotif)}
+      onClose={handleCloseNotification}
+      PaperProps={{
+        sx: {
+          width: '400px',
+          maxHeight: '400px',
+          overflow: 'auto',
+          scrollbarWidth: 'thin'
+        }
+      }}
+    >
+      {userNotifications.length == 0 ? (
+        <div className='m-2 p-2 text-md font semibold text-center italic'
+          style={{ color: theme.palette.text.secondary }}>No notifications</div>
+      ) : (
+        userNotifications.map((notif, index) => {
+          const currentUser = userValues.find((user) => user.UID === notif.sentBy);
+          const userName = currentUser.uName
+          return (
+            <MenuItem key={index}
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: 1,
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                }
+              }}
+              onClick={() => markAsRead(notif)}
+            >
+              <div className='flex items-center'>
+                <div>
+                  <Avatar {...stringAvatar(userName)} className='mr-4 p-5 w-20 h-20' />
+                </div>
+                <div className="grid">
+                  <div
+                    className='text-sm pr-1 text-wrap'
+                    style={{
+                      color: notif.targetUsers.find(target => target.uid === user.UID)?.hasRead ?
+                        theme.palette.text.secondary : theme.palette.text.primary
+                    }}
+                  >
+                    <b>{userName}</b> {typeMessage[notif.eventType]} <b>{notif.keyword}</b>
+                  </div>
+                  <div className="text-xs" style={{ color: theme.palette.text.secondary }} >{formatTimeDifference(notif.time)}</div>
+                </div>
+              </div>
+              <div
+                className='flex'
+                style={{ visibility: !notif.targetUsers.find(target => target.uid === user.UID)?.hasRead ? 'visible' : 'hidden' }}
+              >
+                <FiberManualRecordRounded color='primary' fontSize='small' />
+              </div>
+            </MenuItem>
+          );
+        }))}
+    </Menu>
       sx={{ mt: '45px' }}
       id="menu-appbar"
       anchorEl={anchorNotif}
