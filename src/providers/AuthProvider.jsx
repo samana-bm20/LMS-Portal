@@ -1,8 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from "../context";
-import { io } from 'socket.io-client';
-import { Config } from '../Config';
 import { io } from 'socket.io-client';
 import { Config } from '../Config';
 
@@ -71,16 +68,7 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
     setToken(null);
-    const user = JSON.parse(sessionStorage.getItem('user'));
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('user');
-    setToken(null);
     setIsAuthenticated(false);
-    if (socket) {
-      socket.disconnect();
-      console.log("Socket disconnected with UID:", user.UID);
-      setSocket(null);
-    }
     if (socket) {
       socket.disconnect();
       console.log("Socket disconnected with UID:", user.UID);
@@ -89,7 +77,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, socket, loading }}>
     <AuthContext.Provider value={{ isAuthenticated, token, login, logout, socket, loading }}>
       {children}
     </AuthContext.Provider>

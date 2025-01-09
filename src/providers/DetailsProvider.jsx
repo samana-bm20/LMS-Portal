@@ -1,12 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { DetailsContext } from '../context'
 import { Config } from "../Config";
-import { Config } from "../Config";
 import axios from 'axios';
 
 export const DetailsProvider = ({ children }) => {
-  const token = sessionStorage.getItem('token'); 
-  const [notifications, setNotifications] = useState([]);
   const token = sessionStorage.getItem('token'); 
   const [notifications, setNotifications] = useState([]);
   const [statusValues, setStatusValues] = useState([]);
@@ -66,40 +63,8 @@ export const DetailsProvider = ({ children }) => {
     }
   }
 
-  const fetchUsers = async () => {
-    try {
-      const userResponse = await axios.post(`${Config.apiUrl}/users`, {}, {
-        headers: {
-          'Authorization': token 
-        }
-      });
-      setUserValues(Config.decryptData(userResponse.data));
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const fetchProducts = async () => {
-    try {
-      const productResponse = await axios.post(`${Config.apiUrl}/products`, {}, {
-        headers: {
-          'Authorization': token 
-        }
-      });
-      setProductValues(Config.decryptData(productResponse.data));
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   const fetchFollowUps = async () => {
     try {
-      const followUpResponse = await axios.post(`${Config.apiUrl}/followUpDetails`, {}, {
-        headers: {
-          'Authorization': token 
-        }
-      });
-      setFollowUpValues(Config.decryptData(followUpResponse.data));
       const followUpResponse = await axios.post(`${Config.apiUrl}/followUpDetails`, {}, {
         headers: {
           'Authorization': token 
@@ -127,7 +92,6 @@ export const DetailsProvider = ({ children }) => {
 
   const fetchESRIProducts = async () => {
     try {
-      debugger
       setEsriProducts([]);
       const response = await axios.post(`${Config.apiUrl}/getESRIProduct`, {}, {
         headers: {
@@ -188,10 +152,7 @@ export const DetailsProvider = ({ children }) => {
   useEffect(() => {
     fetchUsers();
     fetchNotifications();
-    fetchUsers();
-    fetchNotifications();
     fetchDetails();
-    fetchProducts();
     fetchProducts();
     fetchFollowUps();
     fetchTasks();

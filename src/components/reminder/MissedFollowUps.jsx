@@ -1,7 +1,5 @@
 import React from 'react'
 import { Fab, useTheme } from '@mui/material'
-import React from 'react'
-import { Fab, useTheme } from '@mui/material'
 import {
     NotificationImportantRounded, PersonRounded, BusinessRounded,
     PhoneDisabledRounded, UnsubscribeRounded, PersonOffRounded
@@ -12,7 +10,6 @@ const MissedFollowUps = () => {
     const theme = useTheme();
     const { followUpValues, statusValues, productValues, userValues, leadValues } = useDetails();
     const user = JSON.parse(sessionStorage.getItem('user'));
-
     //#region Formatting
     const sidToColor = {
         S1: theme.palette.text.disabled,
@@ -50,11 +47,9 @@ const MissedFollowUps = () => {
 
     //#region Data
     const filteredFollowUps = user.userType === 2 ?
-    const filteredFollowUps = user.userType === 2 ?
         followUpValues.filter(item =>
             item.hasOwnProperty('nextDate') &&
             new Date(item.nextDate) < new Date() &&
-            item.UID == user.UID) :
             item.UID == user.UID) :
         followUpValues.filter(item =>
             item.hasOwnProperty('nextDate') &&
@@ -87,7 +82,6 @@ const MissedFollowUps = () => {
                             <p className='text-sm font-semibold'>Date: {new Date(followUp.nextDate).toLocaleDateString('en-GB', dateOptions).replace(/ /g, '-')}</p>
                         </div>
 
-                        <div className="flex justify-between items-center gap-4 p-2 rounded-lg shadow-md border"
                         <div className="flex justify-between items-center gap-4 p-2 rounded-lg shadow-md border"
                             style={{ backgroundColor: theme.palette.background.card }}>
                             <div className="grid p-4 place-items-center rounded-lg w-[120px]"

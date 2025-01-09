@@ -13,7 +13,6 @@ const UpcomingFollowUps = () => {
     const [openEditFollowUp, setOpenEditFollowUp] = useState(false);
     const { followUpValues, statusValues, productValues, userValues, leadValues } = useDetails();
     const user = JSON.parse(sessionStorage.getItem('user'));
-
     //#region Formatting
     const sidToColor = {
         S1: theme.palette.text.disabled,
@@ -149,7 +148,6 @@ const UpcomingFollowUps = () => {
                             </div>
                         </div>
 
-                        <div className="flex justify-between items-center gap-4 p-2 rounded-lg shadow-md border"
                         <div className="flex justify-between items-center gap-4 p-2 rounded-lg shadow-md border"
                             style={{ backgroundColor: theme.palette.background.card }}
                         >

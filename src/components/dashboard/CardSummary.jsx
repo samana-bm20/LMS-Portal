@@ -7,15 +7,6 @@ import { LinearProgress, useTheme, alpha, IconButton } from '@mui/material';
 import ESRI from '../../assets/DashboardCards/owner_esri.svg'
 import ML from '../../assets/DashboardCards/owner_ml.svg'
 import { Config } from "../../Config";
-import React, { useState, useEffect, useRef } from 'react';
-import {
-    AssignmentRounded, AssignmentIndRounded, AssignmentLateRounded, AssistantPhotoRounded,
-    ArrowBackIos, ArrowForwardIos
-} from '@mui/icons-material';
-import { LinearProgress, useTheme, alpha, IconButton } from '@mui/material';
-import ESRI from '../../assets/DashboardCards/owner_esri.svg'
-import ML from '../../assets/DashboardCards/owner_ml.svg'
-import { Config } from "../../Config";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -71,21 +62,13 @@ const Card2 = ({ color, title, total, active, dead, owner, alt, pid }) => {
                 </div>
                 <div className="flex-shrink-0 ml-4">
                     <img src={ownerIcon} alt={alt} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
-                <div className="flex-shrink-0 ml-4">
-                    <img src={ownerIcon} alt={alt} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
                 </div>
             </div>
         </div>
     );
 };
-        </div>
-    );
-};
 
 const CardSummary = () => {
-    const theme = useTheme();
-    const token = sessionStorage.getItem('token');
-    const user = JSON.parse(sessionStorage.getItem('user'));
     const theme = useTheme();
     const token = sessionStorage.getItem('token');
     const user = JSON.parse(sessionStorage.getItem('user'));
@@ -180,7 +163,6 @@ const CardSummary = () => {
 
         fetchLeadCount();
         fetchProductLeadCount();
-        setLoading(false);
         setLoading(false);
     }, []);
 
