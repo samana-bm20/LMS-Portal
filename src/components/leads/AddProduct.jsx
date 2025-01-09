@@ -3,13 +3,16 @@ import {
     Paper, Button, MenuItem, FormControl, TextField, InputLabel, Select, Dialog,
     DialogTitle, DialogContent, DialogActions, Snackbar, Alert
 } from '@mui/material';
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
+import { useAuth } from '../../providers/AuthProvider';
 
 const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
+    const token = sessionStorage.getItem('token');
     const { fetchLeadsData } = useFetchLeads();
+    const { socket } = useAuth();
     const { statusValues, productValues, userValues } = useDetails();
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
@@ -24,6 +27,7 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
         UID: '',
         source: '',
     });
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
 
     //#region Set LID
     useEffect(() => {
@@ -56,6 +60,9 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
 
     const closeAddProduct = () => {
         setOpenAddProduct(false);
+        setProduct('');
+        setStatus('');
+        setAssignedTo('');
     }
 
     //#region Add Product
@@ -66,10 +73,25 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
             return;
         }
         try {
-            const _ = await axios.post(`${Config.apiUrl}/addProduct`, productData);
+            const _ = await axios.post(`${Config.apiUrl}/addProduct`, productData, {
+                headers: {
+                    'Authorization': token
+                }
+            });
+            socket.emit('leadProduct', productData);
             fetchLeadsData();
             setOpenAddProduct(false);
             setSuccess(true);
+            setProductData({
+                LID: 0,
+                PID: '',
+                SID: '',
+                UID: '',
+                source: '',
+            });
+            setProduct('');
+            setStatus('');
+            setAssignedTo('');
             setErrorMessage('');
         } catch (error) {
             if (error.response && error.response.data) {
@@ -102,7 +124,7 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
                 open={openAddProduct}
                 onClose={closeAddProduct}
             >
-                <DialogTitle>Add New Product</DialogTitle>
+                <DialogTitle>Add Product</DialogTitle>
                 <DialogContent>
                     <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -165,7 +187,7 @@ const AddProduct = ({ openAddProduct, setOpenAddProduct, lid }) => {
                                         onChange={handleDataChange}
                                         size='small'
                                     >
-                                        {userValues.map((user) => (
+                                        {activeUsers.map((user) => (
                                             <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                         ))}
                                     </Select>

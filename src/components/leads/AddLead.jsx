@@ -3,8 +3,8 @@ import { Paper, TextField, InputLabel, Select, MenuItem, FormControl } from '@mu
 import { useDetails } from '../../providers/DetailsProvider';
 
 const AddLead = ({ handleLeadDataChange }) => {
-    const { statusValues, productValues, userValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser);
+    const { statusValues, productValues, userValues } = useDetails();
+    const user = JSON.parse(sessionStorage.getItem('user'));
     const [product, setProduct] = useState('');
     const [status, setStatus] = useState('');
     const [assignedTo, setAssignedTo] = useState('');
@@ -22,6 +22,7 @@ const AddLead = ({ handleLeadDataChange }) => {
         UID: '',
         source: '',
     });
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
 
     //#region Field Change
     const handleNewLeadChange = (e) => {
@@ -60,18 +61,6 @@ const AddLead = ({ handleLeadDataChange }) => {
     return (
         <Paper elevation={3} className="p-4 rounded-lg shadow-md" component="form" >
             <div className="grid gap-2">
-                {/* <div className="mb-2">
-                    <TextField
-                        required
-                        name='LID'
-                        id="outlined-required"
-                        label="LID"
-                        size='small'
-                        value={leadID + 1}
-                        disabled
-                    // onChange={handleNewLeadChange}
-                    />
-                </div> */}
                 <div className="mb-2">
                     <TextField
                         required
@@ -89,7 +78,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                     <TextField
                         name='mobileNo'
                         id="outlined"
-                        label="Contact"
+                        label="Contact No."
                         size='small'
                         onChange={handleNestedChange}
                     />
@@ -192,16 +181,16 @@ const AddLead = ({ handleLeadDataChange }) => {
                             onChange={handleNewLeadChange}
                             size='small'
                         >
-                            {user[0]?.userType === 1 ? (
-                                userValues.map((user) => (
+                            {user.userType === 1 ? (
+                                activeUsers.map((user) => (
                                     <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                 ))
                             ) : (
                                 userValues
-                                .filter((userItem) => userItem.UID == user[0]?.UID)
-                                .map((userItem) => (
-                                    <MenuItem key={userItem.UID} value={userItem.UID}>{userItem.uName}</MenuItem>
-                                ))
+                                    .filter((userItem) => userItem.UID == user.UID)
+                                    .map((userItem) => (
+                                        <MenuItem key={userItem.UID} value={userItem.UID}>{userItem.uName}</MenuItem>
+                                    ))
                             )}
 
                         </Select>

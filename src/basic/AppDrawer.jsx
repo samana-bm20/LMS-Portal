@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Drawer as MuiDrawer, Divider, List, ListItemButton, ListItemText, ListItemIcon
 } from '@mui/material';
@@ -8,35 +8,22 @@ import Logo from '../assets/Logo/newLogo.svg';
 import blackLogo from '../assets/Logo/blackLogo.svg';
 import { useMode } from '../providers/ModeProvider';
 
-const drawerWidth = 200;
+const drawerWidth = 180;
 
 const AppDrawer = ({ open, onClose }) => {
+  const routes = RoutesConfig();
   const location = useLocation();
   const [selectedIndex, setSelectedIndex] = useState(null);
   const { mode } = useMode();
-  const listItemRefs = useRef([]);
-  let fetchedSelectedIndex;
   
   useEffect(() => {
     const currentPath = location.pathname;
-    const selectedItemIndex = RoutesConfig.findIndex(item => item.to === currentPath);
+    const selectedItemIndex = routes.findIndex(item => item.to === currentPath);
 
-    setSelectedIndex(selectedItemIndex);
-
-    // Manage session storage and logging
-    
+    setSelectedIndex(selectedItemIndex);    
     
   }, [location.pathname]);
 
-  useEffect(() => {
-    sessionStorage.setItem('selectedIndex', selectedIndex);
-
-    fetchedSelectedIndex = sessionStorage.getItem('selectedIndex')
-
-    if (fetchedSelectedIndex !== null && listItemRefs.current[fetchedSelectedIndex]) {
-      listItemRefs.current[fetchedSelectedIndex].focus();
-    }
-  }, [fetchedSelectedIndex]);
 
   return (
     <MuiDrawer
@@ -65,12 +52,11 @@ const AppDrawer = ({ open, onClose }) => {
       </div>
       <Divider sx={{ backgroundColor: 'divider' }} />
       <List>
-        {RoutesConfig.map((route, index) => (
+        {routes.map((route, index) => (
           <ListItemButton
             component={Link}
             to={route.to}
             key={route.to}
-            ref={el => listItemRefs.current[index] = el} // Assign ref to the button
             selected={selectedIndex === index} // Use `selected` for styling
             sx={{
               '&.Mui-selected': {
@@ -79,15 +65,15 @@ const AppDrawer = ({ open, onClose }) => {
                 borderRadius: '10px',
                 ml: '5px', mr: '5px', mt: '1px', mb: '1px'
               },
-              // '&:hover': {
-              //   backgroundColor: 'primary.dark',
-              //   color: 'primary.contrastText',
-              //   borderRadius: '10px',
-              //   ml: '5px', mr: '5px', mt: '1px', mb: '1px'
-              // },
+              '&:hover': {
+                backgroundColor: 'primary.dark',
+                color: 'primary.contrastText',
+                // borderRadius: '10px',
+                // ml: '5px', mr: '5px', mt: '1px', mb: '1px'
+              },
             }}
           >
-            <ListItemIcon sx={{ color: 'primary.contrastText' }}>{route.icon}</ListItemIcon>
+            <ListItemIcon sx={{ color: 'primary.contrastText', marginRight: '-20px' }}>{route.icon}</ListItemIcon>
             <ListItemText primary={route.name} />
           </ListItemButton>
         ))}

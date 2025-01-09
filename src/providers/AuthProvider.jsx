@@ -1,72 +1,83 @@
-import { useState, useContext } from "react";
+import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from "../context";
-import CryptoJS from "crypto-js";
-import axios from "axios";
-import Config from "../Config";
+import { io } from 'socket.io-client';
+import { Config } from '../Config';
 
 export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState(null);
+  const [socket, setSocket] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [users, setUsersDetails] = useState();
-  const [errorOpen, setErrorOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const storedAuth = sessionStorage.getItem("isAuthenticated");
-    return storedAuth === "true";
-  });
+  useEffect(() => {
+    const storedToken = sessionStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+      setIsAuthenticated(true);
+      connectSocket(storedToken);
+    } else {
+      setIsAuthenticated(false);
+    }
+    setLoading(false);
+  }, []);
 
-  let user;
-  let username;
-  let password;
-  let decryptedUsername;
+  const connectSocket = (jwtToken) => {
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    if (user) {
+      const socketInstance = io(Config.apiUrl, {
+        auth: { token: jwtToken },
+        hostname: 'https://mlinfomap.org:5055',
+        // hostname: 'http://103.171.96.104/lmsapi',
+        path: "/socket.io",
+        transports: ['polling'],  // Fallback to polling
+        secure: true,
+        reconnection: true,       // Enable reconnection
+        reconnectionAttempts: 5,  // Limit reconnection attempts
+        reconnectionDelay: 1000,  // Time between reconnection attempts
+      });
 
-  const fetchUserData = async () => {
-    try {
-      const response = await axios.get(`${Config.apiUrl}/users`);
-      const userData = response.data;
-      user = userData.filter((user) => user.username === decryptedUsername);
-      setUsersDetails(user)
+      socketInstance.on("connect", () => {
+        console.log("Socket connected with UID:", user.UID, socketInstance.id);
+        socketInstance.emit('reconnectNotifications', user.UID);
+      });
 
-      username = user[0].username;
-      password = user[0].password;
-    } catch (error) {
-      console.error(error);
+      socketInstance.on("reconnect", (attemptNumber) => {
+        // Resend token after reconnection
+        socketInstance.auth.token = jwtToken;
+        socketInstance.connect();
+
+        // Resubscribe to notifications
+        socketInstance.emit('reconnectNotifications', user.UID);
+      });
+
+      setSocket(socketInstance);
     }
   };
 
-  const login = () => {
-    const encryptionKey = "my-secure-key-123456";
-    const storedUsername = sessionStorage.getItem("username");
-    const storedPassword = sessionStorage.getItem("password");
-    decryptedUsername = CryptoJS.AES.decrypt(
-      storedUsername,
-      encryptionKey
-    ).toString(CryptoJS.enc.Utf8);
-    const decryptedPassword = CryptoJS.AES.decrypt(
-      storedPassword,
-      encryptionKey
-    ).toString(CryptoJS.enc.Utf8);
 
-
-    fetchUserData();
-
-    setTimeout(() => {
-      if (decryptedUsername == username && decryptedPassword == password) {
-        setIsAuthenticated(true);
-        sessionStorage.setItem("isAuthenticated", "true");
-        window.location.href = "/dashboard";
-      } else {
-        setErrorOpen(true);
-      }
-    }, 100);
+  const login = (jwtToken, user) => {
+    sessionStorage.setItem('token', jwtToken);
+    sessionStorage.setItem('user', JSON.stringify(user));
+    setToken(jwtToken);
+    setIsAuthenticated(true);
+    connectSocket(jwtToken);
   };
 
   const logout = () => {
-    sessionStorage.clear();
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    setToken(null);
     setIsAuthenticated(false);
-    window.location.href = "/";
+    if (socket) {
+      socket.disconnect();
+      console.log("Socket disconnected with UID:", user.UID);
+      setSocket(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, users, errorOpen, setErrorOpen }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, socket, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -8,15 +8,15 @@ import { useDetails } from '../../providers/DetailsProvider';
 
 const TodayTasks = () => {
   const theme = useTheme();
-  const { leadValues, productValues, userValues, taskData, loggedUser } = useDetails();
-  const user = userValues.filter((user) => user.username === loggedUser);
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  const { leadValues, productValues, userValues, taskData } = useDetails();
   const [data, setData] = useState([]);
 
   const fetchTaskData = () => {
     try {
       const todayTasks = taskData
-      .filter(task => new Date(task.taskDate).setHours(0, 0, 0, 0) == new Date().setHours(0, 0, 0, 0))
-      .sort((a, b) => new Date(a.taskDate) - new Date(b.taskDate));
+        .filter(task => new Date(task.taskDate).setHours(0, 0, 0, 0) == new Date().setHours(0, 0, 0, 0))
+        .sort((a, b) => new Date(a.taskDate) - new Date(b.taskDate));
 
       setData(todayTasks)
     } catch (error) {
@@ -28,9 +28,9 @@ const TodayTasks = () => {
     fetchTaskData();
   }, [taskData]);
 
-  const filteredData = user[0]?.userType === 2
-  ? data.filter((task) => task.UID === user[0]?.UID)
-  : data;
+  const filteredData = user.userType === 2
+    ? data.filter((task) => task.UID === user.UID)
+    : data;
 
   const leadMap = leadValues.reduce((map, lead) => {
     map[lead.LID] = lead.name;
@@ -41,9 +41,11 @@ const TodayTasks = () => {
     map[product.PID] = product.pName;
     return map;
   }, {});
-  
-  const userMap = userValues.reduce((map, user) => {
-    map[user.UID] = user.uName;
+
+  const userMap = (userValues || []).reduce((map, user) => {
+    if (user && user.UID) {
+      map[user.UID] = user?.uName || 'User';
+    }
     return map;
   }, {});
 

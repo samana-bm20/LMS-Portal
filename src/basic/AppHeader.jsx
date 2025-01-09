@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AppBar as MuiAppBar, Box, Toolbar, IconButton, Typography, Badge, Button, ButtonGroup, Fab, Menu,
-  MenuItem, Divider
+  MenuItem, Divider, Avatar
 } from '@mui/material';
 import {
   MenuRounded, NotificationsRounded, PersonRounded, LightModeRounded, DarkModeRounded,
@@ -12,8 +12,10 @@ import { useAuth } from '../providers/AuthProvider';
 import { useMode } from '../providers/ModeProvider';
 import { useDetails } from '../providers/DetailsProvider';
 import AppNotifications from './AppNotifications';
+import { useNavigate } from 'react-router-dom';
+
 //#region Responsive
-const drawerWidth = 200;
+const drawerWidth = 180;
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
@@ -33,22 +35,27 @@ const AppBar = styled(MuiAppBar, {
 //#end region
 
 const AppHeader = ({ onMenuClick, open }) => {
+  const navigate = useNavigate();
+  const user = JSON.parse(sessionStorage.getItem('user'));
   const { logout } = useAuth();
   const { mode, toggleColorMode } = useMode();
   const [anchorElUser, setAnchorElUser] = useState('');
-  // const [anchorNotif, setAnchorNotif] = useState('');
-  // const [user, setUser] = useState('');
-  const { loggedUser, userValues } = useDetails();
-  let userName
-  //#region Menu
+  const [anchorNotif, setAnchorNotif] = useState('');
+  const { notifications } = useDetails();
+  const [unreadCount, setUnreadCount] = useState();
 
-  const fetchUser = () => {
-
-    const username = userValues.filter((user) => user.username === loggedUser)
-    userName = username[0]?.uName
+  const fetchNotifCount = () => {
+    const unreadNotifications = notifications
+      .filter(notification => notification.targetUsers
+        .some(target => target.uid === user.UID && target.hasRead === false));
+    setUnreadCount(unreadNotifications.length);
   }
-  fetchUser();
 
+  useEffect(() => {
+    fetchNotifCount();
+  }, [notifications]);
+
+  //#region Menu
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -57,19 +64,19 @@ const AppHeader = ({ onMenuClick, open }) => {
     setAnchorElUser(null);
   };
 
-  // const handleOpenNotification = (event) => {
-  //   setAnchorNotif(event.currentTarget);
-  // };
+  const handleOpenNotification = (event) => {
+    setAnchorNotif(event.currentTarget);
+  };
 
-  // const handleCloseNotification = () => {
-  //   setAnchorNotif(null);
-  // };
-  
-  
+  const handleCloseNotification = () => {
+    setAnchorNotif(null);
+  };
+
+
 
   const settings = [
     {
-      name: userName,
+      name: user.uName,
       icon: <FaceRounded color='primary' />
     },
     {
@@ -78,6 +85,47 @@ const AppHeader = ({ onMenuClick, open }) => {
     }
   ]
   //#end region
+
+  //#region Avatar
+  const stringToColor = (string) => {
+    let hash = 0;
+    let i;
+
+    for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    let color = '#';
+
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+
+    return color;
+  }
+
+  const stringAvatar = (name) => {
+    if (!name) {
+      return {
+        sx: {
+          bgcolor: '#ccc',
+        },
+        children: 'ML',
+      };
+    }
+
+    const nameParts = name.split(' ');
+    const firstInitial = nameParts[0] ? nameParts[0][0] : '';
+    const secondInitial = nameParts[1] ? nameParts[1][0] : '';
+
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: `${firstInitial}${secondInitial}`,
+    };
+  }
 
   return (
     <>
@@ -151,22 +199,22 @@ const AppHeader = ({ onMenuClick, open }) => {
             </ButtonGroup>
 
             {/* Notification */}
-            {/* <IconButton
+            <IconButton
               aria-label="new notifications"
-              sx={{ mr: 1, pt: 0, pb: 0, '&:focus': { outline: 'none' } }}
+              sx={{ mr: 2, pt: 0, pb: 0, '&:focus': { outline: 'none' } }}
               color='primary'
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNotification}
-              >
-              <Badge badgeContent={2} color="error">
+            >
+              <Badge badgeContent={unreadCount} color="error">
                 <NotificationsRounded color='primary' />
               </Badge>
-            </IconButton> */}
+            </IconButton>
 
             {/* User */}
             <Box className='flex-grow'>
-              <Fab
+              {/* <Fab
                 color="primary"
                 aria-label="account"
                 aria-controls="menu-appbar"
@@ -176,7 +224,15 @@ const AppHeader = ({ onMenuClick, open }) => {
                 sx={{ ml: 1, mr: 2, '&:focus': { outline: 'none' } }}
               >
                 <PersonRounded />
-              </Fab>
+              </Fab> */}
+
+              <Avatar {...stringAvatar(user.uName)}
+                aria-label="account"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenUserMenu}
+                style={{ cursor: 'pointer' }}
+              />
 
               {/* User-Menu */}
               <Menu
@@ -206,7 +262,7 @@ const AppHeader = ({ onMenuClick, open }) => {
                   </MenuItem>
                 ))}
                 <Divider />
-                <MenuItem onClick={() => { logout() }}>
+                <MenuItem onClick={() => { logout(); navigate('/lms/') }}>
                   <div className='flex'>
                     <div><PowerSettingsNewRounded color='primary' /></div>
                     <div className='ml-2'>
@@ -218,7 +274,11 @@ const AppHeader = ({ onMenuClick, open }) => {
             </Box>
           </Box>
         </Toolbar>
-        {/* <AppNotifications anchorNotif={anchorNotif} handleCloseNotification={handleCloseNotification} /> */}
+        <AppNotifications
+          anchorNotif={anchorNotif}
+          handleCloseNotification={handleCloseNotification}
+          fetchNotifCount={fetchNotifCount}
+        />
       </AppBar>
     </>
   )

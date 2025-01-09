@@ -1,39 +1,61 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import {
-  HomeRounded, MapRounded, DynamicFormRounded, AssignmentRounded, AlarmRounded, EventRounded
-} from '@mui/icons-material'
+  HomeRounded, MapRounded, DynamicFormRounded, AssignmentRounded, WatchLaterRounded, SwitchAccountRounded, 
+  WebhookRounded, EventRounded,CurrencyRupeeRounded 
+} from '@mui/icons-material';
 
-const RoutesConfig = [
-  {
-    name: 'Dashboard',
-    to: '/dashboard',
-    icon: <HomeRounded />,
-  },
-  // {
-  //   name: 'Products',
-  //   to: '/products',
-  //   icon: <MapRounded />,
-  // },
-  {
-    name: 'Leads',
-    to: '/leads',
-    icon: <DynamicFormRounded />,
-  },
-  {
-    name: 'Tasks',
-    to: '/tasks',
-    icon: <AssignmentRounded />,
-  },
-  {
-    name: 'Reminder',
-    to: '/reminder',
-    icon: <AlarmRounded />,
-  },
-  // {
-  //   name: 'Calendar',
-  //   to: '/calendar',
-  //   icon: <EventRounded />,
-  // },
-];
+const RoutesConfig = () => {
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  
+  const routes = [
+    {
+      name: 'Dashboard',
+      to: '/lms/dashboard',
+      icon: <HomeRounded />,
+    },
+    {
+      name: 'Leads',
+      to: '/lms/leads',
+      icon: <DynamicFormRounded />,
+    },
+    {
+      name: 'Tasks',
+      to: '/lms/tasks',
+      icon: <AssignmentRounded />,
+    },
+    {
+      name: 'Reminder',
+      to: '/lms/reminder',
+      icon: <WatchLaterRounded />,
+    },
+    {
+      name: 'Products',
+      to: '/lms/products',
+      icon: <MapRounded />,
+    },
+    {
+      name: 'Users',
+      to: '/lms/users',
+      icon: <SwitchAccountRounded />,
+    },
+  ];
+
+  if (user.userType === 1) {
+    routes.push({
+      name: 'ML Softwares',
+      to: '/lms/softwares-info',
+      icon: <WebhookRounded />,
+    });
+    routes.push({
+      name: 'Payments',
+      to: '/lms/payment',
+      icon: <CurrencyRupeeRounded />,
+    });
+
+  }
+
+  return routes;
+};
 
 export default RoutesConfig;

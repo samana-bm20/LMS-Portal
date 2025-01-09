@@ -9,25 +9,26 @@ import EditTask from './EditTask'
 
 const TaskCards = () => {
     const theme = useTheme();
-    const { taskData, userValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username == loggedUser);
+    const { taskData } = useDetails();
+    const user = JSON.parse(sessionStorage.getItem('user'));
     const [taskID, setTaskID] = useState();
     const [openEditTask, setOpenEditTask] = useState(false);
-
+    let filteredTaskData;
     const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
     const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
+
 
     const handleEditTask = (tid) => {
         setTaskID(tid);
         setOpenEditTask(true);
     }
 
-    const filteredTaskData = user[0]?.userType === 2 ?
-        taskData.filter((task) => task.UID == user[0]?.UID) : taskData
+    filteredTaskData = user.userType === 2 ?
+        taskData.filter((task) => task.UID == user.UID) : taskData
 
     return (
         <>
-            <div className="grid gap-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1">
+            <div className="grid gap-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1">
                 {filteredTaskData.map(task => {
                     let statusIcon, statusColor, bgColor;
 
@@ -57,17 +58,13 @@ const TaskCards = () => {
                     return (
                         <div
                             key={task.TID}
-                            className={`grid shadow-lg rounded-lg p-4 m-2`}
-                            style={{ backgroundColor: alpha(theme.palette.background.card, 0.5) }}
+                            className={`grid shadow-lg rounded-lg p-4 m-2 border`}
+                            style={{
+                                backgroundColor: alpha(theme.palette.background.card, 0.5),
+                                borderColor: theme.palette.primary.main
+                            }}
                         >
                             <div className='flex justify-between items-center gap-4 mb-2'>
-                                {/* <div
-                                    className='p-1 rounded-lg text-xs'
-                                    style={{ backgroundColor: alpha(theme.palette.background.header, 0.5) }}
-                                >
-                                    TID-{task.TID}
-                                </div> */}
-
                                 <div
                                     className='flex items-center p-1 rounded-lg'
                                     style={{ backgroundColor: bgColor }}
@@ -98,8 +95,9 @@ const TaskCards = () => {
                                 </div>
                                 {task.LID && task.PID && (
                                     <>
+                                    {/* inline-block */}
                                         <div
-                                            className="inline-block p-1 rounded-lg text-sm font-semibold mb-2"
+                                            className=" p-1 rounded-lg text-sm font-semibold mb-2"
                                             style={{
                                                 backgroundColor: alpha(theme.palette.secondary.main, 0.2),
                                                 color: theme.palette.secondary.main
@@ -108,7 +106,7 @@ const TaskCards = () => {
                                             <p>Lead: {task.lName}-{task.organization}</p>
                                         </div>
                                         <div
-                                            className="inline-block p-1 rounded-lg text-sm font-semibold mb-2"
+                                            className=" p-1 rounded-lg text-sm font-semibold mb-2"
                                             style={{
                                                 backgroundColor: alpha(theme.palette.warning.main, 0.2),
                                                 color: theme.palette.warning.main

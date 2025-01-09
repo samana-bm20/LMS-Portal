@@ -7,25 +7,29 @@ import {
 } from 'material-react-table';
 
 import {
-    Box, Button, ListItemIcon, MenuItem, lighten, FormControl, InputLabel, Select, useTheme
+    Box, Button, ListItemIcon, MenuItem, lighten, FormControl, InputLabel, Select, useTheme, alpha
 } from '@mui/material';
 
 //Icons Imports
-import { AccountCircleRounded, AddCommentRounded, AddShoppingCartRounded } from '@mui/icons-material';
+import { AccountCircleRounded, AddCommentRounded, AddShoppingCartRounded, EditRounded } from '@mui/icons-material';
 
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
 import { useDetails } from '../../providers/DetailsProvider';
 import ViewProfile from './ViewProfile';
 import AddFollowUp from './AddFollowUp';
 import AddProduct from './AddProduct';
+import EditLead from './EditLead';
+import { useLocation } from 'react-router-dom';
 
 const LeadsTable = () => {
+    const theme = useTheme();
+    const location = useLocation();
     const { fetchLeadsData, data, product, setProduct } = useFetchLeads();
-    const { productValues, userValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser);
+    const { productValues } = useDetails();
     const [openViewProfile, setOpenViewProfile] = useState(false);
     const [openAddFollowUp, setOpenAddFollowUp] = useState(false);
     const [openAddProduct, setOpenAddProduct] = useState(false);
+    const [openEditLead, setOpenEditLead] = useState(false);
     const [leadID, setLeadID] = useState(0);
     const [productID, setProductID] = useState('');
     const [statusID, setStatusID] = useState('');
@@ -34,6 +38,16 @@ const LeadsTable = () => {
     const handleProductChange = (event) => {
         setProduct(event.target.value);
     };
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const productFromQuery = queryParams.get('product');
+        if (productFromQuery) {
+            setProduct(productFromQuery);
+        } else {
+            setProduct('All');
+        }
+    }, [location.search, setProduct]);
 
     useEffect(() => {
         fetchLeadsData();
@@ -57,28 +71,11 @@ const LeadsTable = () => {
                 size: 100,
             },
             {
-                accessorFn: (row) => row.contact?.mobileNo ?? '--',
-                enableClickToCopy: true,
-                filterVariant: 'autocomplete',
-                header: 'Contact',
-                size: 100,
-                Cell: ({ cell }) => cell.getValue(),
-            },
-            {
-                accessorFn: (row) => row.contact?.emailID ?? '--',
-                enableClickToCopy: true,
-                filterVariant: 'autocomplete',
-                header: 'Email',
-                size: 100,
-                Cell: ({ cell }) => cell.getValue(),
-            },
-            {
                 accessorKey: 'productDetails.sName',
                 filterVariant: 'autocomplete',
                 header: 'Status',
                 size: 100,
                 Cell: ({ cell }) => {
-                    const theme = useTheme();
                     const sid = cell.row.original.productDetails.SID;
                     const sName = cell.getValue();
 
@@ -88,6 +85,7 @@ const LeadsTable = () => {
                         S3: theme.palette.warning.main,
                         S4: theme.palette.success.main,
                         S5: theme.palette.error.main,
+                        S6: theme.palette.info.main
                     };
 
                     const backgroundColor = sidToColor[sid] || theme.palette.grey[500];
@@ -107,6 +105,22 @@ const LeadsTable = () => {
                         </Box>
                     );
                 },
+            },
+            {
+                accessorFn: (row) => row.contact?.mobileNo ?? '--',
+                enableClickToCopy: true,
+                filterVariant: 'autocomplete',
+                header: 'Contact',
+                size: 100,
+                Cell: ({ cell }) => cell.getValue(),
+            },
+            {
+                accessorFn: (row) => row.contact?.emailID ?? '--',
+                enableClickToCopy: true,
+                filterVariant: 'autocomplete',
+                header: 'Email',
+                size: 100,
+                Cell: ({ cell }) => cell.getValue(),
             },
             {
                 accessorKey: 'productDetails.pName',
@@ -134,25 +148,6 @@ const LeadsTable = () => {
         [],
     );
 
-    //#region Top Toolbar
-    // const handleDeactivate = () => {
-    //     table.getSelectedRowModel().flatRows.map((row) => {
-    //         alert('deactivating ' + row.getValue('name'));
-    //     });
-    // };
-
-    // const handleActivate = () => {
-    //     table.getSelectedRowModel().flatRows.map((row) => {
-    //         alert('activating ' + row.getValue('name'));
-    //     });
-    // };
-
-    // const handleContact = () => {
-    //     table.getSelectedRowModel().flatRows.map((row) => {
-    //         alert('contact ' + row.getValue('name'));
-    //     });
-    // };
-
     const renderTopToolbar = ({ table }) => (
         <Box
             sx={(theme) => ({
@@ -167,6 +162,12 @@ const LeadsTable = () => {
                 <MRT_GlobalFilterTextField table={table} />
                 <MRT_ToggleFiltersButton table={table} />
             </Box>
+            <div className="flex items-center">
+                <span className="text-sm font-semibold rounded-md text-center"
+                    style={{ color: theme.palette.primary.main }}>
+                    Records Count: {data.length}
+                </span>
+            </div>
             <Box>
                 <Box sx={{ display: 'flex', gap: '0.5rem', minWidth: 200 }}>
                     <FormControl fullWidth>
@@ -231,6 +232,7 @@ const LeadsTable = () => {
             columnPinning: {
                 right: ['mrt-row-actions'],
             },
+            pagination: { pageSize: 50 },
         },
         paginationDisplayMode: 'pages',
         positionToolbarAlertBanner: 'bottom',
@@ -246,7 +248,7 @@ const LeadsTable = () => {
         },
         muiPaginationProps: {
             color: 'primary',
-            rowsPerPageOptions: [10, 20, 30],
+            rowsPerPageOptions: [25, 50, 75],
             shape: 'rounded',
             variant: 'outlined',
         },
@@ -287,27 +289,35 @@ const LeadsTable = () => {
                     </ListItemIcon>
                     Add Follow-up
                 </MenuItem>,
+                <MenuItem
+                    key={2}
+                    onClick={() => {
+                        setLeadID(lidValue);
+                        setOpenAddProduct(true);
+                        closeMenu();
+                    }}
+                    sx={{ m: 0 }}
+                >
+                    <ListItemIcon>
+                        <AddShoppingCartRounded color='primary' />
+                    </ListItemIcon>
+                    Add Product
+                </MenuItem>,
+                <MenuItem
+                    key={3}
+                    onClick={() => {
+                        setLeadID(lidValue);
+                        setOpenEditLead(true);
+                        closeMenu();
+                    }}
+                    sx={{ m: 0 }}
+                >
+                    <ListItemIcon>
+                        <EditRounded color='primary' />
+                    </ListItemIcon>
+                    Edit Lead
+                </MenuItem>
             ];
-
-            // Conditionally add the "Add Product" menu item if userType is 1
-            if (user[0]?.userType === 1) {
-                menuItems.push(
-                    <MenuItem
-                        key={2}
-                        onClick={() => {
-                            setLeadID(lidValue);
-                            setOpenAddProduct(true);
-                            closeMenu();
-                        }}
-                        sx={{ m: 0 }}
-                    >
-                        <ListItemIcon>
-                            <AddShoppingCartRounded color='primary' />
-                        </ListItemIcon>
-                        Add Product
-                    </MenuItem>
-                );
-            }
 
             return menuItems;
         },
@@ -337,19 +347,14 @@ const LeadsTable = () => {
                 setOpenAddProduct={setOpenAddProduct}
                 lid={leadID}
             />
+            <EditLead
+                openEditLead={openEditLead}
+                setOpenEditLead={setOpenEditLead}
+                lid={leadID}
+            />
         </>
     );
 };
 
 export default LeadsTable;
 
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-
-// const ExampleWithLocalizationProvider = () => (
-//     <LocalizationProvider dateAdapter={AdapterDayjs}>
-//         <LeadsTable />
-//     </LocalizationProvider>
-// );
-
-//export default ExampleWithLocalizationProvider;

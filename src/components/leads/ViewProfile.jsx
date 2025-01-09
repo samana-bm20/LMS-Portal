@@ -1,12 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
-    Box, Button, MenuItem, FormControl, TextField, InputLabel, Select, Dialog,
-    DialogTitle, DialogContent, Snackbar, Alert, Tabs, Tab,
-    DialogActions, IconButton
+    Box,  Dialog, DialogTitle, DialogContent, Tabs, Tab, IconButton
 } from '@mui/material';
-import Config from '../../Config';
-import axios from 'axios';
-import { useDetails } from '../../providers/DetailsProvider';
 import PropTypes from 'prop-types';
 import { CloseRounded } from '@mui/icons-material';
 import LeadDetails from './LeadDetails';
@@ -15,7 +10,6 @@ import FollowUpHistory from './FollowUpHistory';
 
 function CustomTabPanel(props) {
 
-    // const []= useState()
     const { children, value, index, ...other } = props;
 
 

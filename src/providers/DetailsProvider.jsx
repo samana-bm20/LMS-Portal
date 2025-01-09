@@ -1,55 +1,76 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { DetailsContext } from '../context'
-import Config from '../Config';
+import { Config } from "../Config";
 import axios from 'axios';
-import CryptoJS from "crypto-js";
 
 export const DetailsProvider = ({ children }) => {
+  const token = sessionStorage.getItem('token'); 
+  const [notifications, setNotifications] = useState([]);
   const [statusValues, setStatusValues] = useState([]);
   const [productValues, setProductValues] = useState([]);
   const [leadValues, setLeadValues] = useState([]);
   const [userValues, setUserValues] = useState([]);
   const [followUpValues, setFollowUpValues] = useState([]);
   const [taskData, setTaskData] = useState([]);
-  const [loggedUser, setLoggedUser] = useState([]);
-  let storedUsername;
-
-  const fetchUser = () => {
-    const encryptionKey = "my-secure-key-123456";
-
-    storedUsername = sessionStorage.getItem("username");
-    if (storedUsername) {
-      const decryptedUsername = CryptoJS.AES.decrypt(
-        storedUsername,
-        encryptionKey
-      ).toString(CryptoJS.enc.Utf8);
-      setLoggedUser(decryptedUsername)
-    }
-  }
+  const [esriProducts, setEsriProducts] = useState([]);
+  const [mLSoftwareProducts, setMLSoftwareProducts] = useState([]);
+  const [mlPaymentdetails, setMLPaymentDetails] = useState([]);
 
   const fetchDetails = async () => {
+
     try {
-      const statusResponse = await axios.get(`${Config.apiUrl}/status`);
-      setStatusValues(statusResponse.data);
-
-      const productResponse = await axios.get(`${Config.apiUrl}/products`);
-      setProductValues(productResponse.data);
-
-      const userResponse = await axios.get(`${Config.apiUrl}/users`);
-      setUserValues(userResponse.data);
-
-      const leadResponse = await axios.get(`${Config.apiUrl}/leadDetails`);
-      setLeadValues(leadResponse.data);
-
+     
+      const statusResponse = await axios.post(`${Config.apiUrl}/status`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setStatusValues(Config.decryptData(statusResponse.data));
+      const leadResponse = await axios.post(`${Config.apiUrl}/leadDetails`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setLeadValues(Config.decryptData(leadResponse.data));
     } catch (error) {
       console.error(error);
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const userResponse = await axios.post(`${Config.apiUrl}/users`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setUserValues(Config.decryptData(userResponse.data));
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchProducts = async () => {
+    try {
+      const productResponse = await axios.post(`${Config.apiUrl}/products`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setProductValues(Config.decryptData(productResponse.data));
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const fetchFollowUps = async () => {
     try {
-      const followUpResponse = await axios.get(`${Config.apiUrl}/followUpDetails`);
-      setFollowUpValues(followUpResponse.data);
+      const followUpResponse = await axios.post(`${Config.apiUrl}/followUpDetails`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setFollowUpValues(Config.decryptData(followUpResponse.data));
     } catch (error) {
       console.error(error)
     }
@@ -57,25 +78,98 @@ export const DetailsProvider = ({ children }) => {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get(`${Config.apiUrl}/tasks`);
-      setTaskData(response.data);
+      setTaskData([]);
+      const response = await axios.post(`${Config.apiUrl}/tasks`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setTaskData(Config.decryptData(response.data));
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchESRIProducts = async () => {
+    try {
+      debugger
+      setEsriProducts([]);
+      const response = await axios.post(`${Config.apiUrl}/getESRIProduct`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setEsriProducts(Config.decryptData(response.data));
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchMLSoftwareProducts = async () => {
+    try {
+      setMLSoftwareProducts([]);
+      const response = await axios.post(`${Config.apiUrl}/getSoftwareProduct`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setMLSoftwareProducts(Config.decryptData(response.data));
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchMLPaymentsDetails=async()=>{
+ try{
+     setMLPaymentDetails([]);
+     const response=await axios.post(`${Config.apiUrl}/getPaymentDetails`,{},{
+      headers: {
+        'Authorization': token 
+      }
+     });
+     setMLPaymentDetails(Config.decryptData(response.data));     
+    }catch(error){
+  console.error(error);
+}
+
+
+  }
+
+
+
+  const fetchNotifications = async () => {
+    try {
+      const notifResponse = await axios.post(`${Config.apiUrl}/notifications`, {}, {
+        headers: {
+          'Authorization': token 
+        }
+      });
+      setNotifications(Config.decryptData(notifResponse.data));
     } catch (error) {
       console.error(error)
     }
   }
 
   useEffect(() => {
-    fetchUser();
+    fetchUsers();
+    fetchNotifications();
     fetchDetails();
+    fetchProducts();
     fetchFollowUps();
     fetchTasks();
+    fetchESRIProducts();
+    fetchMLSoftwareProducts();
+    fetchMLPaymentsDetails();
   }, []);
 
 
   return (
-    <DetailsContext.Provider value={{
-      statusValues, productValues, userValues, fetchFollowUps,
-      loggedUser, leadValues, followUpValues, fetchTasks, taskData
+    <DetailsContext.Provider value={{fetchDetails,
+      statusValues, productValues, userValues, fetchUsers, fetchProducts, 
+      fetchFollowUps, leadValues, followUpValues, fetchTasks, taskData,
+      setEsriProducts,esriProducts,fetchESRIProducts, fetchNotifications, notifications,
+      mLSoftwareProducts,setMLSoftwareProducts,fetchMLSoftwareProducts,mlPaymentdetails,setMLPaymentDetails,
+      fetchMLPaymentsDetails
     }}>
       {children}
     </DetailsContext.Provider>

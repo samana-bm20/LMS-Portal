@@ -2,13 +2,18 @@ import React, { useState, useCallback } from 'react'
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from '@mui/material'
 import { AddCircleRounded, FileUploadRounded } from '@mui/icons-material'
 import AddLead from './AddLead'
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
+import { useAuth } from '../../providers/AuthProvider';
 import ImportLead from './ImportLead';
+import { useDetails } from '../../providers/DetailsProvider'
 
 const LeadButtons = () => {
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user'));
     const { fetchLeadsData } = useFetchLeads();
+    const {socket} = useAuth();
     const [openAddLeadDialog, setOpenAddLeadDialog] = useState(false);
     const [openImportLead, setOpenImportLead] = useState(false);
     const [addLeadData, setAddLeadData] = useState([]);
@@ -17,6 +22,8 @@ const LeadButtons = () => {
     const [success, setSuccess] = useState(false);
     const phoneRegex = /^[0-9]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const { fetchDetails } = useDetails();
+    
 
     //#region Add Lead Dialog
     const openAddLead = () => {
@@ -50,7 +57,13 @@ const LeadButtons = () => {
             return;
         }
         try {
-            const _ = await axios.post(`${Config.apiUrl}/addLead`, addLeadData);
+            const _ = await axios.post(`${Config.apiUrl}/addLead`, addLeadData, {
+                headers: {
+                    'Authorization': token
+                }
+            });
+            console.log(socket);
+            socket.emit('addLead', addLeadData, user.UID);
             fetchLeadsData();
             setOpenAddLeadDialog(false);
             setSuccess(true);
@@ -76,6 +89,7 @@ const LeadButtons = () => {
         if (reason === 'clickaway') {
             return;
         }
+        fetchDetails()
         setSuccess(false);
     };
 

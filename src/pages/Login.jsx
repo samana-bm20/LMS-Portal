@@ -1,41 +1,24 @@
 // src/pages/Login.js
 import React, { useState } from "react";
-// import { useContext } from "react";
-// import { AuthContext } from "../context";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
-import CryptoJS from "crypto-js";
 import axios from "axios";
-import Config from "../Config";
+import { Config } from "../Config";
 
 import {
-  Container,
-  Box,
-  TextField,
-  Button,
-  Typography,
-  CssBaseline,
-  Avatar,
-  IconButton,
-  InputAdornment,
-  Snackbar,
-  Alert,
+  Container, Box, TextField, Button, Typography, CssBaseline, Avatar, IconButton, InputAdornment,
+  Snackbar, Alert,
 } from "@mui/material";
-import {
-  LockRounded,
-  LoginRounded,
-  VisibilityRounded,
-  VisibilityOffRounded,
-} from "@mui/icons-material";
+import { LockRounded, LoginRounded, VisibilityRounded, VisibilityOffRounded, } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const { login ,isAuthenticated, errorOpen, setErrorOpen } = useAuth();
+  const navigate = useNavigate()
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
-  // const { isAuthenticated } = useContext(AuthContext);
+  const [errorOpen, setErrorOpen] = useState(false);
 
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -45,43 +28,22 @@ const Login = () => {
   };
 
   //#region Login
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
     if (!username || !password) {
       setErrorOpen(true);
     } else {
-      console.log({
-        username: username,
-        password: password,
-      });
-
-      const encryptionKey = "my-secure-key-123456";
-
-      const usernameS = username;
-      const passwordS = password;
-
-      const encryptedUsername = CryptoJS.AES.encrypt(
-        usernameS,
-        encryptionKey
-      ).toString();
-      const encryptedPassword = CryptoJS.AES.encrypt(
-        passwordS,
-        encryptionKey
-      ).toString();
-
-      sessionStorage.setItem("username", encryptedUsername);
-      sessionStorage.setItem("password", encryptedPassword);
-
-      login();
-      if (isAuthenticated) {
-        setSuccessOpen(true);
-        // navigate('/dashboard')
+      try {
+        const response = await axios.post(`${Config.apiUrl}/login`, { username, password });
+        const { token, user } = response.data;
+        login(token, user);
+        navigate('/lms/dashboard');
+      } catch (error) {
+        console.error('Error during login', error);
       }
     }
   };
 
-  
- 
 
   //#region Success/Error
   const handleSuccessClose = (event, reason) => {

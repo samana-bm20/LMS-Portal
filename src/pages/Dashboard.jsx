@@ -8,7 +8,7 @@ import TodayReminders from '../components/dashboard/TodayReminders';
 const Dashboard = () => {
   return (
     <div className='overflow-y-auto scrollbar-thin'>
-      <div className="container mx-auto p-2 mb-2">
+      <div className="container mx-auto px-2 mb-2">
         <CardSummary />
       </div>
       <div className="container mx-auto p-2 m-2">

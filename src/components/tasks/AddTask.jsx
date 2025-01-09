@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import {
-    Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, Checkbox, FormControlLabel,
-    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete, List, ListItem, ListItemText, IconButton, ListItemIcon,
+    Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
+    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete,
 
 } from '@mui/material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useDetails } from '../../providers/DetailsProvider';
 import { useFetchLeads } from '../../providers/FetchLeadsProvider';
-import Config from '../../Config';
+import { Config } from '../../Config';
 import axios from 'axios';
 import SetReminder from './SetRemainder';
+import { useAuth } from '../../providers/AuthProvider';
 
 const AddTask = ({ openAddTask, setOpenAddTask }) => {
-    const { loggedUser, userValues, fetchTasks } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser)
-    let uid = user[0]?.UID
+    const { userValues, fetchTasks } = useDetails();
+    const { socket } = useAuth();
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    let uid = user.UID
     const { data } = useFetchLeads();
     const [assignedTo, setAssignedTo] = useState('');
     const [taskStatus, setTaskStatus] = useState('');
@@ -24,7 +24,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         taskDate: '',
         title: '',
         description: '',
-        createdBy: '',
+        createdBy: uid,
         UID: '',
         taskStatus: '',
         LID: null,
@@ -37,35 +37,16 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
     //set remainder
     const [reminders, setReminders] = useState([]);
     const [showAddReminder, setShowAddReminder] = useState(false);
-
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
 
     useEffect(() => {
         const getCreatedBy = () => {
-            setAddTaskData((prev) => ({ ...prev, createdBy: uid }))
+            if (openAddTask) {
+                setAddTaskData((prev) => ({ ...prev, createdBy: uid }))
+            }
         }
         getCreatedBy();
-    }, [uid]);
-
-    //#region Field Change
-    // const handleAddTaskChange = (e, dateValue) => {
-    //     const name = e?.target?.name || 'taskDate';
-    //     const value = e?.target?.value || dateValue;
-
-
-    //     if (name === 'UID') {
-    //         setAssignedTo(value);
-    //     } else if (name === 'taskStatus') {
-    //         setTaskStatus(value);
-    //     }
-
-
-    //     const updatedValue = name === 'taskDate' ? new Date(value).toISOString() : value;
-
-    //     setAddTaskData((prev) => ({
-    //         ...prev,
-    //         [name]: updatedValue
-    //     }));
-    // };
+    }, [openAddTask]);
 
     const handleAddTaskChange = (e) => {
         const { name, value } = e.target;
@@ -105,6 +86,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
             setError(true);
             return;
         }
+
         const formattedTaskDate = new Date(addTaskData.taskDate).toISOString();
         const taskWithReminders = {
             ...addTaskData,
@@ -113,8 +95,12 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
         };
 
         try {
-
-            const _ = await axios.post(`${Config.apiUrl}/addTask`, taskWithReminders);
+            const _ = await axios.post(`${Config.apiUrl}/addTask`, taskWithReminders, {
+                headers: {
+                    'Authorization': token
+                }
+            });
+            socket.emit('addTask', taskWithReminders);
             setSuccess(true);
             setOpenAddTask(false);
             fetchTasks();
@@ -136,7 +122,6 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
             taskDate: '',
             title: '',
             description: '',
-            createdBy: '',
             UID: '',
             taskStatus: '',
             LID: null,
@@ -185,7 +170,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {/* Start Calendar Region */}
                             <div className="mb-2">
-                            <TextField
+                                <TextField
                                     required
                                     name='taskDate'
                                     id="outlined-required"
@@ -196,27 +181,6 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                     onChange={handleAddTaskChange}
                                     fullWidth
                                 />
-                                {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DateTimePicker
-                                        label="Task Date"
-                                        onChange={(date) => handleAddTaskChange({}, date)}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                required
-                                                name="taskDate"
-                                                fullWidth
-                                                InputProps={{
-                                                    ...params.InputProps,
-                                                    size: 'small', // Pass size directly here
-                                                }}
-                                            />
-                                        )}
-                                    // DialogProps={{
-                                    //     style: { position: 'relative' },
-                                    // }}
-                                    />
-                                </LocalizationProvider> */}
                             </div>
                             <div className="mb-2">
                                 <TextField
@@ -255,13 +219,13 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                                         onChange={handleAddTaskChange}
                                         size='small'
                                     >
-                                        {user[0]?.userType === 1 ? (
-                                            userValues.map((user) => (
+                                        {user.userType === 1 ? (
+                                            activeUsers.map((user) => (
                                                 <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                             ))
                                         ) : (
                                             userValues
-                                                .filter((userItem) => userItem.UID == user[0]?.UID)
+                                                .filter((userItem) => userItem.UID == user.UID)
                                                 .map((userItem) => (
                                                     <MenuItem key={userItem.UID} value={userItem.UID}>{userItem.uName}</MenuItem>
                                                 ))
@@ -319,7 +283,7 @@ const AddTask = ({ openAddTask, setOpenAddTask }) => {
                         </Button>
 
                         {showAddReminder && (
-                            <SetReminder reminders={reminders} setReminders={setReminders} reset={() => {
+                            <SetReminder reminders={reminders} setReminders={setReminders} add={true} reset={() => {
                                 setReminders([]);
                                 setShowAddReminder(false);
                             }} />

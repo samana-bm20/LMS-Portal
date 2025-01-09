@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/layouts/MainLayout.js
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -6,7 +7,7 @@ import AppHeader from '../basic/AppHeader';
 import AppDrawer from '../basic/AppDrawer'
 import AppFooter from '../basic/AppFooter'
 import { Outlet } from 'react-router-dom';
-const drawerWidth = 200;
+const drawerWidth = 180;
 
 const MainLayout = () => {
   const drawerShow = useSelector((state) => state.drawerShow)

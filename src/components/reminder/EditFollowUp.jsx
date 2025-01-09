@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import {
     Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
-    TextField, InputLabel, Select, MenuItem, FormControl, Autocomplete, useTheme, alpha
+    TextField, InputLabel, Select, MenuItem, FormControl
 } from '@mui/material'
 import { useDetails } from '../../providers/DetailsProvider'
-import Config from '../../Config'
+import { useAuth } from '../../providers/AuthProvider'
+import { Config } from '../../Config'
 import axios from 'axios'
 
 const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp }) => {
-    const { loggedUser, userValues, fetchFollowUps } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser)
-    const uid = user[0]?.UID;
+    const { userValues, fetchFollowUps } = useDetails();
+    const { socket } = useAuth();
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const uid = user.UID;
     const [assignedTo, setAssignedTo] = useState('');
     const [nextType, setNextType] = useState('');
     const [nextDate, setNextDate] = useState('');
@@ -23,6 +26,7 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
+    const activeUsers = userValues.filter(user => user.uStatus == 'Active');
 
     //#region Fetch Data
     const getSelectedFollowUp = () => {
@@ -70,8 +74,17 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
             setError(true);
             return;
         }
+        const params = {
+            FID: selectedFollowUp.FID,
+            data: editFollowUpData
+        }
         try {
-            const _ = await axios.put(`${Config.apiUrl}/editFollowUp/${selectedFollowUp.FID}`, editFollowUpData);
+            const _ = await axios.put(`${Config.apiUrl}/editFollowUp`, params, {
+                headers: {
+                    'Authorization': token
+                }
+            });
+            socket.emit('editFollowup', editFollowUpData, selectedFollowUp);
             setOpenEditFollowUp(false);
             fetchFollowUps();
             getSelectedFollowUp();
@@ -131,7 +144,7 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
                                     fullWidth
                                 />
                             </div>
-                            
+
                             <div className="mb-2">
                                 <FormControl required fullWidth>
                                     <InputLabel id="demo-simple-select-label">Next Type</InputLabel>
@@ -144,9 +157,9 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
                                         onChange={handleEditFollowUpChange}
                                         size='small'
                                     >
-                                            <MenuItem value='call'>Call</MenuItem>
-                                            <MenuItem value='email'>Email</MenuItem>
-                                            <MenuItem value='physical'>Physical</MenuItem>
+                                        <MenuItem value='call'>Call</MenuItem>
+                                        <MenuItem value='email'>Email</MenuItem>
+                                        <MenuItem value='physical'>Physical</MenuItem>
 
                                     </Select>
                                 </FormControl>
@@ -164,7 +177,7 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
                                         onChange={handleEditFollowUpChange}
                                         size='small'
                                     >
-                                        {userValues.map((user) => (
+                                        {activeUsers.map((user) => (
                                             <MenuItem key={user.UID} value={user.UID}>{user.uName}</MenuItem>
                                         ))}
                                     </Select>
@@ -176,7 +189,7 @@ const EditFollowUp = ({ openEditFollowUp, setOpenEditFollowUp, selectedFollowUp 
                 <DialogActions>
                     <div className='m-4'>
                         <Button onClick={closeEditFollowUp}>Cancel</Button>
-                        <Button variant='contained' onClick={handleEditFollowUp}>Update</Button>
+                        <Button variant='contained' onClick={handleEditFollowUp}>Edit</Button>
                     </div>
                 </DialogActions>
             </Dialog>

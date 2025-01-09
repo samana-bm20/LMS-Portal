@@ -3,7 +3,7 @@ import { FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemIcon, List
 import { CancelRounded } from '@mui/icons-material';
 import { useTheme } from '@mui/material';
 
-const SetReminder = ({ reminders, setReminders }) => {
+const SetReminder = ({ reminders, setReminders, add }) => {
     const theme = useTheme();
     const [notificationTypes, setNotificationTypes] = useState({});
     const [frequencyValue, setFrequencyValue] = useState('0');
@@ -124,7 +124,7 @@ const SetReminder = ({ reminders, setReminders }) => {
                 Add Reminder
             </Button>
 
-            {reminders.length > 0 && (
+            {add && reminders.length > 0 && (
                 <ul className="mt-2">
                     {reminders.map((reminder, index) => (
                         <li

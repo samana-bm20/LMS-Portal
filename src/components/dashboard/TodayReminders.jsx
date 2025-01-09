@@ -8,8 +8,8 @@ import { useDetails } from '../../providers/DetailsProvider';
 
 const TodayReminders = () => {
     const theme = useTheme();
-    const { leadValues, productValues, statusValues, userValues, followUpValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser)
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const { leadValues, productValues, statusValues, userValues, followUpValues } = useDetails();
     const [data, setData] = useState([]);
 
     const fetchReminderData = () => {
@@ -28,8 +28,8 @@ const TodayReminders = () => {
         fetchReminderData();
     }, [followUpValues]);
 
-    const filteredData = user[0]?.userType === 2
-        ? data.filter((reminder) => reminder.UID === user[0]?.UID)
+    const filteredData = user.userType === 2
+        ? data.filter((reminder) => reminder.UID === user.UID)
         : data;
 
     const leadMap = leadValues.reduce((map, lead) => {
@@ -52,8 +52,10 @@ const TodayReminders = () => {
         return map;
     }, {});
 
-    const userMap = userValues.reduce((map, user) => {
-        map[user.UID] = user.uName;
+    const userMap = (userValues || []).reduce((map, user) => {
+        if (user && user.UID) {
+            map[user.UID] = user?.uName || 'User';
+        }
         return map;
     }, {});
 
@@ -95,11 +97,12 @@ const TodayReminders = () => {
                     const status = statusMap[sid];
 
                     const sidToColor = {
-                        S1: theme.palette.disabled,
+                        S1: theme.palette.text.disabled,
                         S2: theme.palette.secondary.main,
                         S3: theme.palette.warning.main,
                         S4: theme.palette.success.main,
                         S5: theme.palette.error.main,
+                        S6: theme.palette.info.main,
                     };
 
                     const backgroundColor = sidToColor[sid] || theme.palette.grey[500];

@@ -11,8 +11,8 @@ const UpcomingFollowUps = () => {
     const theme = useTheme();
     const [selectedFollowUp, setSelectedFollowUp] = useState([]);
     const [openEditFollowUp, setOpenEditFollowUp] = useState(false);
-    const { followUpValues, statusValues, productValues, userValues, leadValues, loggedUser } = useDetails();
-    const user = userValues.filter((user) => user.username === loggedUser);
+    const { followUpValues, statusValues, productValues, userValues, leadValues } = useDetails();
+    const user = JSON.parse(sessionStorage.getItem('user'));
 
     //#region Formatting
     const sidToColor = {
@@ -21,6 +21,7 @@ const UpcomingFollowUps = () => {
         S3: theme.palette.warning.main,
         S4: theme.palette.success.main,
         S5: theme.palette.error.main,
+        S6: theme.palette.info.main,
     };
     const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
     const dateOptions = { day: '2-digit', month: 'short', year: '2-digit' };
@@ -49,16 +50,16 @@ const UpcomingFollowUps = () => {
     }, {});
 
     //#region Data & Edit
-    const upcomingFollowUps = user[0]?.userType === 2 ? followUpValues
-        .filter(item => 
-            item.hasOwnProperty('nextDate') && 
+    const upcomingFollowUps = user.userType === 2 ? followUpValues
+        .filter(item =>
+            item.hasOwnProperty('nextDate') &&
             new Date(item.nextDate) > new Date() &&
-            item.UID == user[0]?.UID) 
+            item.UID == user.UID)
         .sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate)) : followUpValues
-        .filter(item => 
-            item.hasOwnProperty('nextDate') && 
-            new Date(item.nextDate) > new Date())
-        .sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate));
+            .filter(item =>
+                item.hasOwnProperty('nextDate') &&
+                new Date(item.nextDate) > new Date())
+            .sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate));
 
     const handleOpenEditFollowUp = (followUp) => {
         setSelectedFollowUp(followUp)
@@ -148,7 +149,7 @@ const UpcomingFollowUps = () => {
                             </div>
                         </div>
 
-                        <div className="flex justify-between items-center gap-4 p-2 rounded-lg shadow-md"
+                        <div className="flex justify-between items-center gap-4 p-2 rounded-lg shadow-md border"
                             style={{ backgroundColor: theme.palette.background.card }}
                         >
                             <div className="grid p-4 place-items-center rounded-lg w-[120px]"
