@@ -197,6 +197,8 @@ const UpdatePayment = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   id="outlined"
                   label="Redington Invoice Date"
                   size="small"
+                  type="date"
+                  fullWidth
                   value={editRecordsData?.RedingtonInvoiceDate || ""}
                   onChange={handleEditChange}
                 />
@@ -218,6 +220,8 @@ const UpdatePayment = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   id="outlined-required"
                   label="Advance Cheque Date"
                   size="small"
+                  type="date"
+                  fullWidth
                   value={editRecordsData?.AdvanceChequeDate || ""}
                   onChange={handleEditChange}
                 />

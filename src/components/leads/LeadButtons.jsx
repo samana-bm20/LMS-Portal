@@ -20,7 +20,7 @@ const LeadButtons = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
-    const phoneRegex = /^[0-9]+$/;
+    // const phoneRegex = /^\+?[1-9]\d{0,2}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,9}([-.\s]?\d{1,9})?$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const { fetchDetails } = useDetails();
     
@@ -48,11 +48,11 @@ const LeadButtons = () => {
             setError(true);
             return;
         }
-        if (addLeadData.contact?.mobileNo && !phoneRegex.test(addLeadData.contact.mobileNo)) {
-            setErrorMessage('Invalid mobile number.')
-            setError(true);
-            return;
-        }
+        // if (addLeadData.contact?.mobileNo && !phoneRegex.test(addLeadData.contact.mobileNo)) {
+        //     setErrorMessage('Invalid contact number.')
+        //     setError(true);
+        //     return;
+        // }
         if (addLeadData.contact?.emailID && !emailRegex.test(addLeadData.contact.emailID)) {
             setErrorMessage('Invalid email ID.')
             setError(true);

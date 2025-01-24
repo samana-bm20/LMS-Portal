@@ -273,7 +273,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   name="PODate"
                   id="outlined-required"
                   label="PO Date"
-                  type="text"
+                  type="date"
                   size="small"
                   fullWidth
                   value={editRecordsData?.PODate || ""}
@@ -345,7 +345,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   id="outlined-required"
                   label="License Date"
                   size="small"
-                  type="text"
+                  type="date"
                   fullWidth
                   InputLabelProps={{
                     shrink: true,
@@ -361,7 +361,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   id="outlined-required"
                   label="Renewal Due Date"
                   size="small"
-                  type="text"
+                  type="date"
                   fullWidth
                   InputLabelProps={{
                     shrink: true,

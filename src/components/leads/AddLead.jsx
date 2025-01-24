@@ -81,6 +81,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                         label="Contact No."
                         size='small'
                         onChange={handleNestedChange}
+                        fullWidth
                     />
                 </div>
                 <div className="mb-2">
@@ -90,6 +91,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                         label="Email ID"
                         size='small'
                         onChange={handleNestedChange}
+                        fullWidth
                     />
                 </div>
                 <div className="mb-2">
@@ -99,6 +101,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                         label="Designation/Dept."
                         size='small'
                         onChange={handleNewLeadChange}
+                        fullWidth
                     />
                 </div>
                 <div className="mb-2">
@@ -109,6 +112,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                         label="Organization"
                         size='small'
                         onChange={handleNewLeadChange}
+                        fullWidth
                     />
                 </div>
             </div>
@@ -167,6 +171,7 @@ const AddLead = ({ handleLeadDataChange }) => {
                         label="Source"
                         size='small'
                         onChange={handleNewLeadChange}
+                        fullWidth
                     />
                 </div>
                 <div className="mb-2">

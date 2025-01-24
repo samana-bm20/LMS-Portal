@@ -64,7 +64,7 @@ const AddNewMLRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
   };
 
   useEffect(() => {
-    
+
     const getLastRecordindexMLProducts = async () => {
       const response = await axios.post(`${Config.apiUrl}/getLastIndexMLProduct`, {}, {
         headers: {
@@ -81,14 +81,11 @@ const AddNewMLRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
   }, [formData.SNO]);
 
   const handleAddNewRecord = async () => {
-    if (
-      !formData.VendorName
-    ) {
+    if (!formData.VendorName) {
       setErrorMessage("Required fields cannot be empty.");
       setError(true);
       return;
     }
-    setSuccess(true);
     try {
       const res = await axios.post(`${Config.apiUrl}/insertMLProduct`, formData, {
         headers: {
@@ -96,7 +93,7 @@ const AddNewMLRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
         }
       });
       setShowAddNewRecord(false);
-      //   setSuccess(true);
+      setSuccess(true);
       setErrorMessage("");
       //uploadDocFile(formDataDocFile.InstallationCertificate, formData.SNO);
       fetchMLSoftwareProducts();
@@ -220,8 +217,8 @@ const AddNewMLRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   <InputLabel id="select-label">Subscription For</InputLabel>
                   <Select
                     id="outlined-required"
-                     name="SubscriptionFor"
-                    value={selectedValues}
+                    name="SubscriptionFor"
+                    value={formData?.SubscriptionFor || ''}
                     onChange={handleInputChange}
                     variant="outlined"
                     sx={{ minWidth: 120, height: '45px' }}
@@ -263,7 +260,7 @@ const AddNewMLRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   name="SubscriptionDate"
                   id="inlined-required"
                   label="Subscription Date"
-                  type="datetime-local"
+                  type="date"
                   size="small"
                   fullWidth
                   value={formData?.SubscriptionDate || ""}
@@ -290,7 +287,7 @@ const AddNewMLRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   name="RenewalDueDate"
                   id="outlined-required"
                   label="Renewal Due Date"
-                  type="datetime-local"
+                  type="date"
                   size="small"
                   fullWidth
                   value={formData?.RenewalDueDate || ""}

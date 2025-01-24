@@ -285,7 +285,9 @@ const UpdateMLRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => 
                   name="SubscriptionDate"
                   id="outlined-required"
                   label="Subscription Date"
+                  type="date"
                   size="small"
+                  fullWidth
                   value={editRecordsData?.SubscriptionDate || ""}
                   onChange={handleEditChange}
                 />
@@ -307,7 +309,9 @@ const UpdateMLRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => 
                   name="RenewalDueDate"
                   id="outlined-required"
                   label="Renewal Due Date"
+                  type="date"
                   size="small"
+                  fullWidth
                   value={editRecordsData?.RenewalDueDate || ""}
                   onChange={handleEditChange}
                 />

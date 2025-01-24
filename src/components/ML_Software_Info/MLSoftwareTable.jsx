@@ -396,6 +396,7 @@ const MLSoftwareTable = () => {
             columnPinning: {
                 right: ["mrt-row-actions"],
             },
+            pagination: { pageSize: 50 }
         },
         paginationDisplayMode: "pages",
         positionToolbarAlertBanner: "bottom",
@@ -411,7 +412,7 @@ const MLSoftwareTable = () => {
         },
         muiPaginationProps: {
             color: "primary",
-            rowsPerPageOptions: [10, 20, 30],
+            rowsPerPageOptions: [25, 50, 75],
             shape: "rounded",
             variant: "outlined",
         },
