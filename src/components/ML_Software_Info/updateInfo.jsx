@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import {
-  Paper, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
+  Paper,
+  Button,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import axios from "axios";
 import { Config } from "../../Config";
@@ -8,14 +16,13 @@ import { useDetails } from "../../providers/DetailsProvider";
 
 const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
   const { esriProducts, fetchESRIProducts } = useDetails();
-  const token = sessionStorage.getItem('token');
+  const token = sessionStorage.getItem("token");
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formDataDocFile, setFormDataDocFile] = useState({});
   let currentESRIProduct;
   const [editRecordsData, setEditRecordsData] = useState({
-    
     ClientName: "",
     ClientAddress: "",
     City: "",
@@ -71,6 +78,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
     }
   }, [tableSNO, openUpdateRecord]);
 
+  //#region Edit Change
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditRecordsData((prevState) => ({
@@ -79,29 +87,41 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
     }));
   };
 
-  const uploadDocFile = async (selectedFile, SNO) => {
-    if (!selectedFile) {
-      console.error("No file selected.");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("SNO", SNO);
-    try {
-      const response = await axios.post(`${Config.apiUrl}/uploadDoc`, formData, {
-        headers: {
-          'Authorization': token,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log("File uploaded successfully:", response.data);
-    } catch (error) {
-      console.error(
-        "Error uploading file:",
-        error.response ? error.response.data : error.message
-      );
-    }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (editRecordsData.POValue) {
+        let cleanInput = editRecordsData.POValue.replace(/,/g, "");
+        const num = parseFloat(cleanInput).toFixed(2).toString();
+        let [integer, decimal] = num.split(".");
+        let lastThree = integer.slice(-3);
+        let otherNumbers = integer.slice(0, -3);
+        if (otherNumbers !== "") {
+          lastThree = "," + lastThree;
+        }
+        let formattedNumber =
+          otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        let formattedAmount = formattedNumber + "." + decimal;
+
+        setEditRecordsData((prevState) => ({
+          ...prevState,
+          POValue: formattedAmount,
+        }));
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [editRecordsData.POValue]);
+
+  const handlePOValueChange = (e) => {
+    setEditRecordsData((prevState) => ({
+      ...prevState,
+      POValue: e.target.value,
+    }));
   };
+
+  //#region File Upload
   const handleFileUpload = (e) => {
     const { name, files } = e.target;
     if (files.length > 0) {
@@ -118,20 +138,42 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
     }
   };
 
+  const uploadDocFile = async (selectedFile, SNO, docType) => {
+    if (!selectedFile) {
+      console.log("No file selected for -", docType);
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("SNO", SNO);
+    formData.append("docType", docType);
+    try {
+      const response = await axios.post(
+        `${Config.apiUrl}/uploadDoc`,
+        formData,
+        {
+          headers: {
+            Authorization: token,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("File uploaded successfully:", response.data);
+    } catch (error) {
+      console.error(
+        "Error uploading file:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
+
+  //#region Handle Update
   const handleUpdateClick = async () => {
     if (
-      !editRecordsData.ClientName
-      //   !editRecordsData.PONumber ||
-      //   !editRecordsData.PODate ||
-      //   !editRecordsData.POValue ||
-      //   !editRecordsData.Product ||
-      //   !editRecordsData.ProductVersion ||
-      //   !editRecordsData.NumberOfLicenses ||
-      //   !editRecordsData.LicenseDate ||
-      //   !editRecordsData.RenewalDueDate ||
-      //   !editRecordsData.Tenure ||
-      //   !editRecordsData.City ||
-      //   !editRecordsData.State
+      !editRecordsData.ClientName ||
+      !editRecordsData.PONumber ||
+      !editRecordsData.PODate ||
+      !editRecordsData.POValue
     ) {
       setErrorMessage("Required fields cannot be empty.");
       setError(true);
@@ -145,15 +187,20 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
       };
       await axios.post(`${Config.apiUrl}/updateESRIProduct`, params, {
         headers: {
-          'Authorization': token
-        }
+          Authorization: token,
+        },
       });
       setOpenUpdateRecord(false);
       setEditRecordsData({});
-      fetchESRIProducts();
-      uploadDocFile(formDataDocFile.InstallationCertificate, tableSNO);
+      uploadDocFile(formDataDocFile.PODocument, tableSNO, "PODocument");
+      uploadDocFile(
+        formDataDocFile.InstallationCertificate,
+        tableSNO,
+        "InstallationCertificate"
+      );
       setSuccess(true);
       setErrorMessage("");
+      fetchESRIProducts();
     } catch (error) {
       if (error.response && error.response.data) {
         setError(true);
@@ -234,6 +281,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.Contact || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -244,6 +292,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.Phone || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -254,6 +303,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.Email || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -265,6 +315,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.PONumber || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -291,7 +342,8 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   label="PO Value"
                   size="small"
                   value={editRecordsData?.POValue || ""}
-                  onChange={handleEditChange}
+                  onChange={handlePOValueChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -303,6 +355,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.Product || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -314,6 +367,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.ProductVersion || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -325,6 +379,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.NumberOfLicenses || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -336,6 +391,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.Tenure || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -382,34 +438,53 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                 fullWidth
               />
             </div>
-            <div className="mb-2 mt-2">
-              <TextField
-                name="InstallationCertificate"
-                id="outlined"
-                label="Installation Certificate"
-                type="file"
-                size="small"
-                fullWidth
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                // value={formDataDocFile?.InstallationCertificate}
-                onChange={handleFileUpload}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="mb-2 mt-2">
+                <TextField
+                  name="PODocument"
+                  id="outlined"
+                  label="PO Document"
+                  type="file"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  // value={formDataDocFile?.PODocument}
+                  onChange={handleFileUpload}
+                />
+              </div>
+              <div className="mb-2 mt-2">
+                <TextField
+                  name="InstallationCertificate"
+                  id="outlined"
+                  label="Installation Certificate"
+                  type="file"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  // value={formDataDocFile?.InstallationCertificate}
+                  onChange={handleFileUpload}
+                />
+              </div>
             </div>
-            <div className="mt-2 mb-4">
+            <div className="my-4">
               <span>Address</span>
-              <TextField
-                name="ClientAddress"
-                id="outlined"
-                label="Street/Locality/P.O"
-                size="small"
-                fullWidth
-                value={editRecordsData?.ClientAddress || ""}
-                onChange={handleEditChange}
-              />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div>
+                <TextField
+                  name="ClientAddress"
+                  id="outlined"
+                  label="Street/Locality/P.O"
+                  size="small"
+                  fullWidth
+                  value={editRecordsData?.ClientAddress || ""}
+                  onChange={handleEditChange}
+                />
+              </div>
               <div className="mb-2">
                 <TextField
                   name="Pincode"
@@ -418,6 +493,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.Pincode || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -429,6 +505,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.City || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -440,6 +517,7 @@ const UpdateRecord = ({ openUpdateRecord, setOpenUpdateRecord, tableSNO }) => {
                   size="small"
                   value={editRecordsData?.State || ""}
                   onChange={handleEditChange}
+                  fullWidth
                 />
               </div>
             </div>

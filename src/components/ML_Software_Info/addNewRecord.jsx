@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Paper, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from "@mui/material";
+import {
+  Paper,
+  Button,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  Alert,
+  InputAdornment,
+} from "@mui/material";
 import axios from "axios";
 import { Config } from "../../Config";
 import { useDetails } from "../../providers/DetailsProvider";
+import { CurrencyRupeeRounded } from "@mui/icons-material";
 
 const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
-  const token = sessionStorage.getItem('token');
+  const token = sessionStorage.getItem("token");
   const { fetchESRIProducts } = useDetails();
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(false);
@@ -13,6 +25,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
   const [formData, setFormData] = useState({});
   const [formDataDocFile, setFormDataDocFile] = useState({});
 
+  //#region Input Change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -21,6 +34,47 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
     }));
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formData.POValue) {
+        // const f = new Intl.NumberFormat(undefined, {
+        //   style: "currency",
+        //   currency: "INR",
+        // });
+
+        // const output = f.format(Number(poValue));
+        let cleanInput = formData.POValue.replace(/,/g, "");
+        const num = parseFloat(cleanInput).toFixed(2).toString();
+        let [integer, decimal] = num.split(".");
+        let lastThree = integer.slice(-3);
+        let otherNumbers = integer.slice(0, -3);
+        if (otherNumbers !== "") {
+          lastThree = "," + lastThree;
+        }
+        let formattedNumber =
+          otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        let formattedAmount = formattedNumber + "." + decimal;
+
+        setFormData((prevState) => ({
+          ...prevState,
+          POValue: formattedAmount,
+        }));
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [formData.POValue]);
+
+  const handlePOValueChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      POValue: e.target.value,
+    }));
+  };
+
+  //#region File Upload
   const handleFileUpload = (e) => {
     const { name, files } = e.target;
     if (files.length > 0) {
@@ -37,21 +91,26 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
     }
   };
 
-  const uploadDocFile = async (selectedFile, SNO) => {
+  const uploadDocFile = async (selectedFile, SNO, docType) => {
     if (!selectedFile) {
-      console.error("No file selected.");
+      console.log("No file selected for -", docType);
       return;
     }
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("SNO", SNO);
+    formData.append("docType", docType);
     try {
-      const response = await axios.post(`${Config.apiUrl}/uploadDoc`, formData, {
-        headers: {
-          'Authorization': token,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        `${Config.apiUrl}/uploadDoc`,
+        formData,
+        {
+          headers: {
+            Authorization: token,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       console.log("File uploaded successfully:", response.data);
     } catch (error) {
       console.error(
@@ -61,35 +120,49 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
     }
   };
 
-
+  //#region Add Record
   const handleAddNewRecord = async () => {
-    if (!formData.ClientName ) {
+    if (
+      !formData.ClientName ||
+      !formData.PONumber ||
+      !formData.PODate ||
+      !formData.POValue
+    ) {
       setErrorMessage("Required fields cannot be empty.");
       setError(true);
       return;
     }
     try {
-      const response = await axios.post(`${Config.apiUrl}/getLastIndexESRIProduct`, {}, {
-        headers: {
-          'Authorization': token
+      const response = await axios.post(
+        `${Config.apiUrl}/getLastIndexESRIProduct`,
+        {},
+        {
+          headers: {
+            Authorization: token,
+          },
         }
-      });
+      );
       const SNO = parseInt(Config.decryptData(response.data)) + 1;
 
       const esriData = {
-        'formData': formData,
-        'SNO': SNO,
+        formData: formData,
+        SNO: SNO,
       };
 
-      const res = await axios.post(`${Config.apiUrl}/insertESRIProduct`, esriData, {
-        headers: {
-          'Authorization': token
+      const res = await axios.post(
+        `${Config.apiUrl}/insertESRIProduct`,
+        esriData,
+        {
+          headers: {
+            Authorization: token,
+          },
         }
-      });
+      );
       setShowAddNewRecord(false);
-        setSuccess(true);
+      setSuccess(true);
       setErrorMessage("");
-      uploadDocFile(formDataDocFile.InstallationCertificate, formData.SNO);
+      uploadDocFile(formDataDocFile.PODocument, SNO, "PODocument");
+      uploadDocFile(formDataDocFile.InstallationCertificate, SNO, "InstallationCertificate");
       fetchESRIProducts();
     } catch (error) {
       if (error.response && error.response.data) {
@@ -152,6 +225,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.Contact || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -162,6 +236,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.Phone || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -172,6 +247,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.Email || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -183,6 +259,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.PONumber || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -209,7 +286,15 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   label="PO Value"
                   size="small"
                   value={formData?.POValue || ""}
-                  onChange={handleInputChange}
+                  onChange={handlePOValueChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <CurrencyRupeeRounded fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -221,6 +306,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.Product || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -232,6 +318,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.ProductVersion || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -243,6 +330,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.NumberOfLicense || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -254,6 +342,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.Tenure || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -300,34 +389,53 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                 fullWidth
               />
             </div>
-            <div className="mb-2 mt-2">
-              <TextField
-                name="InstallationCertificate"
-                id="outlined"
-                label="Installation Certificate"
-                type="file"
-                size="small"
-                fullWidth
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                // value={formDataDocFile?.InstallationCertificate}
-                onChange={handleFileUpload}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="mb-2 mt-2">
+                <TextField
+                  name="PODocument"
+                  id="outlined"
+                  label="PO Document"
+                  type="file"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  // value={formDataDocFile?.PODocument}
+                  onChange={handleFileUpload}
+                />
+              </div>
+              <div className="mb-2 mt-2">
+                <TextField
+                  name="InstallationCertificate"
+                  id="outlined"
+                  label="Installation Certificate"
+                  type="file"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  // value={formDataDocFile?.InstallationCertificate}
+                  onChange={handleFileUpload}
+                />
+              </div>
             </div>
-            <div className="mt-2 mb-4">
+            <div className="my-4">
               <span>Address</span>
-              <TextField
-                name="ClientAddress"
-                id="outlined"
-                label="Street/Locality/P.O"
-                size="small"
-                fullWidth
-                value={formData?.ClientAddress || ""}
-                onChange={handleInputChange}
-              />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="mb-2">
+                <TextField
+                  name="ClientAddress"
+                  id="outlined"
+                  label="Street/Locality/P.O"
+                  size="small"
+                  fullWidth
+                  value={formData?.ClientAddress || ""}
+                  onChange={handleInputChange}
+                />
+              </div>
               <div className="mb-2">
                 <TextField
                   name="Pincode"
@@ -336,6 +444,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.Pincode || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -347,6 +456,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.City || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
               <div className="mb-2">
@@ -358,6 +468,7 @@ const AddNewRecord = ({ setShowAddNewRecord, showAddNewRecord }) => {
                   size="small"
                   value={formData?.State || ""}
                   onChange={handleInputChange}
+                  fullWidth
                 />
               </div>
             </div>

@@ -7,12 +7,29 @@ import {
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
 } from "material-react-table";
-import { LibraryAddRounded, FileDownloadRounded } from "@mui/icons-material";
 import {
-  Box, Button, Snackbar, Alert, MenuItem, lighten, FormControl, InputLabel,
-  Select, Tabs, Tab, IconButton, useTheme, alpha
+  LibraryAddRounded,
+  FileDownloadRounded,
+  DownloadRounded,
+  VisibilityRounded,
+} from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Snackbar,
+  Alert,
+  MenuItem,
+  lighten,
+  FormControl,
+  InputLabel,
+  Select,
+  Tabs,
+  Tab,
+  IconButton,
+  useTheme,
+  alpha,
 } from "@mui/material";
-import { mkConfig, generateCsv, download } from 'export-to-csv';
+import { mkConfig, generateCsv, download } from "export-to-csv";
 
 //Icons Imports
 import { EditRounded, SimCardDownloadRounded } from "@mui/icons-material";
@@ -33,12 +50,16 @@ const SoftwaresInfoTable = () => {
   const [tableSNO, setTableSNO] = useState();
   const [copyEsriProducts, setCopyEsriProducts] = useState("All");
   const [showAddNewRecord, setShowAddNewRecord] = useState(false);
-  const { esriProducts } = useDetails();
-  const token = sessionStorage.getItem('token');
+  const { esriProducts, fetchESRIProducts } = useDetails();
+  const token = sessionStorage.getItem("token");
   const [openUpdateRecord, setOpenUpdateRecord] = useState(false);
   const [value, setValue] = React.useState("one");
-  const [selectedValues, setSelectedValues] = useState({});
-
+  const [summary, setSummary] = useState({
+    total: 0,
+    po: 0,
+    ic: 0,
+    both: 0,
+  });
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -47,6 +68,27 @@ const SoftwaresInfoTable = () => {
   //#region Fetch Data
   useEffect(() => {
     setCopyEsriProducts(esriProducts);
+    let totalCount = esriProducts.length;
+    let poCount = 0;
+    let icCount = 0;
+    let bothCount = 0;
+
+    esriProducts.forEach((product) => {
+      if (product.hasPO && product.hasIC) {
+        bothCount++;
+      } else if (product.hasPO) {
+        poCount++;
+      } else if (product.hasIC) {
+        icCount++;
+      }
+    });
+
+    setSummary({
+      total: totalCount,
+      po: poCount,
+      ic: icCount,
+      both: bothCount,
+    });
   }, [esriProducts]);
 
   const handleProductChange = (event) => {
@@ -80,15 +122,58 @@ const SoftwaresInfoTable = () => {
     setSuccess(false);
   };
 
-  const handleDownload = (fid) => {
+  //#region View
+  const handleView = (fid, docType) => {
+    const url = `${Config.apiUrl}/view`;
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ fid, docType }),
+    })
+      .then((response) => {
+        if (response.status === 404) {
+          // Set the error state *before* throwing the error
+          setError(true);
+          setErrorMessage("Document Not Found!");
+          return null; // Return null to prevent further execution
+        }
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        if (!blob || blob.size === 0) {
+          setError(true);
+          setErrorMessage("Document Not Found!");
+          return;
+        }
+        const fileURL = window.URL.createObjectURL(blob);
+        window.open(fileURL, "_blank");
+      })
+      .catch((error) => {
+        console.error("Error viewing file:", error);
+        if (!error.message.includes("Document Not Found!")) {
+          setError(true);
+          setErrorMessage("An error occurred while fetching the file.");
+        }
+      });
+  };
+
+  //#region Download
+  const handleDownload = (fid, docType) => {
     const url = `${Config.apiUrl}/download`;
     fetch(url, {
       method: "POST",
       headers: {
-        'Authorization': token,
+        Authorization: token,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ viewmode: fid }),
+      body: JSON.stringify({ fid, docType }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -128,11 +213,10 @@ const SoftwaresInfoTable = () => {
       });
   };
 
-
   //#region Excel Import
   const csvConfig = mkConfig({
-    fieldSeparator: ',',
-    decimalSeparator: '.',
+    fieldSeparator: ",",
+    decimalSeparator: ".",
     useKeysAsHeaders: true,
   });
 
@@ -141,8 +225,7 @@ const SoftwaresInfoTable = () => {
     download(csvConfig)(csv);
   };
 
-
-  //#region Table Column
+  //#region Table Columns
   const columns = useMemo(
     () => [
       {
@@ -157,6 +240,27 @@ const SoftwaresInfoTable = () => {
         enableClickToCopy: true,
         filterVariant: "autocomplete",
         header: "Client Name",
+        size: 100,
+      },
+      {
+        accessorKey: "PONumber",
+        enableClickToCopy: true,
+        filterVariant: "autocomplete",
+        header: "PO Number",
+        size: 100,
+      },
+      {
+        accessorKey: "POValue",
+        enableClickToCopy: true,
+        filterVariant: "autocomplete",
+        header: "PO Value",
+        size: 100,
+      },
+      {
+        accessorKey: "PODate",
+        enableClickToCopy: true,
+        filterVariant: "autocomplete",
+        header: "PO Date",
         size: 100,
       },
       {
@@ -192,27 +296,6 @@ const SoftwaresInfoTable = () => {
         enableClickToCopy: true,
         filterVariant: "autocomplete",
         header: "Email",
-        size: 100,
-      },
-      {
-        accessorKey: "PONumber",
-        enableClickToCopy: true,
-        filterVariant: "autocomplete",
-        header: "PO Number",
-        size: 100,
-      },
-      {
-        accessorKey: "PODate",
-        enableClickToCopy: true,
-        filterVariant: "autocomplete",
-        header: "PO Date",
-        size: 100,
-      },
-      {
-        accessorKey: "POValue",
-        enableClickToCopy: true,
-        filterVariant: "autocomplete",
-        header: "PO Value",
         size: 100,
       },
       {
@@ -275,6 +358,7 @@ const SoftwaresInfoTable = () => {
     []
   );
 
+  //region Top Toolbar
   const renderTopToolbar = ({ table }) => (
     <Box
       sx={(theme) => ({
@@ -319,7 +403,8 @@ const SoftwaresInfoTable = () => {
               ))}
             </Select>
           </FormControl>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={handleExportData}
             startIcon={<FileDownloadRounded />}
           >
@@ -340,7 +425,12 @@ const SoftwaresInfoTable = () => {
     enableColumnActions: true,
     enableRowActions: true,
     renderRowActions: ({ row }) => (
-      <Box>
+      <Box
+        className="flex"
+        sx={(theme) => ({
+          backgroundColor: theme.palette.background.footer,
+        })}
+      >
         <IconButton
           onClick={() => {
             const s_no = parseInt(row.original.SNO);
@@ -351,14 +441,55 @@ const SoftwaresInfoTable = () => {
         >
           <EditRounded color="primary" />
         </IconButton>
-        <IconButton
-          onClick={() => {
-            const s_no = parseInt(row.original.SNO);
-            handleDownload(s_no);
-          }}
-        >
-          <SimCardDownloadRounded color="primary" />
-        </IconButton>
+        {row.original.hasPO ? (
+          <div className="flex items-center justify-center">
+            <div className="text-sm text-black font-medium pr-1 pl-2">PO</div>
+            <VisibilityRounded
+              color="info"
+              className="cursor-pointer"
+              onClick={() => {
+                const s_no = parseInt(row.original.SNO);
+                handleView(s_no, "PODocument");
+              }}
+            />
+
+            <SimCardDownloadRounded
+              className="cursor-pointer"
+              color="primary"
+              onClick={() => {
+                const s_no = parseInt(row.original.SNO);
+                handleDownload(s_no, "PODocument");
+              }}
+            />
+          </div>
+        ) : (
+          <div className="w-[80px]"></div>
+        )}
+
+        {row.original.hasIC ? (
+          <div className="flex items-center justify-center">
+            <div className="text-sm text-black font-medium pr-1 pl-2">IC</div>
+            <VisibilityRounded
+              color="info"
+              className="cursor-pointer"
+              onClick={() => {
+                const s_no = parseInt(row.original.SNO);
+                handleView(s_no, "InstallationCertificate");
+              }}
+            />
+
+            <SimCardDownloadRounded
+              className="cursor-pointer"
+              color="primary"
+              onClick={() => {
+                const s_no = parseInt(row.original.SNO);
+                handleDownload(s_no, "InstallationCertificate");
+              }}
+            />
+          </div>
+        ) : (
+          <div className="w-[80px]"></div>
+        )}
       </Box>
     ),
     // enableRowSelection: true,
@@ -368,7 +499,7 @@ const SoftwaresInfoTable = () => {
       columnPinning: {
         right: ["mrt-row-actions"],
       },
-      pagination: { pageSize: 50 }
+      pagination: { pageSize: 50 },
     },
     paginationDisplayMode: "pages",
     positionToolbarAlertBanner: "bottom",
@@ -409,12 +540,22 @@ const SoftwaresInfoTable = () => {
         <Tab
           value="one"
           label="ESRI Products"
-          sx={{ "&:hover": { backgroundColor: alpha(theme.palette.primary.main, 0.2), color: theme.palette.primary.main } }}
+          sx={{
+            "&:hover": {
+              backgroundColor: alpha(theme.palette.primary.main, 0.2),
+              color: theme.palette.primary.main,
+            },
+          }}
         />
         <Tab
           value="two"
           label="ML Vendors"
-          sx={{ "&:hover": { backgroundColor: alpha(theme.palette.primary.main, 0.2), color: theme.palette.primary.main } }}
+          sx={{
+            "&:hover": {
+              backgroundColor: alpha(theme.palette.primary.main, 0.2),
+              color: theme.palette.primary.main,
+            },
+          }}
         />
         {/* <Tab
           value="three"
@@ -425,6 +566,31 @@ const SoftwaresInfoTable = () => {
       <Box sx={{ marginTop: 2 }}>
         {value === "one" && (
           <>
+            <Box
+              className="p-4 rounded my-4"
+              sx={(theme) => ({
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+              })}
+            >
+              <p className="text-xl font-semibold tracking-wider text-center pb-2">
+                Summary
+              </p>
+              <div className="flex justify-around font-bold">
+                <div>
+                  <p>Total Clients: {summary.total}</p>
+                </div>
+                <div>
+                  <p>Clients with PO: {summary.po}</p>
+                </div>
+                <div>
+                  <p>Clients with IC: {summary.ic}</p>
+                </div>
+                <div>
+                  <p>Clients with Both: {summary.both}</p>
+                </div>
+              </div>
+            </Box>
             <MaterialReactTable table={table} />
             <Button
               sx={{ m: "5px", top: "8px", right: "6px" }}
